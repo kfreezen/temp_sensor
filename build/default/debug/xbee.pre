@@ -6326,6 +6326,8 @@ UART_ReceiveMsg(buf, max_len, end_char);
 
 Frame apiFrame;
 
+unsigned char checksum_debug = 0;
+
 int checksum(void* addr, int length) {
 unsigned char* address = (unsigned char*) addr;
 
@@ -6334,6 +6336,7 @@ unsigned char checksum = 0;
 int i;
 for(i=0; i<length; i++) {
 checksum += address[i];
+checksum_debug = checksum;
 }
 
 return 0xFF - checksum;
@@ -6389,7 +6392,7 @@ return r;
 byte calc_checksum;
 int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid) {
 
-# 128
+# 131
 int atCmdLength = (data_valid) ? sizeof(ATCmdFrame) : sizeof(ATCmdFrame_NoData);
 
 apiFrame.atCmd.start_delimiter = 0x7e;
@@ -6404,7 +6407,7 @@ apiFrame.atCmd.data = swap_endian_32(data);
 byte check = doChecksumVerify(&apiFrame+3, atCmdLength-4, calc_checksum);
 calc_checksum = checksum(&apiFrame+3, atCmdLength-4);
 
-calc_checksum = 0;
+
 
 if(data_valid) {
 apiFrame.atCmd.checksum = calc_checksum;

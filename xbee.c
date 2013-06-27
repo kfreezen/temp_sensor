@@ -50,6 +50,8 @@ void XBee_Recv(char* buf, int max_len, const char end_char) {
 
 Frame apiFrame;
 
+unsigned char checksum_debug = 0;
+
 int checksum(void* addr, int length) {
     unsigned char* address = (unsigned char*) addr;
     
@@ -58,6 +60,7 @@ int checksum(void* addr, int length) {
     int i;
     for(i=0; i<length; i++) {
         checksum += address[i];
+        checksum_debug = checksum;
     }
 
     return 0xFF - checksum;
@@ -139,7 +142,7 @@ int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_v
     byte check = doChecksumVerify(&apiFrame+3, atCmdLength-4, calc_checksum);
     calc_checksum = checksum(&apiFrame+3, atCmdLength-4);
 
-    calc_checksum = 0;
+    //calc_checksum = 0;
     
     if(data_valid) {
         apiFrame.atCmd.checksum = calc_checksum;

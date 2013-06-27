@@ -6489,7 +6489,10 @@ XBee_Wake();
 
 sleep(1);
 
-# 89
+XBAPI_Command(0x4D53, command_data, 0xc0, 1);
+
+
+
 CRC16_Init();
 
 # 97
@@ -6497,7 +6500,7 @@ while(1) {
 XBee_Wake();
 
 timer1_poll_delay_ms(14);
-SendReport();
+
 XBee_Sleep();
 
 sleep(59);
