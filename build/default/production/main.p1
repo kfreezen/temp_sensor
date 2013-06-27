@@ -39,12 +39,12 @@ Version 3.2 HI-TECH Software Intermediate Code
 [v _XBee_Wake `TF4953 ~T0 @X0 0 e ]
 "42 timer.h
 [v _sleep `(v ~T0 @X0 0 ef1`us ]
+"77 xbee.h
+[v _XBAPI_Command `(i ~T0 @X0 0 ef4`us`ul`i`i ]
 "16 crc16.h
 [v _CRC16_Init `(v ~T0 @X0 0 ef ]
 "44 timer.h
 [v _timer1_poll_delay_ms `(v ~T0 @X0 0 ef1`us ]
-"64 packets.h
-[v _SendReport `(v ~T0 @X0 0 ef ]
 "31 xbee.h
 [v F4951 `(v ~T0 @X0 1 tf ]
 [v _XBee_Sleep `TF4951 ~T0 @X0 0 e ]
@@ -4871,6 +4871,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;main.c: 83: sleep(1);
 "83
 [e ( _sleep (1 -> -> 1 `i `us ]
+[; ;main.c: 85: XBAPI_Command(0x4D53, command_data, 0xc0, 1);
+"85
+[e ( _XBAPI_Command (4 , , , -> -> 19795 `i `us _command_data -> 192 `i -> 1 `i ]
 [; ;main.c: 89: CRC16_Init();
 "89
 [e ( _CRC16_Init ..  ]
@@ -4884,9 +4887,6 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;main.c: 100: timer1_poll_delay_ms(14);
 "100
 [e ( _timer1_poll_delay_ms (1 -> -> 14 `i `us ]
-[; ;main.c: 101: SendReport();
-"101
-[e ( _SendReport ..  ]
 [; ;main.c: 102: XBee_Sleep();
 "102
 [e ( _XBee_Sleep ..  ]

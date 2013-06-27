@@ -26,7 +26,7 @@ Linker command line:
   -ppowerup=CODE -pfunctab=CODE -ACONFIG=08007h-08008h -pconfig=CONFIG \
   -DCONFIG=2 -AIDLOC=08000h-08003h -pidloc=IDLOC -DIDLOC=2 \
   -AEEDATA=00h-0FFh/0F000h -peeprom_data=EEDATA -DEEDATA=2 -DCODE=2 \
-  -DSTRCODE=2 -DSTRING=2 -DCONST=2 -DENTRY=2 -k /tmp/cgtmZ6OBF.obj \
+  -DSTRCODE=2 -DSTRING=2 -DCONST=2 -DENTRY=2 -k /tmp/cgtrGXHjV.obj \
   dist/default/production/temp_sensor.X.production.obj 
 
 Object code version is 3.10
@@ -36,61 +36,55 @@ Machine type is 16LF1783
 
 
                 Name                               Link     Load   Length Selector   Space Scale
-/tmp/cgtmZ6OBF.obj
+/tmp/cgtrGXHjV.obj
                 end_init                             16       16        2        8       0
                 reset_vec                             0        0        2        0       0
                 config                             8007     8007        2    1000E       0
 dist/default/production/temp_sensor.X.production.obj
                 intentry                              4        4       12        8       0
-                text1112                            167      167       98        8       0
-                text1111                            308      308       6A        8       0
-                text1110                            6A2      6A2       24        8       0
-                text1109                            45C      45C       41        8       0
-                text1108                            7E4      7E4       11        8       0
-                text1107                            5C1      5C1       32        8       0
-                text1106                            372      372       65        8       0
-                text1105                            3D7      3D7       44        8       0
-                text1104                            77B      77B       19        8       0
-                text1103                            1FF      1FF       86        8       0
-                text1102                            557      557       38        8       0
-                text1101                            7AA      7AA       15        8       0
-                text1100                            51A      51A       3D        8       0
-                text1099                             CE       CE       99        8       0
-                text1098                            761      761       1A        8       0
-                text1097                            FF6      FF6        A     1FEC       0
-                text1096                            58F      58F       32        8       0
-                text1095                            FE1      FE1        3     1FC2       0
-                text1094                            794      794       16        8       0
-                text1093                            655      655       27        8       0
-                text1092                            624      624       31        8       0
-                text1091                            285      285       83        8       0
-                text1090                            41B      41B       41        8       0
-                text1089                            FE4      FE4        3     1FC8       0
-                text1088                            4DD      4DD       3D        8       0
-                text1087                            745      745       1C        8       0
-                text1086                            728      728       1D        8       0
-                text1085                            FE7      FE7        3     1FCE       0
-                text1084                            7BF      7BF       13        8       0
-                text1083                            5F3      5F3       31        8       0
-                text1082                            6C6      6C6       22        8       0
-                text1081                            67C      67C       26        8       0
-                text1080                            7D2      7D2       12        8       0
-                maintext                             18       18       B6        8       0
-                cstackBANK0                          20       20       32       20       1
+                text937                             234      234       98        8       0
+                text936                             5D6      5D6       24        8       0
+                text935                              E3       E3       B1        8       0
+                text934                             526      526       32        8       0
+                text933                             352      352       65        8       0
+                text932                             3B7      3B7       44        8       0
+                text931                             695      695       19        8       0
+                text930                             2CC      2CC       86        8       0
+                text929                             4F1      4F1       35        8       0
+                text928                             4B9      4B9       38        8       0
+                text927                             6C4      6C4       15        8       0
+                text926                             47C      47C       3D        8       0
+                text925                             3FB      3FB       41        8       0
+                text924                             724      724        3        8       0
+                text923                             6AE      6AE       16        8       0
+                text922                             721      721        3        8       0
+                text921                             589      589       27        8       0
+                text920                             679      679       1C        8       0
+                text919                             708      708        A        8       0
+                text918                             194      194       A0        8       0
+                text917                             65C      65C       1D        8       0
+                text916                             71E      71E        3        8       0
+                text915                             6D9      6D9       13        8       0
+                text914                             558      558       31        8       0
+                text913                             5FA      5FA       22        8       0
+                text912                             5B0      5B0       26        8       0
+                text911                             6EC      6EC       12        8       0
+                maintext                             18       18       CB        8       0
+                cstackBANK0                          20       20       30       20       1
                 cstackCOMMON                         70       70        C       70       1
-                inittext                            FEA      FEA        6     1FD4       0
-                clrtext                             FF0      FF0        6     1FE0       0
+                inittext                            718      718        6        8       0
+                clrtext                             712      712        6        8       0
                 dataBANK3                           1A0      1A0       20      1A0       1
                 bssBANK2                            120      120       3C      120       1
                 dataBANK1                            C0       C0       20       A0       1
                 bssBANK1                             A0       A0       20       A0       1
-                dataBANK0                            61       61        A       20       1
-                bssBANK0                             52       52        F       20       1
+                dataBANK0                            5F       5F        A       20       1
+                bssBANK0                             50       50        F       20       1
                 bssCOMMON                            7C       7C        1       70       1
-                cinit                               49D      49D       40        8       0
-                idataBANK3                          708      708       20        8       0
-                idataBANK1                          6E8      6E8       20        8       0
-                idataBANK0                          7F5      7F5        A        8       0
+                cinit                               43C      43C       40        8       0
+                idataBANK3                          63C      63C       20        8       0
+                idataBANK1                          61C      61C       20        8       0
+                idataBANK0                          6FE      6FE        A        8       0
 
 TOTAL           Name                               Link     Load   Length     Space
         CLASS   CONST          
@@ -99,46 +93,40 @@ TOTAL           Name                               Link     Load   Length     Sp
                 end_init                             16       16        2         0
                 intentry                              4        4       12         0
                 reset_vec                             0        0        2         0
-                text1112                            167      167       98         0
-                text1111                            308      308       6A         0
-                text1110                            6A2      6A2       24         0
-                text1109                            45C      45C       41         0
-                text1108                            7E4      7E4       11         0
-                text1107                            5C1      5C1       32         0
-                text1106                            372      372       65         0
-                text1105                            3D7      3D7       44         0
-                text1104                            77B      77B       19         0
-                text1103                            1FF      1FF       86         0
-                text1102                            557      557       38         0
-                text1101                            7AA      7AA       15         0
-                text1100                            51A      51A       3D         0
-                text1099                             CE       CE       99         0
-                text1098                            761      761       1A         0
-                text1097                            FF6      FF6        A         0
-                text1096                            58F      58F       32         0
-                text1095                            FE1      FE1        3         0
-                text1094                            794      794       16         0
-                text1093                            655      655       27         0
-                text1092                            624      624       31         0
-                text1091                            285      285       83         0
-                text1090                            41B      41B       41         0
-                text1089                            FE4      FE4        3         0
-                text1088                            4DD      4DD       3D         0
-                text1087                            745      745       1C         0
-                text1086                            728      728       1D         0
-                text1085                            FE7      FE7        3         0
-                text1084                            7BF      7BF       13         0
-                text1083                            5F3      5F3       31         0
-                text1082                            6C6      6C6       22         0
-                text1081                            67C      67C       26         0
-                text1080                            7D2      7D2       12         0
-                maintext                             18       18       B6         0
-                inittext                            FEA      FEA        6         0
-                clrtext                             FF0      FF0        6         0
-                cinit                               49D      49D       40         0
-                idataBANK3                          708      708       20         0
-                idataBANK1                          6E8      6E8       20         0
-                idataBANK0                          7F5      7F5        A         0
+                text937                             234      234       98         0
+                text936                             5D6      5D6       24         0
+                text935                              E3       E3       B1         0
+                text934                             526      526       32         0
+                text933                             352      352       65         0
+                text932                             3B7      3B7       44         0
+                text931                             695      695       19         0
+                text930                             2CC      2CC       86         0
+                text929                             4F1      4F1       35         0
+                text928                             4B9      4B9       38         0
+                text927                             6C4      6C4       15         0
+                text926                             47C      47C       3D         0
+                text925                             3FB      3FB       41         0
+                text924                             724      724        3         0
+                text923                             6AE      6AE       16         0
+                text922                             721      721        3         0
+                text921                             589      589       27         0
+                text920                             679      679       1C         0
+                text919                             708      708        A         0
+                text918                             194      194       A0         0
+                text917                             65C      65C       1D         0
+                text916                             71E      71E        3         0
+                text915                             6D9      6D9       13         0
+                text914                             558      558       31         0
+                text913                             5FA      5FA       22         0
+                text912                             5B0      5B0       26         0
+                text911                             6EC      6EC       12         0
+                maintext                             18       18       CB         0
+                inittext                            718      718        6         0
+                clrtext                             712      712        6         0
+                cinit                               43C      43C       40         0
+                idataBANK3                          63C      63C       20         0
+                idataBANK1                          61C      61C       20         0
+                idataBANK0                          6FE      6FE        A         0
 
         CLASS   STRCODE        
 
@@ -151,9 +139,9 @@ TOTAL           Name                               Link     Load   Length     Sp
                 bssCOMMON                            7C       7C        1         1
 
         CLASS   BANK0          
-                cstackBANK0                          20       20       32         1
-                dataBANK0                            61       61        A         1
-                bssBANK0                             52       52        F         1
+                cstackBANK0                          20       20       30         1
+                dataBANK0                            5F       5F        A         1
+                bssBANK0                             50       50        F         1
 
         CLASS   BANK1          
                 dataBANK1                            C0       C0       20         1
@@ -304,25 +292,19 @@ TOTAL           Name                               Link     Load   Length     Sp
 SEGMENTS        Name                           Load    Length   Top    Selector   Space  Class     Delta
 
                 reset_vec                      000000  000002  000002         0       0  CODE        2
-                intentry                       000004  0007FB  0007FF         8       0  CODE        2
-                cstackBANK0                    000020  00004B  00006B        20       1  BANK0       1
+                intentry                       000004  000723  000727         8       0  CODE        2
+                cstackBANK0                    000020  000049  000069        20       1  BANK0       1
                 cstackCOMMON                   000070  00000D  00007D        70       1  COMMON      1
                 bssBANK1                       0000A0  000040  0000E0        A0       1  BANK1       1
                 bssBANK2                       000120  00003C  00015C       120       1  BANK2       1
                 dataBANK3                      0001A0  000020  0001C0       1A0       1  BANK3       1
-                text1095                       000FE1  000003  000FE4      1FC2       0  CODE        2
-                text1089                       000FE4  000003  000FE7      1FC8       0  CODE        2
-                text1085                       000FE7  000003  000FEA      1FCE       0  CODE        2
-                inittext                       000FEA  000006  000FF0      1FD4       0  CODE        2
-                clrtext                        000FF0  000006  000FF6      1FE0       0  CODE        2
-                text1097                       000FF6  00000A  001000      1FEC       0  CODE        2
                 config                         008007  000002  008009     1000E       0  CONFIG      2
 
 
 UNUSED ADDRESS RANGES
 
         Name                Unused          Largest block    Delta
-        BANK0            0006B-0006F               5           1
+        BANK0            00069-0006F               7           1
         BANK1            000E0-000EF              10           1
         BANK2            0015C-0016F              14           1
         BANK3            001C0-001EF              30           1
@@ -331,15 +313,15 @@ UNUSED ADDRESS RANGES
         BANK6            00320-0032F              10           1
         BIGRAM           02000-021EF             1F0           1
         CODE             00002-00003               2           2
-                         007FF-00FE0               1
+                         00727-00FFF              D9
         COMMON           0007D-0007D               1           1
         CONST            00002-00003               2           2
-                         007FF-00FE0             100
+                         00727-00FFF             100
         EEDATA           0F000-0F0FF             100           2
         ENTRY            00002-00003               2           2
-                         007FF-00FE0             100
+                         00727-00FFF             100
         IDLOC            08000-08003               4           2
-        RAM              0006B-0006F               5           1
+        RAM              00069-0006F               7           1
                          000E0-000EF              10
                          0015C-0016F              14
                          001C0-001EF              30
@@ -379,15 +361,12 @@ UNUSED ADDRESS RANGES
         SFR8             00400-0046F              70           1
         SFR9             00480-004EF              70           1
         STRCODE          00002-00003               2           2
-                         007FF-00FE0             7E2
+                         00727-00FFF             8D9
         STRING           00002-00003               2           2
-                         007FF-00FE0             100
+                         00727-00FFF             100
 
                                   Symbol Table
 
-?_ADC_Read                        cstackBANK0  00024
-?_ADC_ReadOne                     cstackBANK0  00020
-?_CRC16_Generate                  cstackBANK0  00020
 ?_EEPROM_Read                     cstackCOMMON 00071
 ?_EEPROM_Write                    cstackCOMMON 00071
 ?_Timer1_Init                     cstackCOMMON 00071
@@ -396,31 +375,20 @@ UNUSED ADDRESS RANGES
 ?_UART_ReceiveMsg                 cstackBANK0  0002C
 ?_UART_ReceiveMsgTmo              cstackBANK0  00020
 ?_UART_TransmitMsg                cstackCOMMON 00072
+?_XBAPI_Command                   cstackBANK0  00037
 ?_XBAPI_HandleFrame               cstackBANK0  00030
-?_XBAPI_Transmit                  cstackBANK0  00037
 ?_XBee_Enable                     cstackBANK0  0002E
 ?___aldiv                         cstackCOMMON 00071
-?___awdiv                         cstackCOMMON 00071
 ?___wmul                          cstackCOMMON 00071
 ?_checksum                        cstackCOMMON 00071
+?_doChecksumVerify                cstackCOMMON 00071
 ?_memcpy                          cstackCOMMON 00071
 ?_memset                          cstackCOMMON 00071
 ?_pulseLed                        cstackBANK0  00020
 ?_sleep                           cstackCOMMON 00071
+?_swap_endian_32                  cstackCOMMON 00071
 ?_timer1_poll_delay               cstackCOMMON 00077
 ?_timer1_poll_delay_ms            cstackBANK0  00020
-ADC_Read@channel                  cstackBANK0  00024
-ADC_Read@i                        cstackBANK0  00032
-ADC_Read@res                      cstackBANK0  00028
-ADC_Read@sum                      cstackBANK0  00030
-ADC_ReadOne@channel               cstackBANK0  00020
-ADC_ReadOne@result                cstackBANK0  00022
-CRC16_Generate@i                  cstackBANK0  00023
-CRC16_Generate@len                cstackBANK0  00020
-CRC16_Generate@msg                cstackBANK0  00022
-CRC16_Update4Bits@t               cstackCOMMON 00078
-CRC16_Update4Bits@val             cstackCOMMON 00077
-CRC16_Update@val                  cstackCOMMON 0007A
 EEPROM_Read@address               cstackCOMMON 00076
 EEPROM_Read@data                  cstackCOMMON 00071
 EEPROM_Read@i                     cstackCOMMON 00077
@@ -429,7 +397,6 @@ EEPROM_Write@address              cstackCOMMON 00075
 EEPROM_Write@data                 cstackCOMMON 00071
 EEPROM_Write@i                    cstackCOMMON 00076
 EEPROM_Write@length               cstackCOMMON 00072
-SendPacket@packet                 cstackBANK0  00048
 Timer1_Init@t1ckps                cstackCOMMON 00073
 Timer1_Init@tmr1cs                cstackCOMMON 00071
 UART_Init@baud                    cstackBANK0  00026
@@ -449,45 +416,38 @@ UART_TransmitMsg@_msg             cstackCOMMON 00076
 UART_TransmitMsg@end_char         cstackCOMMON 00074
 UART_TransmitMsg@i                cstackCOMMON 00077
 UART_TransmitMsg@len              cstackCOMMON 00072
+XBAPI_Command@atCmdLength         cstackBANK0  00045
+XBAPI_Command@check               cstackBANK0  00044
+XBAPI_Command@command             cstackBANK0  00037
+XBAPI_Command@data                cstackBANK0  00039
+XBAPI_Command@data_valid          cstackBANK0  0003F
+XBAPI_Command@id                  cstackBANK0  0003D
 XBAPI_HandleFrame@expected        cstackBANK0  00030
 XBAPI_HandleFrame@packet          cstackBANK0  00034
 XBAPI_HandleFrame@received_length cstackBANK0  00035
-XBAPI_Transmit@address            cstackBANK0  0003D
-XBAPI_Transmit@data               cstackBANK0  00037
-XBAPI_Transmit@error              cstackBANK0  00040
-XBAPI_Transmit@frame_length       cstackBANK0  0003E
-XBAPI_Transmit@id                 cstackBANK0  0003A
-XBAPI_Transmit@length             cstackBANK0  00038
 _ADCON0bits                       (abs)        0009D
 _ADCON1bits                       (abs)        0009E
-_ADC_Read                         text1091     00285
-_ADC_ReadOne                      text1092     00624
 _ADRES                            (abs)        0009B
 _ANSELA                           (abs)        0018C
 _ANSELB                           (abs)        0018D
-_CRC16_Generate                   text1096     0058F
-_CRC16_High                       bssBANK0     00054
-_CRC16_Init                       text1097     00FF6
+_CRC16_High                       bssCOMMON    0007C
+_CRC16_Init                       text919      00708
 _CRC16_LookupHigh                 dataBANK1    000C0
 _CRC16_LookupLow                  dataBANK3    001A0
-_CRC16_Low                        bssBANK0     00055
-_CRC16_Reg                        bssBANK0     00052
-_CRC16_Update                     text1108     007E4
-_CRC16_Update4Bits                text1109     0045C
+_CRC16_Low                        bssBANK0     00052
+_CRC16_Reg                        bssBANK0     00050
 _EEADRL                           (abs)        00191
 _EECON1bits                       (abs)        00195
 _EECON2                           (abs)        00196
 _EEDATL                           (abs)        00193
-_EEPROM_Read                      text1081     0067C
-_EEPROM_Write                     text1083     005F3
+_EEPROM_Read                      text912      005B0
+_EEPROM_Write                     text914      00558
 _PIR1bits                         (abs)        00011
 _PIR2bits                         (abs)        00012
 _PORTCbits                        (abs)        0000E
 _RC1REG                           (abs)        00199
 _RC1STAbits                       (abs)        0019D
 _SPBRG                            (abs)        0019B
-_SendPacket                       text1098     00761
-_SendReport                       text1088     004DD
 _T1CONbits                        (abs)        00018
 _T1GCONbits                       (abs)        00019
 _TMR1                             (abs)        00016
@@ -497,22 +457,21 @@ _TRISC                            (abs)        0008E
 _TX1REG                           (abs)        0019A
 _TX1STAbits                       (abs)        0019E
 _TXSTAbits                        (abs)        0019E
-_Timer1_Disable                   text1095     00FE1
-_Timer1_Init                      text1094     00794
-_UART_Init                        text1090     0041B
-_UART_Init$1624                   cstackBANK0  00028
-_UART_Receive                     text1106     00372
-_UART_ReceiveMsg                  text1104     0077B
-_UART_ReceiveMsgTmo               text1105     003D7
-_UART_Transmit                    text1101     007AA
-_UART_TransmitMsg                 text1100     0051A
+_Timer1_Disable                   text924      00724
+_Timer1_Init                      text923      006AE
+_UART_Init                        text925      003FB
+_UART_Init$1628                   cstackBANK0  00028
+_UART_Receive                     text933      00352
+_UART_ReceiveMsg                  text931      00695
+_UART_ReceiveMsgTmo               text932      003B7
+_UART_Transmit                    text927      006C4
+_UART_TransmitMsg                 text926      0047C
 _WDTCONbits                       (abs)        00097
-_XBAPI_HandleFrame                text1103     001FF
-_XBAPI_Transmit                   text1099     000CE
-_XBAPI_Transmit$735               cstackBANK0  00042
-_XBee_Enable                      text1084     007BF
-_XBee_Sleep                       text1089     00FE4
-_XBee_Wake                        text1085     00FE7
+_XBAPI_Command                    text918      00194
+_XBAPI_HandleFrame                text930      002CC
+_XBee_Enable                      text915      006D9
+_XBee_Sleep                       text922      00721
+_XBee_Wake                        text916      0071E
 __CFG_FOSC$HS                     (abs)        00000
 __CFG_LVP$OFF                     (abs)        00000
 __CFG_PLLEN$OFF                   (abs)        00000
@@ -712,116 +671,91 @@ __Ltext                           text         00000
 __S0                              (abs)        08009
 __S1                              (abs)        001C0
 __S2                              (abs)        00000
-___aldiv                          text1112     00167
+___aldiv                          text937      00234
 ___aldiv@counter                  cstackBANK0  00020
 ___aldiv@dividend                 cstackCOMMON 00075
 ___aldiv@divisor                  cstackCOMMON 00071
 ___aldiv@quotient                 cstackBANK0  00022
 ___aldiv@sign                     cstackBANK0  00021
-___awdiv                          text1111     00308
-___awdiv@counter                  cstackCOMMON 00076
-___awdiv@dividend                 cstackCOMMON 00073
-___awdiv@divisor                  cstackCOMMON 00071
-___awdiv@quotient                 cstackCOMMON 00078
-___awdiv@sign                     cstackCOMMON 00077
-___wmul                           text1110     006A2
+___wmul                           text936      005D6
 ___wmul@multiplicand              cstackCOMMON 00073
 ___wmul@multiplier                cstackCOMMON 00071
 ___wmul@product                   cstackCOMMON 00075
-__end_of_ADC_Read                 text1091     00308
-__end_of_ADC_ReadOne              text1092     00655
-__end_of_CRC16_Generate           text1096     005C1
-__end_of_CRC16_Init               text1097     01000
-__end_of_CRC16_Update             text1108     007F5
-__end_of_CRC16_Update4Bits        text1109     0049D
-__end_of_EEPROM_Read              text1081     006A2
-__end_of_EEPROM_Write             text1083     00624
-__end_of_SendPacket               text1098     0077B
-__end_of_SendReport               text1088     0051A
-__end_of_Timer1_Disable           text1095     00FE4
-__end_of_Timer1_Init              text1094     007AA
-__end_of_UART_Init                text1090     0045C
-__end_of_UART_Receive             text1106     003D7
-__end_of_UART_ReceiveMsg          text1104     00794
-__end_of_UART_ReceiveMsgTmo       text1105     0041B
-__end_of_UART_Transmit            text1101     007BF
-__end_of_UART_TransmitMsg         text1100     00557
-__end_of_XBAPI_HandleFrame        text1103     00285
-__end_of_XBAPI_Transmit           text1099     00167
-__end_of_XBee_Enable              text1084     007D2
-__end_of_XBee_Sleep               text1089     00FE7
-__end_of_XBee_Wake                text1085     00FEA
-__end_of___aldiv                  text1112     001FF
-__end_of___awdiv                  text1111     00372
-__end_of___wmul                   text1110     006C6
-__end_of__initialization          cinit        004DA
-__end_of_checksum                 text1102     0058F
+__end_of_CRC16_Init               text919      00712
+__end_of_EEPROM_Read              text912      005D6
+__end_of_EEPROM_Write             text914      00589
+__end_of_Timer1_Disable           text924      00727
+__end_of_Timer1_Init              text923      006C4
+__end_of_UART_Init                text925      0043C
+__end_of_UART_Receive             text933      003B7
+__end_of_UART_ReceiveMsg          text931      006AE
+__end_of_UART_ReceiveMsgTmo       text932      003FB
+__end_of_UART_Transmit            text927      006D9
+__end_of_UART_TransmitMsg         text926      004B9
+__end_of_XBAPI_Command            text918      00234
+__end_of_XBAPI_HandleFrame        text930      00352
+__end_of_XBee_Enable              text915      006EC
+__end_of_XBee_Sleep               text922      00724
+__end_of_XBee_Wake                text916      00721
+__end_of___aldiv                  text937      002CC
+__end_of___wmul                   text936      005FA
+__end_of__initialization          cinit        00479
+__end_of_checksum                 text928      004F1
+__end_of_doChecksumVerify         text929      00526
 __end_of_isr                      intentry     00016
-__end_of_main                     maintext     000CE
-__end_of_memcpy                   text1107     005F3
-__end_of_memset                   text1082     006E8
-__end_of_pulseLed                 text1080     007E4
-__end_of_sleep                    text1086     00745
-__end_of_timer1_poll_delay        text1093     0067C
-__end_of_timer1_poll_delay_ms     text1087     00761
-__initialization                  cinit        0049D
-__pbssBANK0                       bssBANK0     00052
+__end_of_main                     maintext     000E3
+__end_of_memcpy                   text934      00558
+__end_of_memset                   text913      0061C
+__end_of_pulseLed                 text911      006FE
+__end_of_sleep                    text917      00679
+__end_of_swap_endian_32           text935      00194
+__end_of_timer1_poll_delay        text921      005B0
+__end_of_timer1_poll_delay_ms     text920      00695
+__initialization                  cinit        0043C
+__pbssBANK0                       bssBANK0     00050
 __pbssBANK1                       bssBANK1     000A0
 __pbssBANK2                       bssBANK2     00120
 __pbssCOMMON                      bssCOMMON    0007C
 __pcstackBANK0                    cstackBANK0  00020
 __pcstackCOMMON                   cstackCOMMON 00070
-__pdataBANK0                      dataBANK0    00061
+__pdataBANK0                      dataBANK0    0005F
 __pdataBANK1                      dataBANK1    000C0
 __pdataBANK3                      dataBANK3    001A0
-__pidataBANK0                     idataBANK0   007F5
-__pidataBANK1                     idataBANK1   006E8
-__pidataBANK3                     idataBANK3   00708
+__pidataBANK0                     idataBANK0   006FE
+__pidataBANK1                     idataBANK1   0061C
+__pidataBANK3                     idataBANK3   0063C
 __pintentry                       intentry     00004
 __pmaintext                       maintext     00018
-__ptext1080                       text1080     007D2
-__ptext1081                       text1081     0067C
-__ptext1082                       text1082     006C6
-__ptext1083                       text1083     005F3
-__ptext1084                       text1084     007BF
-__ptext1085                       text1085     00FE7
-__ptext1086                       text1086     00728
-__ptext1087                       text1087     00745
-__ptext1088                       text1088     004DD
-__ptext1089                       text1089     00FE4
-__ptext1090                       text1090     0041B
-__ptext1091                       text1091     00285
-__ptext1092                       text1092     00624
-__ptext1093                       text1093     00655
-__ptext1094                       text1094     00794
-__ptext1095                       text1095     00FE1
-__ptext1096                       text1096     0058F
-__ptext1097                       text1097     00FF6
-__ptext1098                       text1098     00761
-__ptext1099                       text1099     000CE
-__ptext1100                       text1100     0051A
-__ptext1101                       text1101     007AA
-__ptext1102                       text1102     00557
-__ptext1103                       text1103     001FF
-__ptext1104                       text1104     0077B
-__ptext1105                       text1105     003D7
-__ptext1106                       text1106     00372
-__ptext1107                       text1107     005C1
-__ptext1108                       text1108     007E4
-__ptext1109                       text1109     0045C
-__ptext1110                       text1110     006A2
-__ptext1111                       text1111     00308
-__ptext1112                       text1112     00167
-__size_of_ADC_Read                (abs)        00000
-__size_of_ADC_ReadOne             (abs)        00000
-__size_of_CRC16_Generate          (abs)        00000
+__ptext911                        text911      006EC
+__ptext912                        text912      005B0
+__ptext913                        text913      005FA
+__ptext914                        text914      00558
+__ptext915                        text915      006D9
+__ptext916                        text916      0071E
+__ptext917                        text917      0065C
+__ptext918                        text918      00194
+__ptext919                        text919      00708
+__ptext920                        text920      00679
+__ptext921                        text921      00589
+__ptext922                        text922      00721
+__ptext923                        text923      006AE
+__ptext924                        text924      00724
+__ptext925                        text925      003FB
+__ptext926                        text926      0047C
+__ptext927                        text927      006C4
+__ptext928                        text928      004B9
+__ptext929                        text929      004F1
+__ptext930                        text930      002CC
+__ptext931                        text931      00695
+__ptext932                        text932      003B7
+__ptext933                        text933      00352
+__ptext934                        text934      00526
+__ptext935                        text935      000E3
+__ptext936                        text936      005D6
+__ptext937                        text937      00234
 __size_of_CRC16_Init              (abs)        00000
-__size_of_CRC16_Update            (abs)        00000
-__size_of_CRC16_Update4Bits       (abs)        00000
 __size_of_EEPROM_Read             (abs)        00000
 __size_of_EEPROM_Write            (abs)        00000
-__size_of_SendPacket              (abs)        00000
-__size_of_SendReport              (abs)        00000
 __size_of_Timer1_Disable          (abs)        00000
 __size_of_Timer1_Init             (abs)        00000
 __size_of_UART_Init               (abs)        00000
@@ -830,56 +764,64 @@ __size_of_UART_ReceiveMsg         (abs)        00000
 __size_of_UART_ReceiveMsgTmo      (abs)        00000
 __size_of_UART_Transmit           (abs)        00000
 __size_of_UART_TransmitMsg        (abs)        00000
+__size_of_XBAPI_Command           (abs)        00000
 __size_of_XBAPI_HandleFrame       (abs)        00000
-__size_of_XBAPI_Transmit          (abs)        00000
 __size_of_XBee_Enable             (abs)        00000
 __size_of_XBee_Sleep              (abs)        00000
 __size_of_XBee_Wake               (abs)        00000
 __size_of___aldiv                 (abs)        00000
-__size_of___awdiv                 (abs)        00000
 __size_of___wmul                  (abs)        00000
 __size_of_checksum                (abs)        00000
+__size_of_doChecksumVerify        (abs)        00000
 __size_of_isr                     (abs)        00000
 __size_of_main                    (abs)        00000
 __size_of_memcpy                  (abs)        00000
 __size_of_memset                  (abs)        00000
 __size_of_pulseLed                (abs)        00000
 __size_of_sleep                   (abs)        00000
+__size_of_swap_endian_32          (abs)        00000
 __size_of_timer1_poll_delay       (abs)        00000
 __size_of_timer1_poll_delay_ms    (abs)        00000
 _apiFrame                         bssBANK2     00120
-_calc_checksum                    bssCOMMON    0007C
-_calibrationData                  bssBANK0     00057
-_checksum                         text1102     00557
-_dest_address                     dataBANK0    00063
-_frame_id_itr                     bssBANK0     00056
-_intervalData                     bssBANK0     0005D
+_calc_checksum                    bssBANK0     00053
+_calibrationData                  bssBANK0     00055
+_checksum                         text928      004B9
+_dest_address                     dataBANK0    00061
+_doChecksumVerify                 text929      004F1
+_frame_id_itr                     bssBANK0     00054
+_intervalData                     bssBANK0     0005B
 _isr                              intentry     00004
 _main                             maintext     00018
-_memcpy                           text1107     005C1
-_memset                           text1082     006C6
+_memcpy                           text934      00526
+_memset                           text913      005FA
 _packet_buffer                    bssBANK1     000A0
-_pulseLed                         text1080     007D2
-_sleep                            text1086     00728
-_timer1_poll_delay                text1093     00655
-_timer1_poll_delay_ms             text1087     00745
-_xbee_set_baud_rate               dataBANK0    00061
+_pulseLed                         text911      006EC
+_sleep                            text917      0065C
+_swap_endian_32                   text935      000E3
+_timer1_poll_delay                text921      00589
+_timer1_poll_delay_ms             text920      00679
+_xbee_set_baud_rate               dataBANK0    0005F
 btemp                             (abs)        0007E
 checksum@addr                     cstackCOMMON 00075
 checksum@address                  cstackCOMMON 00076
 checksum@checksum                 cstackCOMMON 00077
 checksum@i                        cstackCOMMON 00078
 checksum@length                   cstackCOMMON 00071
-clear_ram                         clrtext      00FF0
-end_of_initialization             cinit        004DA
-init_ram                          inittext     00FEA
+clear_ram                         clrtext      00712
+doChecksumVerify@address          cstackCOMMON 00076
+doChecksumVerify@check            cstackCOMMON 00077
+doChecksumVerify@checksum         cstackCOMMON 00073
+doChecksumVerify@i                cstackCOMMON 00078
+doChecksumVerify@length           cstackCOMMON 00071
+end_of_initialization             cinit        00479
+init_ram                          inittext     00718
 intlevel0                         functab      00000
 intlevel1                         functab      00000
 intlevel2                         functab      00000
 intlevel3                         functab      00000
 intlevel4                         functab      00000
 intlevel5                         functab      00000
-main@command_data                 cstackBANK0  0004E
+main@command_data                 cstackBANK0  0004C
 memcpy@d                          cstackCOMMON 00078
 memcpy@d1                         cstackCOMMON 00071
 memcpy@n                          cstackCOMMON 00075
@@ -894,7 +836,9 @@ reset_vec                         reset_vec    00000
 sleep@i                           cstackCOMMON 00073
 sleep@seconds                     cstackCOMMON 00071
 start                             init         00016
-start_initialization              cinit        0049D
+start_initialization              cinit        0043C
+swap_endian_32@n                  cstackCOMMON 00071
+swap_endian_32@r                  cstackCOMMON 00075
 timer1_poll_delay@division        cstackCOMMON 00079
 timer1_poll_delay@ticks           cstackCOMMON 00077
 timer1_poll_delay_ms@ms           cstackBANK0  00020
@@ -907,12 +851,12 @@ FUNCTION INFORMATION:
  Defined at:
 		line 54 in file "main.c"
  Parameters:    Size  Location     Type
-  argc            2   41[BANK0 ] int 
-  argv            2   43[BANK0 ] PTR PTR unsigned char 
+  argc            2   39[BANK0 ] int 
+  argv            2   41[BANK0 ] PTR PTR unsigned char 
  Auto vars:     Size  Location     Type
-  command_data    4   46[BANK0 ] unsigned long 
+  command_data    4   44[BANK0 ] unsigned long 
  Return value:  Size  Location     Type
-                  2   41[BANK0 ] int 
+                  2   39[BANK0 ] int 
  Registers used:
 		wreg, fsr0l, fsr0h, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
  Tracked objects:
@@ -925,7 +869,7 @@ FUNCTION INFORMATION:
       Temps:          0       1       0       0       0       0       0       0
       Totals:         0       9       0       0       0       0       0       0
 Total ram usage:        9 bytes
- Hardware stack levels required when called:    8
+ Hardware stack levels required when called:    6
  This function calls:
 		_pulseLed
 		_timer1_poll_delay
@@ -935,9 +879,9 @@ Total ram usage:        9 bytes
 		_XBee_Enable
 		_XBee_Wake
 		_sleep
+		_XBAPI_Command
 		_CRC16_Init
 		_timer1_poll_delay_ms
-		_SendReport
 		_XBee_Sleep
  This function is called by:
 		Startup code after reset
@@ -1168,6 +1112,75 @@ Total ram usage:        4 bytes
  This function uses a non-reentrant model
 
 
+ *************** function _XBAPI_Command *****************
+ Defined at:
+		line 114 in file "xbee.c"
+ Parameters:    Size  Location     Type
+  command         2   23[BANK0 ] unsigned short 
+  data            4   25[BANK0 ] unsigned long 
+  id              2   29[BANK0 ] int 
+  data_valid      2   31[BANK0 ] int 
+ Auto vars:     Size  Location     Type
+  atCmdLength     2   37[BANK0 ] int 
+  check           1   36[BANK0 ] unsigned char 
+ Return value:  Size  Location     Type
+                  2   23[BANK0 ] int 
+ Registers used:
+		wreg, fsr0l, fsr0h, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
+ Tracked objects:
+		On entry : 
+		On exit  : 
+		Unchanged: 
+ Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
+      Params:         0      10       0       0       0       0       0       0
+      Locals:         0       3       0       0       0       0       0       0
+      Temps:          0       3       0       0       0       0       0       0
+      Totals:         0      16       0       0       0       0       0       0
+Total ram usage:       16 bytes
+ Hardware stack levels used:    1
+ Hardware stack levels required when called:    5
+ This function calls:
+		_swap_endian_32
+		_doChecksumVerify
+		_checksum
+		_UART_TransmitMsg
+		_XBAPI_HandleFrame
+ This function is called by:
+		_main
+ This function uses a non-reentrant model
+
+
+ *************** function _CRC16_Init *****************
+ Defined at:
+		line 28 in file "crc16.c"
+ Parameters:    Size  Location     Type
+		None
+ Auto vars:     Size  Location     Type
+		None
+ Return value:  Size  Location     Type
+		None               void
+ Registers used:
+		wreg
+ Tracked objects:
+		On entry : 
+		On exit  : 
+		Unchanged: 
+ Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
+      Params:         0       0       0       0       0       0       0       0
+      Locals:         0       0       0       0       0       0       0       0
+      Temps:          1       0       0       0       0       0       0       0
+      Totals:         1       0       0       0       0       0       0       0
+Total ram usage:        1 bytes
+ Hardware stack levels used:    1
+ Hardware stack levels required when called:    1
+ This function calls:
+		Nothing
+ This function is called by:
+		_main
+		_CRC16_Generate
+ This function uses a non-reentrant model
+
+
  *************** function _timer1_poll_delay_ms *****************
  Defined at:
 		line 32 in file "timer.c"
@@ -1196,161 +1209,6 @@ Total ram usage:        2 bytes
 		_timer1_poll_delay
  This function is called by:
 		_main
- This function uses a non-reentrant model
-
-
- *************** function _SendReport *****************
- Defined at:
-		line 10 in file "packets.c"
- Parameters:    Size  Location     Type
-		None
- Auto vars:     Size  Location     Type
-		None
- Return value:  Size  Location     Type
-		None               void
- Registers used:
-		wreg, fsr0l, fsr0h, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       0       0       0       0       0       0       0
-      Locals:         0       0       0       0       0       0       0       0
-      Temps:          0       0       0       0       0       0       0       0
-      Totals:         0       0       0       0       0       0       0       0
-Total ram usage:        0 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    7
- This function calls:
-		_ADC_Read
-		_CRC16_Generate
-		_SendPacket
- This function is called by:
-		_main
- This function uses a non-reentrant model
-
-
- *************** function _XBee_Sleep *****************
- Defined at:
-		line 27 in file "xbee.c"
- Parameters:    Size  Location     Type
-		None
- Auto vars:     Size  Location     Type
-		None
- Return value:  Size  Location     Type
-		None               void
- Registers used:
-		None
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       0       0       0       0       0       0       0
-      Locals:         0       0       0       0       0       0       0       0
-      Temps:          0       0       0       0       0       0       0       0
-      Totals:         0       0       0       0       0       0       0       0
-Total ram usage:        0 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    1
- This function calls:
-		Nothing
- This function is called by:
-		_main
- This function uses a non-reentrant model
-
-
- *************** function _UART_Init *****************
- Defined at:
-		line 7 in file "uart.c"
- Parameters:    Size  Location     Type
-  baud            2    6[BANK0 ] int 
- Auto vars:     Size  Location     Type
-  spbrg           2   12[BANK0 ] int 
- Return value:  Size  Location     Type
-		None               void
- Registers used:
-		wreg, status,2, status,0, pclath, cstack
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       2       0       0       0       0       0       0
-      Locals:         0       6       0       0       0       0       0       0
-      Temps:          0       0       0       0       0       0       0       0
-      Totals:         0       8       0       0       0       0       0       0
-Total ram usage:        8 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    2
- This function calls:
-		___aldiv
- This function is called by:
-		_XBee_Enable
- This function uses a non-reentrant model
-
-
- *************** function _ADC_Read *****************
- Defined at:
-		line 37 in file "adc.c"
- Parameters:    Size  Location     Type
-  channel         2    4[BANK0 ] int 
- Auto vars:     Size  Location     Type
-  res             8    8[BANK0 ] int [4]
-  i               2   18[BANK0 ] int 
-  sum             2   16[BANK0 ] int 
- Return value:  Size  Location     Type
-                  2    4[BANK0 ] unsigned int 
- Registers used:
-		wreg, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       2       0       0       0       0       0       0
-      Locals:         0      12       0       0       0       0       0       0
-      Temps:          0       2       0       0       0       0       0       0
-      Totals:         0      16       0       0       0       0       0       0
-Total ram usage:       16 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    4
- This function calls:
-		_ADC_ReadOne
-		___awdiv
- This function is called by:
-		_SendReport
- This function uses a non-reentrant model
-
-
- *************** function _ADC_ReadOne *****************
- Defined at:
-		line 21 in file "adc.c"
- Parameters:    Size  Location     Type
-  channel         2    0[BANK0 ] int 
- Auto vars:     Size  Location     Type
-  result          2    2[BANK0 ] unsigned short 
- Return value:  Size  Location     Type
-                  2    0[BANK0 ] unsigned int 
- Registers used:
-		wreg, status,2, status,0, pclath, cstack
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       2       0       0       0       0       0       0
-      Locals:         0       2       0       0       0       0       0       0
-      Temps:          1       0       0       0       0       0       0       0
-      Totals:         1       4       0       0       0       0       0       0
-Total ram usage:        5 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    3
- This function calls:
-		_timer1_poll_delay
- This function is called by:
-		_ADC_Read
  This function uses a non-reentrant model
 
 
@@ -1386,6 +1244,36 @@ Total ram usage:        4 bytes
 		_main
 		_timer1_poll_delay_ms
 		_ADC_ReadOne
+ This function uses a non-reentrant model
+
+
+ *************** function _XBee_Sleep *****************
+ Defined at:
+		line 27 in file "xbee.c"
+ Parameters:    Size  Location     Type
+		None
+ Auto vars:     Size  Location     Type
+		None
+ Return value:  Size  Location     Type
+		None               void
+ Registers used:
+		None
+ Tracked objects:
+		On entry : 
+		On exit  : 
+		Unchanged: 
+ Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
+      Params:         0       0       0       0       0       0       0       0
+      Locals:         0       0       0       0       0       0       0       0
+      Temps:          0       0       0       0       0       0       0       0
+      Totals:         0       0       0       0       0       0       0       0
+Total ram usage:        0 bytes
+ Hardware stack levels used:    1
+ Hardware stack levels required when called:    1
+ This function calls:
+		Nothing
+ This function is called by:
+		_main
  This function uses a non-reentrant model
 
 
@@ -1450,144 +1338,33 @@ Total ram usage:        0 bytes
  This function uses a non-reentrant model
 
 
- *************** function _CRC16_Generate *****************
+ *************** function _UART_Init *****************
  Defined at:
-		line 66 in file "crc16.c"
+		line 7 in file "uart.c"
  Parameters:    Size  Location     Type
-  msg             1    wreg     PTR unsigned char 
-		 -> packet_buffer(32), 
-  len             2    0[BANK0 ] int 
+  baud            2    6[BANK0 ] int 
  Auto vars:     Size  Location     Type
-  msg             1    2[BANK0 ] PTR unsigned char 
-		 -> packet_buffer(32), 
-  i               2    3[BANK0 ] int 
+  spbrg           2   12[BANK0 ] int 
  Return value:  Size  Location     Type
-                  2    0[BANK0 ] unsigned short 
+		None               void
  Registers used:
-		wreg, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
+		wreg, status,2, status,0, pclath, cstack
  Tracked objects:
 		On entry : 
 		On exit  : 
 		Unchanged: 
  Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
       Params:         0       2       0       0       0       0       0       0
-      Locals:         0       3       0       0       0       0       0       0
-      Temps:          1       0       0       0       0       0       0       0
-      Totals:         1       5       0       0       0       0       0       0
-Total ram usage:        6 bytes
+      Locals:         0       6       0       0       0       0       0       0
+      Temps:          0       0       0       0       0       0       0       0
+      Totals:         0       8       0       0       0       0       0       0
+Total ram usage:        8 bytes
  Hardware stack levels used:    1
- Hardware stack levels required when called:    3
+ Hardware stack levels required when called:    2
  This function calls:
-		_CRC16_Init
-		_CRC16_Update
+		___aldiv
  This function is called by:
-		_SendReport
-		_SendReceiverBroadcastRequest
- This function uses a non-reentrant model
-
-
- *************** function _CRC16_Init *****************
- Defined at:
-		line 28 in file "crc16.c"
- Parameters:    Size  Location     Type
-		None
- Auto vars:     Size  Location     Type
-		None
- Return value:  Size  Location     Type
-		None               void
- Registers used:
-		wreg
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       0       0       0       0       0       0       0
-      Locals:         0       0       0       0       0       0       0       0
-      Temps:          1       0       0       0       0       0       0       0
-      Totals:         1       0       0       0       0       0       0       0
-Total ram usage:        1 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    1
- This function calls:
-		Nothing
- This function is called by:
-		_main
-		_CRC16_Generate
- This function uses a non-reentrant model
-
-
- *************** function _SendPacket *****************
- Defined at:
-		line 34 in file "packets.c"
- Parameters:    Size  Location     Type
-  packet          1    wreg     PTR struct .
-		 -> packet_buffer(32), 
- Auto vars:     Size  Location     Type
-  packet          1   40[BANK0 ] PTR struct .
-		 -> packet_buffer(32), 
- Return value:  Size  Location     Type
-		None               void
- Registers used:
-		wreg, fsr0l, fsr0h, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       0       0       0       0       0       0       0
-      Locals:         0       1       0       0       0       0       0       0
-      Temps:          0       4       0       0       0       0       0       0
-      Totals:         0       5       0       0       0       0       0       0
-Total ram usage:        5 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    6
- This function calls:
-		_XBAPI_Transmit
- This function is called by:
-		_SendReport
-		_SendReceiverBroadcastRequest
- This function uses a non-reentrant model
-
-
- *************** function _XBAPI_Transmit *****************
- Defined at:
-		line 78 in file "xbee.c"
- Parameters:    Size  Location     Type
-  address         1    wreg     PTR struct __XBeeAddress
-		 -> dest_address(8), 
-  data            1   23[BANK0 ] PTR const unsigned char 
-		 -> packet_buffer(32), 
-  length          2   24[BANK0 ] int 
-  id              2   26[BANK0 ] int 
- Auto vars:     Size  Location     Type
-  address         1   29[BANK0 ] PTR struct __XBeeAddress
-		 -> dest_address(8), 
-  error           2   32[BANK0 ] int 
-  frame_length    2   30[BANK0 ] int 
- Return value:  Size  Location     Type
-		None               void
- Registers used:
-		wreg, fsr0l, fsr0h, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       5       0       0       0       0       0       0
-      Locals:         0       7       0       0       0       0       0       0
-      Temps:          0       1       0       0       0       0       0       0
-      Totals:         0      13       0       0       0       0       0       0
-Total ram usage:       13 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    5
- This function calls:
-		_memcpy
-		_checksum
-		_UART_TransmitMsg
-		_XBAPI_HandleFrame
- This function is called by:
-		_SendPacket
+		_XBee_Enable
  This function uses a non-reentrant model
 
 
@@ -1622,9 +1399,9 @@ Total ram usage:        7 bytes
  This function calls:
 		_UART_Transmit
  This function is called by:
-		_XBAPI_Transmit
-		_XBee_Send
 		_XBAPI_Command
+		_XBee_Send
+		_XBAPI_Transmit
  This function uses a non-reentrant model
 
 
@@ -1691,7 +1468,43 @@ Total ram usage:        9 bytes
  This function calls:
 		Nothing
  This function is called by:
+		_XBAPI_Command
 		_XBAPI_Transmit
+ This function uses a non-reentrant model
+
+
+ *************** function _doChecksumVerify *****************
+ Defined at:
+		line 66 in file "xbee.c"
+ Parameters:    Size  Location     Type
+  address         1    wreg     PTR unsigned char 
+		 -> apiFrame(60), 
+  length          2    1[COMMON] int 
+  checksum        1    3[COMMON] unsigned char 
+ Auto vars:     Size  Location     Type
+  address         1    6[COMMON] PTR unsigned char 
+		 -> apiFrame(60), 
+  i               2    8[COMMON] int 
+  check           1    7[COMMON] unsigned char 
+ Return value:  Size  Location     Type
+                  2    1[COMMON] int 
+ Registers used:
+		wreg, fsr1l, fsr1h, status,2, status,0
+ Tracked objects:
+		On entry : 
+		On exit  : 
+		Unchanged: 
+ Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
+      Params:         3       0       0       0       0       0       0       0
+      Locals:         4       0       0       0       0       0       0       0
+      Temps:          2       0       0       0       0       0       0       0
+      Totals:         9       0       0       0       0       0       0       0
+Total ram usage:        9 bytes
+ Hardware stack levels used:    1
+ Hardware stack levels required when called:    1
+ This function calls:
+		Nothing
+ This function is called by:
 		_XBAPI_Command
  This function uses a non-reentrant model
 
@@ -1725,8 +1538,8 @@ Total ram usage:        7 bytes
 		_UART_ReceiveMsg
 		_memcpy
  This function is called by:
-		_XBAPI_Transmit
 		_XBAPI_Command
+		_XBAPI_Transmit
  This function uses a non-reentrant model
 
 
@@ -1864,69 +1677,38 @@ Total ram usage:       11 bytes
  This function calls:
 		Nothing
  This function is called by:
-		_XBAPI_Transmit
 		_XBAPI_HandleFrame
+		_XBAPI_Transmit
  This function uses a non-reentrant model
 
 
- *************** function _CRC16_Update *****************
+ *************** function _swap_endian_32 *****************
  Defined at:
-		line 61 in file "crc16.c"
+		line 103 in file "xbee.c"
  Parameters:    Size  Location     Type
-  val             1    wreg     unsigned char 
+  n               4    1[COMMON] unsigned long 
  Auto vars:     Size  Location     Type
-  val             1   10[COMMON] unsigned char 
+  r               4    5[COMMON] unsigned long 
  Return value:  Size  Location     Type
-		None               void
+                  4    1[COMMON] unsigned long 
  Registers used:
-		wreg, fsr1l, fsr1h, status,2, status,0, btemp+1, pclath, cstack
+		wreg, status,2, status,0
  Tracked objects:
 		On entry : 
 		On exit  : 
 		Unchanged: 
  Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       0       0       0       0       0       0       0
-      Locals:         1       0       0       0       0       0       0       0
-      Temps:          1       0       0       0       0       0       0       0
-      Totals:         2       0       0       0       0       0       0       0
-Total ram usage:        2 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    2
- This function calls:
-		_CRC16_Update4Bits
- This function is called by:
-		_CRC16_Generate
- This function uses a non-reentrant model
-
-
- *************** function _CRC16_Update4Bits *****************
- Defined at:
-		line 38 in file "crc16.c"
- Parameters:    Size  Location     Type
-  val             1    wreg     unsigned char 
- Auto vars:     Size  Location     Type
-  val             1    7[COMMON] unsigned char 
-  t               1    8[COMMON] unsigned char 
- Return value:  Size  Location     Type
-		None               void
- Registers used:
-		wreg, fsr1l, fsr1h, status,2, status,0, btemp+1
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         0       0       0       0       0       0       0       0
-      Locals:         2       0       0       0       0       0       0       0
-      Temps:          6       0       0       0       0       0       0       0
-      Totals:         8       0       0       0       0       0       0       0
-Total ram usage:        8 bytes
+      Params:         4       0       0       0       0       0       0       0
+      Locals:         4       0       0       0       0       0       0       0
+      Temps:          0       8       0       0       0       0       0       0
+      Totals:         8       8       0       0       0       0       0       0
+Total ram usage:       16 bytes
  Hardware stack levels used:    1
  Hardware stack levels required when called:    1
  This function calls:
 		Nothing
  This function is called by:
-		_CRC16_Update
+		_XBAPI_Command
  This function uses a non-reentrant model
 
 
@@ -1958,39 +1740,6 @@ Total ram usage:        6 bytes
 		Nothing
  This function is called by:
 		_timer1_poll_delay_ms
- This function uses a non-reentrant model
-
-
- *************** function ___awdiv *****************
- Defined at:
-		line 5 in file "/opt/microchip/xc8/v1.12/sources/awdiv.c"
- Parameters:    Size  Location     Type
-  divisor         2    1[COMMON] int 
-  dividend        2    3[COMMON] int 
- Auto vars:     Size  Location     Type
-  quotient        2    8[COMMON] int 
-  sign            1    7[COMMON] unsigned char 
-  counter         1    6[COMMON] unsigned char 
- Return value:  Size  Location     Type
-                  2    1[COMMON] int 
- Registers used:
-		wreg, status,2, status,0
- Tracked objects:
-		On entry : 
-		On exit  : 
-		Unchanged: 
- Data sizes:     COMMON   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6
-      Params:         4       0       0       0       0       0       0       0
-      Locals:         4       0       0       0       0       0       0       0
-      Temps:          1       0       0       0       0       0       0       0
-      Totals:         9       0       0       0       0       0       0       0
-Total ram usage:        9 bytes
- Hardware stack levels used:    1
- Hardware stack levels required when called:    1
- This function calls:
-		Nothing
- This function is called by:
-		_ADC_Read
  This function uses a non-reentrant model
 
 
@@ -2061,95 +1810,77 @@ Total ram usage:        1 bytes
 MODULE INFORMATION
 
 Module		Function		Class		Link	Load	Size
-packets.c
-		_SendReport    		CODE           	04DD	0000	61
-		_SendPacket    		CODE           	0761	0000	26
-
-packets.c estimated size: 87
-
 uart.c
-		_UART_Receive  		CODE           	0372	0000	101
-		_UART_Init     		CODE           	041B	0000	65
-		_UART_ReceiveMs		CODE           	077B	0000	25
-		_UART_ReceiveMs		CODE           	03D7	0000	68
-		_UART_TransmitM		CODE           	051A	0000	61
-		_UART_Transmit 		CODE           	07AA	0000	21
+		_UART_Receive  		CODE           	0352	0000	101
+		_UART_Init     		CODE           	03FB	0000	65
+		_UART_ReceiveMs		CODE           	0695	0000	25
+		_UART_ReceiveMs		CODE           	03B7	0000	68
+		_UART_TransmitM		CODE           	047C	0000	61
+		_UART_Transmit 		CODE           	06C4	0000	21
 
 uart.c estimated size: 341
 
 /opt/microchip/xc8/v1.12/sources/aldiv.c
-		___aldiv       		CODE           	0167	0000	152
+		___aldiv       		CODE           	0234	0000	152
 
 /opt/microchip/xc8/v1.12/sources/aldiv.c estimated size: 152
 
 /opt/microchip/xc8/v1.12/sources/memcpy.c
-		_memcpy        		CODE           	05C1	0000	50
+		_memcpy        		CODE           	0526	0000	50
 
 /opt/microchip/xc8/v1.12/sources/memcpy.c estimated size: 50
 
 timer.c
-		_timer1_poll_de		CODE           	0655	0000	39
-		_Timer1_Init   		CODE           	0794	0000	22
-		_Timer1_Disable		CODE           	0FE1	0000	3
-		_timer1_poll_de		CODE           	0745	0000	28
-		_sleep         		CODE           	0728	0000	29
+		_timer1_poll_de		CODE           	0589	0000	39
+		_Timer1_Init   		CODE           	06AE	0000	22
+		_Timer1_Disable		CODE           	0724	0000	3
+		_timer1_poll_de		CODE           	0679	0000	28
+		_sleep         		CODE           	065C	0000	29
 
 timer.c estimated size: 121
 
 xbee.c
-		_XBAPI_HandleFr		CODE           	01FF	0000	134
-		_XBee_Enable   		CODE           	07BF	0000	19
-		_XBAPI_Transmit		CODE           	00CE	0000	153
-		_XBee_Wake     		CODE           	0FE7	0000	3
-		_XBee_Sleep    		CODE           	0FE4	0000	3
-		_checksum      		CODE           	0557	0000	56
+		_XBAPI_HandleFr		CODE           	02CC	0000	134
+		_XBee_Enable   		CODE           	06D9	0000	19
+		_XBee_Wake     		CODE           	071E	0000	3
+		_XBAPI_Command 		CODE           	0194	0000	160
+		_swap_endian_32		CODE           	00E3	0000	177
+		_doChecksumVeri		CODE           	04F1	0000	53
+		_XBee_Sleep    		CODE           	0721	0000	3
+		_checksum      		CODE           	04B9	0000	56
 
-xbee.c estimated size: 368
-
-adc.c
-		_ADC_Read      		CODE           	0285	0000	131
-		_ADC_ReadOne   		CODE           	0624	0000	49
-
-adc.c estimated size: 180
+xbee.c estimated size: 605
 
 shared
-		__initializatio		CODE           	049D	0000	61
+		__initializatio		CODE           	043C	0000	61
 
 shared estimated size: 61
 
 eeprom.c
-		_EEPROM_Read   		CODE           	067C	0000	38
-		_EEPROM_Write  		CODE           	05F3	0000	49
+		_EEPROM_Read   		CODE           	05B0	0000	38
+		_EEPROM_Write  		CODE           	0558	0000	49
 
 eeprom.c estimated size: 87
 
 /opt/microchip/xc8/v1.12/sources/memset.c
-		_memset        		CODE           	06C6	0000	34
+		_memset        		CODE           	05FA	0000	34
 
 /opt/microchip/xc8/v1.12/sources/memset.c estimated size: 34
 
 main.c
-		_main          		CODE           	0018	0000	182
-		_pulseLed      		CODE           	07D2	0000	18
+		_main          		CODE           	0018	0000	203
+		_pulseLed      		CODE           	06EC	0000	18
 		_isr           		CODE           	0004	0000	18
 
-main.c estimated size: 218
+main.c estimated size: 239
 
 /opt/microchip/xc8/v1.12/sources/wmul.c
-		___wmul        		CODE           	06A2	0000	36
+		___wmul        		CODE           	05D6	0000	36
 
 /opt/microchip/xc8/v1.12/sources/wmul.c estimated size: 36
 
-/opt/microchip/xc8/v1.12/sources/awdiv.c
-		___awdiv       		CODE           	0308	0000	106
-
-/opt/microchip/xc8/v1.12/sources/awdiv.c estimated size: 106
-
 crc16.c
-		_CRC16_Update  		CODE           	07E4	0000	17
-		_CRC16_Update4B		CODE           	045C	0000	65
-		_CRC16_Generate		CODE           	058F	0000	50
-		_CRC16_Init    		CODE           	0FF6	0000	10
+		_CRC16_Init    		CODE           	0708	0000	10
 
-crc16.c estimated size: 142
+crc16.c estimated size: 10
 
