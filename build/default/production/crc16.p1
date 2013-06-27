@@ -1,0 +1,172 @@
+Version 3.2 HI-TECH Software Intermediate Code
+"14 crc16.h
+[v _CRC16_High `uc ~T0 @X0 1 e ]
+[v _CRC16_Low `uc ~T0 @X0 1 e ]
+[; ;crc16.h: 14: unsigned char CRC16_High, CRC16_Low;
+[; ;crc16.h: 16: void CRC16_Init( void );
+[; ;crc16.h: 17: void CRC16_Update4Bits( unsigned char val );
+[; ;crc16.h: 18: void CRC16_Update( unsigned char val );
+[; ;crc16.h: 19: unsigned short CRC16_Generate(unsigned char* msg, int len);
+"8 crc16.c
+[v _CRC16_LookupHigh `us ~T0 @X0 -> 16 `i e ]
+[i _CRC16_LookupHigh
+:U ..
+"9
+-> -> 0 `i `us
+-> -> 16 `i `us
+-> -> 32 `i `us
+-> -> 48 `i `us
+-> -> 64 `i `us
+-> -> 80 `i `us
+-> -> 96 `i `us
+-> -> 112 `i `us
+"10
+-> -> 129 `i `us
+-> -> 145 `i `us
+-> -> 161 `i `us
+-> -> 177 `i `us
+-> -> 193 `i `us
+-> -> 209 `i `us
+-> -> 225 `i `us
+"11
+-> -> 241 `i `us
+..
+]
+[; ;crc16.c: 8: unsigned short CRC16_LookupHigh[16] = {
+[; ;crc16.c: 9: 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
+[; ;crc16.c: 10: 0x81, 0x91, 0xA1, 0xB1, 0xC1, 0xD1, 0xE1, 0xF1
+[; ;crc16.c: 11: };
+"12
+[v _CRC16_LookupLow `us ~T0 @X0 -> 16 `i e ]
+[i _CRC16_LookupLow
+:U ..
+"13
+-> -> 0 `i `us
+-> -> 33 `i `us
+-> -> 66 `i `us
+-> -> 99 `i `us
+-> -> 132 `i `us
+-> -> 165 `i `us
+-> -> 198 `i `us
+-> -> 231 `i `us
+"14
+-> -> 8 `i `us
+-> -> 41 `i `us
+-> -> 74 `i `us
+-> -> 107 `i `us
+-> -> 140 `i `us
+-> -> 173 `i `us
+-> -> 206 `i `us
+"15
+-> -> 239 `i `us
+..
+]
+[; ;crc16.c: 12: unsigned short CRC16_LookupLow[16] = {
+[; ;crc16.c: 13: 0x00, 0x21, 0x42, 0x63, 0x84, 0xA5, 0xC6, 0xE7,
+[; ;crc16.c: 14: 0x08, 0x29, 0x4A, 0x6B, 0x8C, 0xAD, 0xCE, 0xEF
+[; ;crc16.c: 15: };
+"21
+[v _CRC16_Reg `us ~T0 @X0 1 e ]
+[; ;crc16.c: 21: unsigned short CRC16_Reg;
+"28
+[v _CRC16_Init `(v ~T0 @X0 1 ef ]
+{
+[; ;crc16.c: 27: void CRC16_Init( void )
+[; ;crc16.c: 28: {
+[e :U _CRC16_Init ]
+[f ]
+[; ;crc16.c: 30: CRC16_High = 0xFF;
+"30
+[e = _CRC16_High -> -> 255 `i `uc ]
+[; ;crc16.c: 31: CRC16_Low = 0xFF;
+"31
+[e = _CRC16_Low -> -> 255 `i `uc ]
+[; ;crc16.c: 32: }
+"32
+[e :UE 1 ]
+}
+"38
+[v _CRC16_Update4Bits `(v ~T0 @X0 1 ef1`uc ]
+{
+[; ;crc16.c: 38: void CRC16_Update4Bits(unsigned char val) {
+[e :U _CRC16_Update4Bits ]
+[v _val `uc ~T0 @X0 1 r1 ]
+[f ]
+"39
+[v _t `uc ~T0 @X0 1 a ]
+[; ;crc16.c: 39: unsigned char t;
+[; ;crc16.c: 42: t = CRC16_High >> 4;
+"42
+[e = _t -> >> -> _CRC16_High `i -> 4 `i `uc ]
+[; ;crc16.c: 45: t = t ^ val;
+"45
+[e = _t -> ^ -> _t `i -> _val `i `uc ]
+[; ;crc16.c: 50: CRC16_Reg = CRC16_Reg << 4;
+"50
+[e = _CRC16_Reg -> << -> _CRC16_Reg `ui -> 4 `i `us ]
+[; ;crc16.c: 55: CRC16_Reg = CRC16_Reg ^ (CRC16_LookupHigh[t] << 8) | CRC16_LookupLow[t];
+"55
+[e = _CRC16_Reg -> | ^ -> _CRC16_Reg `ui << -> *U + &U _CRC16_LookupHigh * -> _t `ux -> -> # *U &U _CRC16_LookupHigh `ui `ux `ui -> 8 `i -> *U + &U _CRC16_LookupLow * -> _t `ux -> -> # *U &U _CRC16_LookupLow `ui `ux `ui `us ]
+[; ;crc16.c: 57: }
+"57
+[e :UE 2 ]
+}
+"61
+[v _CRC16_Update `(v ~T0 @X0 1 ef1`uc ]
+{
+[; ;crc16.c: 61: void CRC16_Update(unsigned char val) {
+[e :U _CRC16_Update ]
+[v _val `uc ~T0 @X0 1 r1 ]
+[f ]
+[; ;crc16.c: 62: CRC16_Update4Bits(val >> 4);
+"62
+[e ( _CRC16_Update4Bits (1 -> >> -> _val `i -> 4 `i `uc ]
+[; ;crc16.c: 63: CRC16_Update4Bits(val & 0x0F);
+"63
+[e ( _CRC16_Update4Bits (1 -> & -> _val `i -> 15 `i `uc ]
+[; ;crc16.c: 64: }
+"64
+[e :UE 3 ]
+}
+"66
+[v _CRC16_Generate `(us ~T0 @X0 1 ef2`*uc`i ]
+{
+[; ;crc16.c: 66: unsigned short CRC16_Generate(unsigned char* msg, int len) {
+[e :U _CRC16_Generate ]
+[v _msg `*uc ~T0 @X0 1 r1 ]
+[v _len `i ~T0 @X0 1 r2 ]
+[f ]
+[; ;crc16.c: 67: CRC16_Init();
+"67
+[e ( _CRC16_Init ..  ]
+"68
+[v _i `i ~T0 @X0 1 a ]
+[; ;crc16.c: 68: int i;
+[; ;crc16.c: 69: for(i=0; i<len; i++) {
+"69
+{
+[e = _i -> 0 `i ]
+[e $U 8  ]
+[e :U 5 ]
+{
+[; ;crc16.c: 70: CRC16_Update(msg[i]);
+"70
+[e ( _CRC16_Update (1 *U + _msg * -> _i `x -> -> # *U _msg `i `x ]
+"71
+}
+"69
+[e ++ _i -> 1 `i ]
+[e :U 8 ]
+[e $ < _i _len 5  ]
+[e :U 6 ]
+"71
+}
+[; ;crc16.c: 71: }
+[; ;crc16.c: 73: return CRC16_Reg;
+"73
+[e ) _CRC16_Reg ]
+[e $UE 4  ]
+[; ;crc16.c: 74: }
+"74
+[e :UE 4 ]
+}
