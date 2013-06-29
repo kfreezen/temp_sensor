@@ -83,14 +83,15 @@ int main(int argc, char** argv) {
     sleep(1);
     
     XBAPI_Command(CMD_ATSM, command_data, 0xc0, TRUE);
-    //XBAPI_Command(CMD_ATAC, 0, 0xc1, FALSE);
+    XBAPI_Command(CMD_ATAC, 0, 0xc1, FALSE);
 
     // Initialize crc16 code.
     CRC16_Init();
 
     // Send receiver address broadcast request
-    //SendReceiverBroadcastRequest();
-
+    SendReceiverBroadcastRequest();
+    //XBAPI_HandleFrame(API_RX_INDICATOR);
+    
     //LED2_SIGNAL = 1;
 
     // Core logic
@@ -98,7 +99,7 @@ int main(int argc, char** argv) {
         XBee_Wake();
         //sleep(1); // FIXME: This is an extremely bad way to do this.  Figure out a
         timer1_poll_delay_ms(14);
-        //SendReport();
+        SendReport();
         XBee_Sleep();
 
         sleep(59);

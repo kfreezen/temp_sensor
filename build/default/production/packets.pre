@@ -192,12 +192,14 @@ byte buffer[60];
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
+
+
 void SendReport() {
 packet_buffer.header.command = 0x00;
 packet_buffer.header.magic = 0xAA55;
 packet_buffer.header.revision = 0;
 packet_buffer.report.thermistorBeta = 3948;
-packet_buffer.report.thermistorResistance = ADC_Read(10);
+packet_buffer.report.thermistorResistance = ADC_ReadOne(10);
 packet_buffer.report.thermistorResistance25C = 5000;
 packet_buffer.report.topResistorValue = 16200;
 packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));

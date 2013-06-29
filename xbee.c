@@ -51,23 +51,27 @@ void XBee_Recv(char* buf, int max_len, const char end_char) {
 Frame apiFrame;
 
 unsigned char checksum_debug = 0;
+void* __addr;
 
-int checksum(void* addr, int length) {
+unsigned char checksum(void* addr, int length) {
     unsigned char* address = (unsigned char*) addr;
+    __addr = addr;
     
     // Calculate checksum
     unsigned char checksum = 0;
     int i;
     for(i=0; i<length; i++) {
         checksum += address[i];
-        checksum_debug = checksum;
+        checksum_debug = address[i];
     }
 
     return 0xFF - checksum;
 }
 
-int doChecksumVerify(unsigned char* address, int length, unsigned char checksum) {
+unsigned char doChecksumVerify(unsigned char* address, int length, unsigned char checksum) {
     unsigned char check = 0;
+    __addr = address;
+    
     int i;
     for(i=0; i<length; i++) {
         check += address[i];
@@ -75,7 +79,7 @@ int doChecksumVerify(unsigned char* address, int length, unsigned char checksum)
 
     check += checksum;
 
-    return (check == 0xFF) ? TRUE : FALSE;
+    return check;
 }
 
 void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id) {
@@ -91,7 +95,7 @@ void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length,
     apiFrame.tx.transmit_options = 0;
     apiFrame.tx.broadcast_radius = 0;
     memcpy(&apiFrame.tx.packet, data, (length>sizeof(Packet)) ? sizeof(Packet) : length);
-    apiFrame.tx.checksum = checksum(&apiFrame+3, frame_length-4);
+    apiFrame.tx.checksum = checksum(apiFrame.buffer+3, frame_length-4);
 
     UART_TransmitMsg((byte*)&apiFrame, sizeof(TxFrame), 0);
 
@@ -137,12 +141,9 @@ int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_v
     apiFrame.atCmd.frame_id = id;
     apiFrame.atCmd.command = command;
     apiFrame.atCmd.data = swap_endian_32(data);
-
-    
-    byte check = doChecksumVerify(&apiFrame+3, atCmdLength-4, calc_checksum);
-    calc_checksum = checksum(&apiFrame+3, atCmdLength-4);
-
-    //calc_checksum = 0;
+   
+    calc_checksum = checksum(apiFrame.buffer+3, atCmdLength-4);
+    byte check = doChecksumVerify(apiFrame.buffer+3, atCmdLength-4, calc_checksum);
     
     if(data_valid) {
         apiFrame.atCmd.checksum = calc_checksum;
