@@ -30,6 +30,8 @@ inline void XBee_Sleep() {
 
 inline void XBee_Wake() {
     XBEE_SLEEP_RQ = 0;
+    // wait for nCTS to go low.
+    while(XBEE_nCTS) {}
 }
 
 inline void XBee_Disable() {
@@ -99,8 +101,11 @@ void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length,
 
     UART_TransmitMsg((byte*)&apiFrame, sizeof(TxFrame), 0);
 
-    int error = XBAPI_HandleFrame(API_TRANSMIT_STATUS);
-
+    int error = 0;
+    if(id) {
+        error = XBAPI_HandleFrame(API_TRANSMIT_STATUS);
+    }
+    
     if(error) {
         LED1_SIGNAL = !LED1_SIGNAL;
     }
@@ -153,24 +158,36 @@ int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_v
 
     UART_TransmitMsg(apiFrame.buffer, atCmdLength, 0);
 
-    return XBAPI_HandleFrame(API_AT_CMD_RESPONSE);
+    if(id) {
+        return XBAPI_HandleFrame(API_AT_CMD_RESPONSE);
+    } else {
+        return 0;
+    }
+    
     
     // TODO:  Add checksum verification and a way to discard bytes that aren't in a frame.
 }
 
 int XBAPI_HandleFrame(int expected) {
-    // TODO:  Implement
     // TODO:  Add verification of frames
-    UART_ReceiveMsg(apiFrame.buffer, 3, 0);
 
-    unsigned short received_length = apiFrame.buffer[2];
-    received_length |= (apiFrame.buffer[1]<<8);
+    while (1) {
+        UART_ReceiveMsg(apiFrame.buffer, 3, 0);
 
-    UART_ReceiveMsg(apiFrame.buffer+3, received_length+1, 0);
+        unsigned short received_length = apiFrame.buffer[2];
+        received_length |= (apiFrame.buffer[1] << 8);
 
-    if(apiFrame.rx.frame_type!=expected && expected) {
-        return NOT_HANDLED;
+        UART_ReceiveMsg(apiFrame.buffer + 3, received_length + 1, 0);
+
+        if (apiFrame.rx.frame_type != expected && expected) {
+            // This is better than before, but I don't know if it's the best way.
+            continue;
+        } else {
+            break;
+        }
     }
+
+    
     
     switch(apiFrame.rx.frame_type) { // It's all the same frame type so it doesn't really matter which struct in the union I choose to access it.
         case API_RX_INDICATOR: {
@@ -191,6 +208,10 @@ int XBAPI_HandleFrame(int expected) {
         case API_TRANSMIT_STATUS: {
             // TODO:  Add error handling code here.
             return apiFrame.txStatus.delivery_status;
+        }
+
+        case API_AT_CMD_RESPONSE: {
+            return apiFrame.atCmdResponse.cmd_status;
         }
 
         default:

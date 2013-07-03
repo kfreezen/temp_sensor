@@ -50,6 +50,12 @@ int GetOhms(int adc_value) {
 
 extern XBeeAddress dest_address;
 
+int therm_debug = 0;
+
+extern void __doTestSendPacket();
+
+int error;
+
 // TODO:  Enable ADC pins
 int main(int argc, char** argv) {
     TRISC = TRISC_MASK;
@@ -79,27 +85,40 @@ int main(int argc, char** argv) {
 
     XBee_Enable(9600);
     XBee_Wake();
-
-    sleep(1);
     
-    XBAPI_Command(CMD_ATSM, command_data, 0xc0, TRUE);
-    XBAPI_Command(CMD_ATAC, 0, 0xc1, FALSE);
+    error = XBAPI_Command(CMD_ATSM, command_data, 0xc0, TRUE);
+    if(error) {
+        XBee_Disable();
+        while(1){}
+    }
 
+    error = XBAPI_Command(CMD_ATAC, 0, 0xc1, FALSE);
+    if(error) {
+        XBee_Disable();
+        while(1){}
+    }
+    
+    ADC_Enable(SEL_PORTB, 1);
+    
     // Initialize crc16 code.
     CRC16_Init();
 
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
-    //XBAPI_HandleFrame(API_RX_INDICATOR);
+    XBAPI_HandleFrame(API_RX_INDICATOR); // Freezing here because it never gets any stuff.
     
     //LED2_SIGNAL = 1;
 
     // Core logic
     while(1) {
+        // Gather data here so that the xbee isn't waiting on it.
+        long thermistorResistance = (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(THERMISTOR_CHANNEL))-1000);
+        therm_debug = thermistorResistance;
+        
         XBee_Wake();
         //sleep(1); // FIXME: This is an extremely bad way to do this.  Figure out a
-        timer1_poll_delay_ms(14);
-        SendReport();
+        //timer1_poll_delay_ms(100);
+        SendReport(thermistorResistance, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
         XBee_Sleep();
 
         sleep(59);

@@ -53,12 +53,13 @@ byte address[8];
 byte packet_data[32];
 } Packet;
 
-void SendReport();
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
+
 void SendReceiverBroadcastRequest();
 
 void SendPacket(Packet* packet);
 
-# 34 "platform_defines.h"
+# 38 "platform_defines.h"
 typedef struct {
 unsigned short magic;
 short thermistorValue25CAdjust;
@@ -192,16 +193,15 @@ byte buffer[60];
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
 
-
-void SendReport() {
 packet_buffer.header.command = 0x00;
 packet_buffer.header.magic = 0xAA55;
 packet_buffer.header.revision = 0;
-packet_buffer.report.thermistorBeta = 3948;
-packet_buffer.report.thermistorResistance = ADC_ReadOne(10);
-packet_buffer.report.thermistorResistance25C = 5000;
-packet_buffer.report.topResistorValue = 16200;
+packet_buffer.report.thermistorBeta = thermBeta;
+packet_buffer.report.thermistorResistance = thermistorResistance;
+packet_buffer.report.thermistorResistance25C = thermRes25C;
+packet_buffer.report.topResistorValue = topResValue;
 packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
 
 SendPacket(&packet_buffer);
@@ -218,6 +218,13 @@ SendPacket(&packet_buffer);
 
 unsigned char frame_id_itr = 0;
 
+void __doTestSendPacket() {
+SendPacket(&packet_buffer);
+}
+
 void SendPacket(Packet* packet) {
-XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), ++frame_id_itr);
+if(frame_id_itr == 0) {
+frame_id_itr++;
+}
+XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0);
 }

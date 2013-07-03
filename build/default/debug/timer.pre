@@ -6058,7 +6058,7 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned long u32;
 
-# 34 "platform_defines.h"
+# 38 "platform_defines.h"
 typedef struct {
 unsigned short magic;
 short thermistorValue25CAdjust;

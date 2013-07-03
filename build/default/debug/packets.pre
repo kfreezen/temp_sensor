@@ -53,12 +53,13 @@ byte address[8];
 byte packet_data[32];
 } Packet;
 
-void SendReport();
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
+
 void SendReceiverBroadcastRequest();
 
 void SendPacket(Packet* packet);
 
-# 34 "platform_defines.h"
+# 38 "platform_defines.h"
 typedef struct {
 unsigned short magic;
 short thermistorValue25CAdjust;
@@ -176,6 +177,21 @@ byte discovery_status;
 byte checksum;
 } TxStatusFrame;
 
+typedef struct {
+byte start_delimiter;
+byte length[2];
+byte frame_type;
+byte frame_id;
+union {
+byte command_bytes[2];
+unsigned short command;
+};
+
+byte cmd_status;
+
+byte data[5];
+} ATCmdResponse;
+
 typedef union {
 RxFrame rx;
 TxFrame tx;
@@ -184,6 +200,7 @@ TxStatusFrame txStatus;
 ATCmdFrame atCmd;
 ATCmdFrame_NoData atCmdNoData;
 
+ATCmdResponse atCmdResponse;
 byte buffer[60];
 
 } Frame;
@@ -192,14 +209,15 @@ byte buffer[60];
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
-void SendReport() {
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
+
 packet_buffer.header.command = 0x00;
 packet_buffer.header.magic = 0xAA55;
 packet_buffer.header.revision = 0;
-packet_buffer.report.thermistorBeta = 3948;
-packet_buffer.report.thermistorResistance = ADC_Read(10);
-packet_buffer.report.thermistorResistance25C = 5000;
-packet_buffer.report.topResistorValue = 16200;
+packet_buffer.report.thermistorBeta = thermBeta;
+packet_buffer.report.thermistorResistance = thermistorResistance;
+packet_buffer.report.thermistorResistance25C = thermRes25C;
+packet_buffer.report.topResistorValue = topResValue;
 packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
 
 SendPacket(&packet_buffer);
@@ -216,6 +234,13 @@ SendPacket(&packet_buffer);
 
 unsigned char frame_id_itr = 0;
 
+void __doTestSendPacket() {
+SendPacket(&packet_buffer);
+}
+
 void SendPacket(Packet* packet) {
-XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), ++frame_id_itr);
+if(frame_id_itr == 0) {
+frame_id_itr++;
+}
+XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0);
 }

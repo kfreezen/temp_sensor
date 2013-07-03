@@ -7,16 +7,15 @@
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
-#define THERMISTOR_CHANNEL 10
-
-void SendReport() {
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
+    
     packet_buffer.header.command = REPORT;
     packet_buffer.header.magic = 0xAA55;
     packet_buffer.header.revision = PROGRAM_REVISION;
-    packet_buffer.report.thermistorBeta = THERMISTOR_BETA;
-    packet_buffer.report.thermistorResistance = ADC_ReadOne(THERMISTOR_CHANNEL);
-    packet_buffer.report.thermistorResistance25C = THERMISTOR_RESISTANCE_25C;
-    packet_buffer.report.topResistorValue = TOP_RESISTOR_VALUE;
+    packet_buffer.report.thermistorBeta = thermBeta;
+    packet_buffer.report.thermistorResistance = thermistorResistance;
+    packet_buffer.report.thermistorResistance25C = thermRes25C;
+    packet_buffer.report.topResistorValue = topResValue;
     packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
     
     SendPacket(&packet_buffer);
@@ -33,6 +32,13 @@ void SendReceiverBroadcastRequest() {
 
 unsigned char frame_id_itr = 0;
 
+void __doTestSendPacket() {
+    SendPacket(&packet_buffer);
+}
+
 void SendPacket(Packet* packet) {
-    XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), ++frame_id_itr);
+    if(frame_id_itr == 0) {
+        frame_id_itr++;
+    }
+    XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0); // FIXME:  Some time I may want to know what the transmit status is.
 }

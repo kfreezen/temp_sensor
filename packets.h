@@ -61,7 +61,8 @@ typedef union {
     byte packet_data[32];
 } Packet;
 
-void SendReport();
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
+
 void SendReceiverBroadcastRequest();
 
 void SendPacket(Packet* packet);

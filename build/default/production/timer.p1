@@ -4438,15 +4438,15 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;globaldef.h: 14: typedef unsigned char byte;
 [; ;globaldef.h: 15: typedef unsigned short word;
 [; ;globaldef.h: 16: typedef unsigned long u32;
-[; ;platform_defines.h: 34: typedef struct {
-[; ;platform_defines.h: 35: unsigned short magic;
-[; ;platform_defines.h: 36: short thermistorValue25CAdjust;
-[; ;platform_defines.h: 37: short topResistorValueAdjust;
-[; ;platform_defines.h: 38: } CalibrationData;
-[; ;platform_defines.h: 41: typedef struct {
-[; ;platform_defines.h: 42: word magic;
-[; ;platform_defines.h: 43: word interval;
-[; ;platform_defines.h: 44: } IntervalData;
+[; ;platform_defines.h: 38: typedef struct {
+[; ;platform_defines.h: 39: unsigned short magic;
+[; ;platform_defines.h: 40: short thermistorValue25CAdjust;
+[; ;platform_defines.h: 41: short topResistorValueAdjust;
+[; ;platform_defines.h: 42: } CalibrationData;
+[; ;platform_defines.h: 45: typedef struct {
+[; ;platform_defines.h: 46: word magic;
+[; ;platform_defines.h: 47: word interval;
+[; ;platform_defines.h: 48: } IntervalData;
 "5 timer.c
 [v _Timer1_Init `(v ~T0 @X0 1 ef2`i`i ]
 {

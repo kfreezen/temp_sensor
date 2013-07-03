@@ -6305,7 +6305,8 @@ byte address[8];
 byte packet_data[32];
 } Packet;
 
-void SendReport();
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
+
 void SendReceiverBroadcastRequest();
 
 void SendPacket(Packet* packet);
@@ -6400,7 +6401,7 @@ void UART_ReceiveMsgTmo(char* msg, int len, const char end_char, long tmo);
 
 inline void UART_ReceiveMsg(char* msg, int len, const char end_char);
 
-# 34 "platform_defines.h"
+# 38 "platform_defines.h"
 typedef struct {
 unsigned short magic;
 short thermistorValue25CAdjust;
@@ -6457,6 +6458,10 @@ return 16200000/((4096000/adc_value)-1000);
 
 extern XBeeAddress dest_address;
 
+int therm_debug = 0;
+
+extern void __doTestSendPacket();
+
 
 int main(int argc, char** argv) {
 TRISC = 0x84;
@@ -6487,23 +6492,30 @@ EEPROM_Write((0x00+sizeof(CalibrationData)), (byte*)&intervalData, sizeof(Interv
 XBee_Enable(9600);
 XBee_Wake();
 
-sleep(1);
-
 XBAPI_Command(0x4D53, command_data, 0xc0, 1);
 XBAPI_Command(0x4341, 0, 0xc1, 0);
+
+ADC_Enable(1, 1);
 
 
 CRC16_Init();
 
 
 SendReceiverBroadcastRequest();
+XBAPI_HandleFrame(0x90);
 
-# 98
+
+
+
 while(1) {
+
+long thermistorResistance = (16200 * 1000L) / ((4096000L/ADC_Read(10))-1000);
+therm_debug = thermistorResistance;
+
 XBee_Wake();
 
-timer1_poll_delay_ms(14);
-SendReport();
+
+SendReport(thermistorResistance, 5000, 3948, 16200);
 XBee_Sleep();
 
 sleep(59);

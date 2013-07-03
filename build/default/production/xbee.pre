@@ -78,7 +78,8 @@ byte address[8];
 byte packet_data[32];
 } Packet;
 
-void SendReport();
+void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
+
 void SendReceiverBroadcastRequest();
 
 void SendPacket(Packet* packet);
@@ -6225,7 +6226,7 @@ void timer1_poll_delay_ms(unsigned short ms);
 
 void wdt_sleep(int setting);
 
-# 34 "platform_defines.h"
+# 38 "platform_defines.h"
 typedef struct {
 unsigned short magic;
 short thermistorValue25CAdjust;
@@ -6306,6 +6307,8 @@ PORTCbits.RC1 = 1;
 
 inline void XBee_Wake() {
 PORTCbits.RC1 = 0;
+
+while(PORTCbits.RC4) {}
 }
 
 inline void XBee_Disable() {
@@ -6375,7 +6378,10 @@ apiFrame.tx.checksum = checksum(apiFrame.buffer+3, frame_length-4);
 
 UART_TransmitMsg((byte*)&apiFrame, sizeof(TxFrame), 0);
 
-int error = XBAPI_HandleFrame(0x8B);
+int error = 0;
+if(id) {
+error = XBAPI_HandleFrame(0x8B);
+}
 
 if(error) {
 PORTCbits.RC3 = !PORTCbits.RC3;
@@ -6396,7 +6402,7 @@ return r;
 byte calc_checksum;
 int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid) {
 
-# 135
+# 140
 int atCmdLength = (data_valid) ? sizeof(ATCmdFrame) : sizeof(ATCmdFrame_NoData);
 
 apiFrame.atCmd.start_delimiter = 0x7e;
@@ -6418,7 +6424,12 @@ apiFrame.atCmdNoData.checksum = calc_checksum;
 
 UART_TransmitMsg(apiFrame.buffer, atCmdLength, 0);
 
+if(id) {
 return XBAPI_HandleFrame(0x88);
+} else {
+return 0;
+}
+
 
 
 }

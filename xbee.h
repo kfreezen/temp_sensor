@@ -160,6 +160,21 @@ typedef struct {
     byte checksum;
 } TxStatusFrame;
 
+typedef struct {
+    byte start_delimiter;
+    byte length[2];
+    byte frame_type;
+    byte frame_id;
+    union {
+        byte command_bytes[2];
+        unsigned short command;
+    };
+
+    byte cmd_status;
+    
+    byte data[5]; // 4 bytes is the maximum that we can handle + 1 byte for the checksum.
+} ATCmdResponse;
+
 typedef union {
     RxFrame rx;
     TxFrame tx;
@@ -167,7 +182,8 @@ typedef union {
 
     ATCmdFrame atCmd;
     ATCmdFrame_NoData atCmdNoData;
-    
+
+    ATCmdResponse atCmdResponse;
     byte buffer[60];
     
 } Frame;
