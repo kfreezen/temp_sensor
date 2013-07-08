@@ -1,8 +1,8 @@
 Version 3.2 HI-TECH Software Intermediate Code
-[s S530 `us 1 `s 1 `s 1 ]
-[n S530 . magic thermistorValue25CAdjust topResistorValueAdjust ]
-[s S531 `us 1 `us 1 ]
-[n S531 . magic interval ]
+[s S532 `us 1 `s 1 `s 1 ]
+[n S532 . magic thermistorValue25CAdjust topResistorValueAdjust ]
+[s S533 `us 1 `us 1 ]
+[n S533 . magic interval ]
 [s S41 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
 [n S41 . RC0 RC1 RC2 RC3 RC4 RC5 RC6 RC7 ]
 [s S42 :8 `uc 1 ]
@@ -34,11 +34,13 @@ Version 3.2 HI-TECH Software Intermediate Code
 [v _EEPROM_Write `(v ~T0 @X0 0 ef3`uc`*uc`i ]
 "25 xbee.h
 [v _XBee_Enable `(v ~T0 @X0 0 ef1`i ]
-"32
-[v F4953 `(v ~T0 @X0 1 tf ]
-[v _XBee_Wake `TF4953 ~T0 @X0 0 e ]
-"77
+"42 timer.h
+[v _sleep `(v ~T0 @X0 0 ef1`us ]
+"77 xbee.h
 [v _XBAPI_Command `(i ~T0 @X0 0 ef4`us`ul`i`i ]
+"30
+[v F4949 `(v ~T0 @X0 1 tf ]
+[v _XBee_Disable `TF4949 ~T0 @X0 0 e ]
 "16 adc.h
 [v _ADC_Enable `(v ~T0 @X0 0 ef2`i`i ]
 "16 crc16.h
@@ -49,13 +51,14 @@ Version 3.2 HI-TECH Software Intermediate Code
 [v _XBAPI_HandleFrame `(i ~T0 @X0 0 ef1`i ]
 "18 adc.h
 [v _ADC_Read `(ui ~T0 @X0 0 ef1`i ]
+"32 xbee.h
+[v F4953 `(v ~T0 @X0 1 tf ]
+[v _XBee_Wake `TF4953 ~T0 @X0 0 e ]
 "64 packets.h
 [v _SendReport `(v ~T0 @X0 0 ef4`i`i`i`i ]
 "31 xbee.h
 [v F4951 `(v ~T0 @X0 1 tf ]
 [v _XBee_Sleep `TF4951 ~T0 @X0 0 e ]
-"42 timer.h
-[v _sleep `(v ~T0 @X0 0 ef1`us ]
 "8 main.c
 [p x WDTE=SWDTEN ]
 "9
@@ -4692,14 +4695,27 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;xbee.h: 159: byte discovery_status;
 [; ;xbee.h: 160: byte checksum;
 [; ;xbee.h: 161: } TxStatusFrame;
-[; ;xbee.h: 163: typedef union {
-[; ;xbee.h: 164: RxFrame rx;
-[; ;xbee.h: 165: TxFrame tx;
-[; ;xbee.h: 166: TxStatusFrame txStatus;
-[; ;xbee.h: 168: ATCmdFrame atCmd;
-[; ;xbee.h: 169: ATCmdFrame_NoData atCmdNoData;
-[; ;xbee.h: 171: byte buffer[60];
-[; ;xbee.h: 173: } Frame;
+[; ;xbee.h: 163: typedef struct {
+[; ;xbee.h: 164: byte start_delimiter;
+[; ;xbee.h: 165: byte length[2];
+[; ;xbee.h: 166: byte frame_type;
+[; ;xbee.h: 167: byte frame_id;
+[; ;xbee.h: 168: union {
+[; ;xbee.h: 169: byte command_bytes[2];
+[; ;xbee.h: 170: unsigned short command;
+[; ;xbee.h: 171: };
+[; ;xbee.h: 173: byte cmd_status;
+[; ;xbee.h: 175: byte data[5];
+[; ;xbee.h: 176: } ATCmdResponse;
+[; ;xbee.h: 178: typedef union {
+[; ;xbee.h: 179: RxFrame rx;
+[; ;xbee.h: 180: TxFrame tx;
+[; ;xbee.h: 181: TxStatusFrame txStatus;
+[; ;xbee.h: 183: ATCmdFrame atCmd;
+[; ;xbee.h: 184: ATCmdFrame_NoData atCmdNoData;
+[; ;xbee.h: 186: ATCmdResponse atCmdResponse;
+[; ;xbee.h: 187: byte buffer[60];
+[; ;xbee.h: 189: } Frame;
 [; ;uart.h: 15: void UART_Init(int baud);
 [; ;uart.h: 17: void UART_Transmit(volatile char c);
 [; ;uart.h: 19: void UART_TransmitMsg(volatile const unsigned char* msg, int len, const char end_char);
@@ -4729,10 +4745,10 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;crc16.h: 18: void CRC16_Update( unsigned char val );
 [; ;crc16.h: 19: unsigned short CRC16_Generate(unsigned char* msg, int len);
 "27 main.c
-[v _calibrationData `S530 ~T0 @X0 1 e ]
+[v _calibrationData `S532 ~T0 @X0 1 e ]
 [; ;main.c: 27: CalibrationData calibrationData;
 "28
-[v _intervalData `S531 ~T0 @X0 1 e ]
+[v _intervalData `S533 ~T0 @X0 1 e ]
 [; ;main.c: 28: IntervalData intervalData;
 "30
 [v _pulseLed `(v ~T0 @X0 1 ef1`i ]
@@ -4752,40 +4768,40 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e = . . _PORTCbits 0 3 -> -> 0 `i `uc ]
 [; ;main.c: 34: }
 "34
-[e :UE 532 ]
+[e :UE 534 ]
 }
 "36
-[v F5145 `(v ~T0 @X0 1 tf ]
-[v _isr `IF5145 ~T0 @X0 1 e ]
+[v F5158 `(v ~T0 @X0 1 tf ]
+[v _isr `IF5158 ~T0 @X0 1 e ]
 {
 [; ;main.c: 36: void interrupt isr() {
 [e :U _isr ]
 [f ]
 [; ;main.c: 37: if(PIR1bits.TMR1IF==1) {
 "37
-[e $ ! == -> . . _PIR1bits 0 0 `i -> 1 `i 534  ]
+[e $ ! == -> . . _PIR1bits 0 0 `i -> 1 `i 536  ]
 {
 [; ;main.c: 38: PIR1bits.TMR1IF = 0;
 "38
 [e = . . _PIR1bits 0 0 -> -> 0 `i `uc ]
 "39
 }
-[e :U 534 ]
+[e :U 536 ]
 [; ;main.c: 39: }
 [; ;main.c: 41: if(PIR1bits.RCIF==1) {
 "41
-[e $ ! == -> . . _PIR1bits 0 5 `i -> 1 `i 535  ]
+[e $ ! == -> . . _PIR1bits 0 5 `i -> 1 `i 537  ]
 {
 [; ;main.c: 42: PIR1bits.RCIF = 0;
 "42
 [e = . . _PIR1bits 0 5 -> -> 0 `i `uc ]
 "44
 }
-[e :U 535 ]
+[e :U 537 ]
 [; ;main.c: 44: }
 [; ;main.c: 45: }
 "45
-[e :UE 533 ]
+[e :UE 535 ]
 }
 "47
 [v _GetOhms `(i ~T0 @X0 1 ef1`i ]
@@ -4797,10 +4813,10 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;main.c: 48: return 16200000/((4096000/adc_value)-1000);
 "48
 [e ) -> / -> 16200000 `l - / -> 4096000 `l -> _adc_value `l -> -> 1000 `i `l `i ]
-[e $UE 536  ]
+[e $UE 538  ]
 [; ;main.c: 49: }
 "49
-[e :UE 536 ]
+[e :UE 538 ]
 }
 [; ;main.c: 51: extern XBeeAddress dest_address;
 "53
@@ -4810,128 +4826,187 @@ Version 3.2 HI-TECH Software Intermediate Code
 ]
 [; ;main.c: 53: int therm_debug = 0;
 [; ;main.c: 55: extern void __doTestSendPacket();
+"57
+[v _error `i ~T0 @X0 1 e ]
+[; ;main.c: 57: int error;
 "58
+[v _cmd_itr `i ~T0 @X0 1 e ]
+[i _cmd_itr
+-> 0 `i
+]
+[; ;main.c: 58: int cmd_itr = 0;
+"61
 [v _main `(i ~T0 @X0 1 ef2`i`**uc ]
 {
-[; ;main.c: 58: int main(int argc, char** argv) {
+[; ;main.c: 61: int main(int argc, char** argv) {
 [e :U _main ]
 [v _argc `i ~T0 @X0 1 r1 ]
 [v _argv `**uc ~T0 @X0 1 r2 ]
 [f ]
-[; ;main.c: 59: TRISC = 0x84;
-"59
-[e = _TRISC -> -> 132 `i `uc ]
-[; ;main.c: 60: TRISB = 0x80;
-"60
-[e = _TRISB -> -> 128 `i `uc ]
-[; ;main.c: 61: TRISA = 0x0;
-"61
-[e = _TRISA -> -> 0 `i `uc ]
+[; ;main.c: 62: TRISC = 0x80 | (0x14);;
+"62
+[e = _TRISC -> | -> 128 `i -> 20 `i `uc ]
+[; ;main.c: 63: TRISB = 0x0;
 "63
-[v _command_data `ul ~T0 @X0 1 a ]
-[; ;main.c: 63: unsigned long command_data = 0x1;
-[e = _command_data -> -> -> 1 `i `l `ul ]
-[; ;main.c: 65: pulseLed(5000);
-"65
-[e ( _pulseLed (1 -> 5000 `i ]
-[; ;main.c: 66: timer1_poll_delay(5000, 3);
+[e = _TRISB -> -> 0 `i `uc ]
+[; ;main.c: 64: TRISA = 0x0;
+"64
+[e = _TRISA -> -> 0 `i `uc ]
 "66
-[e ( _timer1_poll_delay (2 , -> -> 5000 `i `us -> 3 `i ]
-[; ;main.c: 69: EEPROM_Read(0x00, (byte*)&calibrationData, sizeof(CalibrationData));
+[v _command_data `ul ~T0 @X0 1 a ]
+[; ;main.c: 66: unsigned long command_data = 0x1;
+[e = _command_data -> -> -> 1 `i `l `ul ]
+[; ;main.c: 68: pulseLed(5000);
+"68
+[e ( _pulseLed (1 -> 5000 `i ]
+[; ;main.c: 69: timer1_poll_delay(5000, 3);
 "69
-[e ( _EEPROM_Read (3 , , -> -> 0 `i `uc -> &U _calibrationData `*uc -> -> # `S530 `ui `i ]
-[; ;main.c: 70: if(calibrationData.magic != 0xF00D) {
-"70
-[e $ ! != -> . _calibrationData 0 `ui -> 61453 `ui 538  ]
-{
-[; ;main.c: 71: memset(&calibrationData, 0, sizeof(CalibrationData));
-"71
-[e ( _memset (3 , , -> &U _calibrationData `*v -> 0 `i -> # `S530 `ui ]
-[; ;main.c: 72: calibrationData.magic = 0xF00D;
-"72
-[e = . _calibrationData 0 -> -> 61453 `ui `us ]
-[; ;main.c: 73: EEPROM_Write(0x00, (byte*)&calibrationData, sizeof(CalibrationData));
+[e ( _timer1_poll_delay (2 , -> -> 5000 `i `us -> 3 `i ]
+[; ;main.c: 73: EEPROM_Read(0x00, (byte*)&calibrationData, sizeof(CalibrationData));
 "73
-[e ( _EEPROM_Write (3 , , -> -> 0 `i `uc -> &U _calibrationData `*uc -> -> # `S530 `ui `i ]
+[e ( _EEPROM_Read (3 , , -> -> 0 `i `uc -> &U _calibrationData `*uc -> -> # `S532 `ui `i ]
+[; ;main.c: 74: if(calibrationData.magic != 0xF00D) {
 "74
-}
-[e :U 538 ]
-[; ;main.c: 74: }
-[; ;main.c: 77: EEPROM_Read((0x00+sizeof(CalibrationData)), (byte*)&intervalData, sizeof(IntervalData));
+[e $ ! != -> . _calibrationData 0 `ui -> 61453 `ui 540  ]
+{
+[; ;main.c: 75: memset(&calibrationData, 0, sizeof(CalibrationData));
+"75
+[e ( _memset (3 , , -> &U _calibrationData `*v -> 0 `i -> # `S532 `ui ]
+[; ;main.c: 76: calibrationData.magic = 0xF00D;
+"76
+[e = . _calibrationData 0 -> -> 61453 `ui `us ]
+[; ;main.c: 77: EEPROM_Write(0x00, (byte*)&calibrationData, sizeof(CalibrationData));
 "77
-[e ( _EEPROM_Read (3 , , -> + -> -> 0 `i `ui -> # `S530 `ui `uc -> &U _intervalData `*uc -> -> # `S531 `ui `i ]
-[; ;main.c: 78: if(intervalData.magic != 0xFACE) {
+[e ( _EEPROM_Write (3 , , -> -> 0 `i `uc -> &U _calibrationData `*uc -> -> # `S532 `ui `i ]
 "78
-[e $ ! != -> . _intervalData 0 `ui -> 64206 `ui 539  ]
-{
-[; ;main.c: 79: intervalData.magic = 0xFACE;
-"79
-[e = . _intervalData 0 -> -> 64206 `ui `us ]
-[; ;main.c: 80: intervalData.interval = 60;
-"80
-[e = . _intervalData 1 -> -> 60 `i `us ]
-[; ;main.c: 81: EEPROM_Write((0x00+sizeof(CalibrationData)), (byte*)&intervalData, sizeof(IntervalData));
-"81
-[e ( _EEPROM_Write (3 , , -> + -> -> 0 `i `ui -> # `S530 `ui `uc -> &U _intervalData `*uc -> -> # `S531 `ui `i ]
-"82
-}
-[e :U 539 ]
-[; ;main.c: 82: }
-[; ;main.c: 84: XBee_Enable(9600);
-"84
-[e ( _XBee_Enable (1 -> 9600 `i ]
-[; ;main.c: 85: XBee_Wake();
-"85
-[e ( _XBee_Wake ..  ]
-[; ;main.c: 87: XBAPI_Command(0x4D53, command_data, 0xc0, 1);
-"87
-[e ( _XBAPI_Command (4 , , , -> -> 19795 `i `us _command_data -> 192 `i -> 1 `i ]
-[; ;main.c: 88: XBAPI_Command(0x4341, 0, 0xc1, 0);
-"88
-[e ( _XBAPI_Command (4 , , , -> -> 17217 `i `us -> -> -> 0 `i `l `ul -> 193 `i -> 0 `i ]
-[; ;main.c: 90: ADC_Enable(1, 1);
-"90
-[e ( _ADC_Enable (2 , -> 1 `i -> 1 `i ]
-[; ;main.c: 93: CRC16_Init();
-"93
-[e ( _CRC16_Init ..  ]
-[; ;main.c: 96: SendReceiverBroadcastRequest();
-"96
-[e ( _SendReceiverBroadcastRequest ..  ]
-[; ;main.c: 97: XBAPI_HandleFrame(0x90);
-"97
-[e ( _XBAPI_HandleFrame (1 -> 144 `i ]
-[; ;main.c: 102: while(1) {
-"102
-[e :U 541 ]
-{
-"104
-[v _thermistorResistance `l ~T0 @X0 1 a ]
-[; ;main.c: 104: long thermistorResistance = (16200 * 1000L) / ((4096000L/ADC_Read(10))-1000);
-[e = _thermistorResistance / * -> -> 16200 `i `l -> 1000 `l - / -> 4096000 `l -> ( _ADC_Read (1 -> 10 `i `l -> -> 1000 `i `l ]
-[; ;main.c: 105: therm_debug = thermistorResistance;
-"105
-[e = _therm_debug -> _thermistorResistance `i ]
-[; ;main.c: 107: XBee_Wake();
-"107
-[e ( _XBee_Wake ..  ]
-[; ;main.c: 110: SendReport(thermistorResistance, 5000, 3948, 16200);
-"110
-[e ( _SendReport (4 , , , -> _thermistorResistance `i -> 5000 `i -> 3948 `i -> 16200 `i ]
-[; ;main.c: 111: XBee_Sleep();
-"111
-[e ( _XBee_Sleep ..  ]
-[; ;main.c: 113: sleep(59);
-"113
-[e ( _sleep (1 -> -> 59 `i `us ]
-"114
 }
 [e :U 540 ]
-"102
-[e $U 541  ]
+[; ;main.c: 78: }
+[; ;main.c: 81: EEPROM_Read((0x00+sizeof(CalibrationData)), (byte*)&intervalData, sizeof(IntervalData));
+"81
+[e ( _EEPROM_Read (3 , , -> + -> -> 0 `i `ui -> # `S532 `ui `uc -> &U _intervalData `*uc -> -> # `S533 `ui `i ]
+[; ;main.c: 82: if(intervalData.magic != 0xFACE) {
+"82
+[e $ ! != -> . _intervalData 0 `ui -> 64206 `ui 541  ]
+{
+[; ;main.c: 83: intervalData.magic = 0xFACE;
+"83
+[e = . _intervalData 0 -> -> 64206 `ui `us ]
+[; ;main.c: 84: intervalData.interval = 60;
+"84
+[e = . _intervalData 1 -> -> 60 `i `us ]
+[; ;main.c: 85: EEPROM_Write((0x00+sizeof(CalibrationData)), (byte*)&intervalData, sizeof(IntervalData));
+"85
+[e ( _EEPROM_Write (3 , , -> + -> -> 0 `i `ui -> # `S532 `ui `uc -> &U _intervalData `*uc -> -> # `S533 `ui `i ]
+"86
+}
+[e :U 541 ]
+[; ;main.c: 86: }
+[; ;main.c: 88: XBee_Enable(9600);
+"88
+[e ( _XBee_Enable (1 -> 9600 `i ]
+[; ;main.c: 89: sleep(1);
+"89
+[e ( _sleep (1 -> -> 1 `i `us ]
+[; ;main.c: 91: error = XBAPI_Command(0x4D53, command_data, 0xc0, 1);
+"91
+[e = _error ( _XBAPI_Command (4 , , , -> -> 19795 `i `us _command_data -> 192 `i -> 1 `i ]
+[; ;main.c: 92: if(error) {
+"92
+[e $ ! != _error -> 0 `i 542  ]
+{
+[; ;main.c: 93: XBee_Disable();
+"93
+[e ( _XBee_Disable ..  ]
+[; ;main.c: 94: while(1){
+"94
+[e :U 544 ]
+{
+"96
+}
+[e :U 543 ]
+"94
+[e $U 544  ]
+[e :U 545 ]
+"97
+}
 [e :U 542 ]
-[; ;main.c: 114: }
-[; ;main.c: 115: }
-"115
-[e :UE 537 ]
+[; ;main.c: 96: }
+[; ;main.c: 97: }
+[; ;main.c: 99: cmd_itr++;
+"99
+[e ++ _cmd_itr -> 1 `i ]
+[; ;main.c: 101: error = XBAPI_Command(0x4341, 0, 0xc1, 0);
+"101
+[e = _error ( _XBAPI_Command (4 , , , -> -> 17217 `i `us -> -> -> 0 `i `l `ul -> 193 `i -> 0 `i ]
+[; ;main.c: 102: if(error) {
+"102
+[e $ ! != _error -> 0 `i 546  ]
+{
+[; ;main.c: 103: XBee_Disable();
+"103
+[e ( _XBee_Disable ..  ]
+[; ;main.c: 104: while(1){
+"104
+[e :U 548 ]
+{
+"106
+}
+[e :U 547 ]
+"104
+[e $U 548  ]
+[e :U 549 ]
+"107
+}
+[e :U 546 ]
+[; ;main.c: 106: }
+[; ;main.c: 107: }
+[; ;main.c: 109: cmd_itr++;
+"109
+[e ++ _cmd_itr -> 1 `i ]
+[; ;main.c: 111: ADC_Enable(1, 1);
+"111
+[e ( _ADC_Enable (2 , -> 1 `i -> 1 `i ]
+[; ;main.c: 114: CRC16_Init();
+"114
+[e ( _CRC16_Init ..  ]
+[; ;main.c: 119: SendReceiverBroadcastRequest();
+"119
+[e ( _SendReceiverBroadcastRequest ..  ]
+[; ;main.c: 120: XBAPI_HandleFrame(0x90);
+"120
+[e ( _XBAPI_HandleFrame (1 -> 144 `i ]
+[; ;main.c: 125: while(1) {
+"125
+[e :U 551 ]
+{
+"127
+[v _thermistorResistance `l ~T0 @X0 1 a ]
+[; ;main.c: 127: long thermistorResistance = (16200 * 1000L) / ((4096000L/ADC_Read(10))-1000);
+[e = _thermistorResistance / * -> -> 16200 `i `l -> 1000 `l - / -> 4096000 `l -> ( _ADC_Read (1 -> 10 `i `l -> -> 1000 `i `l ]
+[; ;main.c: 128: therm_debug = thermistorResistance;
+"128
+[e = _therm_debug -> _thermistorResistance `i ]
+[; ;main.c: 130: XBee_Wake();
+"130
+[e ( _XBee_Wake ..  ]
+[; ;main.c: 133: SendReport(thermistorResistance, 5000, 3948, 16200);
+"133
+[e ( _SendReport (4 , , , -> _thermistorResistance `i -> 5000 `i -> 3948 `i -> 16200 `i ]
+[; ;main.c: 134: XBee_Sleep();
+"134
+[e ( _XBee_Sleep ..  ]
+[; ;main.c: 136: sleep(59);
+"136
+[e ( _sleep (1 -> -> 59 `i `us ]
+"137
+}
+[e :U 550 ]
+"125
+[e $U 551  ]
+[e :U 552 ]
+[; ;main.c: 137: }
+[; ;main.c: 138: }
+"138
+[e :UE 539 ]
 }

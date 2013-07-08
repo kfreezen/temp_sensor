@@ -177,6 +177,21 @@ byte discovery_status;
 byte checksum;
 } TxStatusFrame;
 
+typedef struct {
+byte start_delimiter;
+byte length[2];
+byte frame_type;
+byte frame_id;
+union {
+byte command_bytes[2];
+unsigned short command;
+};
+
+byte cmd_status;
+
+byte data[5];
+} ATCmdResponse;
+
 typedef union {
 RxFrame rx;
 TxFrame tx;
@@ -185,6 +200,7 @@ TxStatusFrame txStatus;
 ATCmdFrame atCmd;
 ATCmdFrame_NoData atCmdNoData;
 
+ATCmdResponse atCmdResponse;
 byte buffer[60];
 
 } Frame;

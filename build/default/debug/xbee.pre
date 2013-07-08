@@ -6453,16 +6453,24 @@ return 0;
 int XBAPI_HandleFrame(int expected) {
 
 
+while (1) {
 UART_ReceiveMsg(apiFrame.buffer, 3, 0);
 
 unsigned short received_length = apiFrame.buffer[2];
-received_length |= (apiFrame.buffer[1]<<8);
+received_length |= (apiFrame.buffer[1] << 8);
 
-UART_ReceiveMsg(apiFrame.buffer+3, received_length+1, 0);
+UART_ReceiveMsg(apiFrame.buffer + 3, received_length + 1, 0);
 
-if(apiFrame.rx.frame_type!=expected && expected) {
-return -1;
+if (apiFrame.rx.frame_type != expected && expected) {
+
+continue;
+
+} else {
+break;
 }
+}
+
+
 
 switch(apiFrame.rx.frame_type) {
 case 0x90: {

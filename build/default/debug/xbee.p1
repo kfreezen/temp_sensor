@@ -5096,119 +5096,138 @@ Version 3.2 HI-TECH Software Intermediate Code
 [e :U _XBAPI_HandleFrame ]
 [v _expected `i ~T0 @X0 1 r1 ]
 [f ]
-[; ;xbee.c: 174: UART_ReceiveMsg(apiFrame.buffer, 3, 0);
+[; ;xbee.c: 174: while (1) {
 "174
+[e :U 562 ]
+{
+[; ;xbee.c: 175: UART_ReceiveMsg(apiFrame.buffer, 3, 0);
+"175
 [e ( _UART_ReceiveMsg (3 , , &U . _apiFrame 6 -> 3 `i -> -> 0 `i `uc ]
-"176
-[v _received_length `us ~T0 @X0 1 a ]
-[; ;xbee.c: 176: unsigned short received_length = apiFrame.buffer[2];
-[e = _received_length -> *U + &U . _apiFrame 6 * -> -> -> 2 `i `ui `ux -> -> # *U &U . _apiFrame 6 `ui `ux `us ]
-[; ;xbee.c: 177: received_length |= (apiFrame.buffer[1]<<8);
 "177
+[v _received_length `us ~T0 @X0 1 a ]
+[; ;xbee.c: 177: unsigned short received_length = apiFrame.buffer[2];
+[e = _received_length -> *U + &U . _apiFrame 6 * -> -> -> 2 `i `ui `ux -> -> # *U &U . _apiFrame 6 `ui `ux `us ]
+[; ;xbee.c: 178: received_length |= (apiFrame.buffer[1] << 8);
+"178
 [e =| _received_length -> << -> *U + &U . _apiFrame 6 * -> -> -> 1 `i `ui `ux -> -> # *U &U . _apiFrame 6 `ui `ux `i -> 8 `i `us ]
-[; ;xbee.c: 179: UART_ReceiveMsg(apiFrame.buffer+3, received_length+1, 0);
-"179
+[; ;xbee.c: 180: UART_ReceiveMsg(apiFrame.buffer + 3, received_length + 1, 0);
+"180
 [e ( _UART_ReceiveMsg (3 , , + &U . _apiFrame 6 * -> -> 3 `i `x -> -> # *U &U . _apiFrame 6 `i `x -> + -> _received_length `ui -> -> 1 `i `ui `i -> -> 0 `i `uc ]
-[; ;xbee.c: 181: if(apiFrame.rx.frame_type!=expected && expected) {
-"181
-[e $ ! && != -> . . _apiFrame 0 2 `i _expected != _expected -> 0 `i 561  ]
-{
-[; ;xbee.c: 182: return -1;
+[; ;xbee.c: 182: if (apiFrame.rx.frame_type != expected && expected) {
 "182
-[e ) -U -> 1 `i ]
-[e $UE 560  ]
-"183
-}
-[e :U 561 ]
-[; ;xbee.c: 183: }
-[; ;xbee.c: 185: switch(apiFrame.rx.frame_type) {
-"185
-[e $U 563  ]
+[e $ ! && != -> . . _apiFrame 0 2 `i _expected != _expected -> 0 `i 564  ]
 {
-[; ;xbee.c: 186: case 0x90: {
+[; ;xbee.c: 184: continue;
+"184
+[e $U 561  ]
 "186
+}
+[; ;xbee.c: 186: } else {
+[e $U 565  ]
 [e :U 564 ]
 {
+[; ;xbee.c: 187: break;
+"187
+[e $U 563  ]
 "188
-[v _packet `*S3 ~T0 @X0 1 a ]
-[; ;xbee.c: 188: Packet* packet = &apiFrame.rx.packet;
-[e = _packet &U . . _apiFrame 0 7 ]
-[; ;xbee.c: 189: switch(packet->header.command) {
-"189
-[e $U 566  ]
-{
-[; ;xbee.c: 190: case 0x04:
-"190
-[e :U 567 ]
-[; ;xbee.c: 191: {
-"191
-{
-[; ;xbee.c: 192: memcpy(&dest_address, &apiFrame.rx.source_address, sizeof(XBeeAddress));
-"192
-[e ( _memcpy (3 , , -> &U _dest_address `*v -> &U . . _apiFrame 0 4 `*Cv -> # `S1 `ui ]
-"196
 }
-[; ;xbee.c: 196: } break;
-[e $U 565  ]
-"197
-}
-[; ;xbee.c: 197: }
-[e $U 565  ]
-"189
-[e :U 566 ]
-[e [\ . . . *U _packet 0 0 3 , $ -> -> 4 `i `uc 567
- 565 ]
-"197
 [e :U 565 ]
-"199
+"189
 }
-[; ;xbee.c: 199: } break;
+[e :U 561 ]
+"174
 [e $U 562  ]
-[; ;xbee.c: 201: case 0x8B: {
-"201
+[e :U 563 ]
+[; ;xbee.c: 188: }
+[; ;xbee.c: 189: }
+[; ;xbee.c: 193: switch(apiFrame.rx.frame_type) {
+"193
+[e $U 567  ]
+{
+[; ;xbee.c: 194: case 0x90: {
+"194
 [e :U 568 ]
 {
-[; ;xbee.c: 203: return apiFrame.txStatus.delivery_status;
-"203
-[e ) -> . . _apiFrame 2 6 `i ]
-[e $UE 560  ]
+"196
+[v _packet `*S3 ~T0 @X0 1 a ]
+[; ;xbee.c: 196: Packet* packet = &apiFrame.rx.packet;
+[e = _packet &U . . _apiFrame 0 7 ]
+[; ;xbee.c: 197: switch(packet->header.command) {
+"197
+[e $U 570  ]
+{
+[; ;xbee.c: 198: case 0x04:
+"198
+[e :U 571 ]
+[; ;xbee.c: 199: {
+"199
+{
+[; ;xbee.c: 200: memcpy(&dest_address, &apiFrame.rx.source_address, sizeof(XBeeAddress));
+"200
+[e ( _memcpy (3 , , -> &U _dest_address `*v -> &U . . _apiFrame 0 4 `*Cv -> # `S1 `ui ]
 "204
 }
-[; ;xbee.c: 204: }
-[; ;xbee.c: 206: case 0x88: {
-"206
-[e :U 569 ]
-{
-[; ;xbee.c: 207: return apiFrame.atCmdResponse.cmd_status;
-"207
-[e ) -> . . _apiFrame 5 5 `i ]
-[e $UE 560  ]
-"208
+[; ;xbee.c: 204: } break;
+[e $U 569  ]
+"205
 }
-[; ;xbee.c: 208: }
-[; ;xbee.c: 210: default:
-"210
+[; ;xbee.c: 205: }
+[e $U 569  ]
+"197
 [e :U 570 ]
-[; ;xbee.c: 211: break;
+[e [\ . . . *U _packet 0 0 3 , $ -> -> 4 `i `uc 571
+ 569 ]
+"205
+[e :U 569 ]
+"207
+}
+[; ;xbee.c: 207: } break;
+[e $U 566  ]
+[; ;xbee.c: 209: case 0x8B: {
+"209
+[e :U 572 ]
+{
+[; ;xbee.c: 211: return apiFrame.txStatus.delivery_status;
 "211
-[e $U 562  ]
+[e ) -> . . _apiFrame 2 6 `i ]
+[e $UE 560  ]
 "212
 }
 [; ;xbee.c: 212: }
-[e $U 562  ]
-"185
-[e :U 563 ]
-[e [\ . . _apiFrame 0 2 , $ -> -> 144 `i `uc 564
- , $ -> -> 139 `i `uc 568
- , $ -> -> 136 `i `uc 569
- 570 ]
-"212
-[e :U 562 ]
-[; ;xbee.c: 214: return -1;
+[; ;xbee.c: 214: case 0x88: {
 "214
+[e :U 573 ]
+{
+[; ;xbee.c: 215: return apiFrame.atCmdResponse.cmd_status;
+"215
+[e ) -> . . _apiFrame 5 5 `i ]
+[e $UE 560  ]
+"216
+}
+[; ;xbee.c: 216: }
+[; ;xbee.c: 218: default:
+"218
+[e :U 574 ]
+[; ;xbee.c: 219: break;
+"219
+[e $U 566  ]
+"220
+}
+[; ;xbee.c: 220: }
+[e $U 566  ]
+"193
+[e :U 567 ]
+[e [\ . . _apiFrame 0 2 , $ -> -> 144 `i `uc 568
+ , $ -> -> 139 `i `uc 572
+ , $ -> -> 136 `i `uc 573
+ 574 ]
+"220
+[e :U 566 ]
+[; ;xbee.c: 222: return -1;
+"222
 [e ) -U -> 1 `i ]
 [e $UE 560  ]
-[; ;xbee.c: 215: }
-"215
+[; ;xbee.c: 223: }
+"223
 [e :UE 560 ]
 }

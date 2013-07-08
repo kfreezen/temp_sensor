@@ -19,8 +19,9 @@ void XBee_Enable(int baud) {
     XBEE_POWER = 1;
     XBEE_SLEEP_RQ = 0;
     
-    while(!PORTCbits.RC2) {}
-
+    while(!XBEE_ON_nSLEEP) {}
+    while(XBEE_nCTS) {}
+    
     UART_Init(xbee_set_baud_rate);
 }
 
@@ -181,7 +182,8 @@ int XBAPI_HandleFrame(int expected) {
 
         if (apiFrame.rx.frame_type != expected && expected) {
             // This is better than before, but I don't know if it's the best way.
-            continue;
+            continue; // We blatantly discard all unexpected packets.  It will stay this way until it becomes a problem.
+            
         } else {
             break;
         }

@@ -55,6 +55,7 @@ int therm_debug = 0;
 extern void __doTestSendPacket();
 
 int error;
+int cmd_itr = 0;
 
 // TODO:  Enable ADC pins
 int main(int argc, char** argv) {
@@ -66,6 +67,7 @@ int main(int argc, char** argv) {
     
     pulseLed(5000);
     timer1_poll_delay(5000, DIVISION_8);
+    //LED1_SIGNAL = 1;
     
     // Load Calibration
     EEPROM_Read(CALIBRATION_DATA_LOCATION, (byte*)&calibrationData, sizeof(CalibrationData));
@@ -84,30 +86,40 @@ int main(int argc, char** argv) {
     }
 
     XBee_Enable(9600);
-    XBee_Wake();
+    sleep(1);
     
     error = XBAPI_Command(CMD_ATSM, command_data, 0xc0, TRUE);
     if(error) {
         XBee_Disable();
-        while(1){}
+        while(1){
+            //LED1_SIGNAL = !LED1_SIGNAL;
+        }
     }
+
+    cmd_itr++;
 
     error = XBAPI_Command(CMD_ATAC, 0, 0xc1, FALSE);
     if(error) {
         XBee_Disable();
-        while(1){}
+        while(1){
+            //LED1_SIGNAL = !LED1_SIGNAL;
+        }
     }
+
+    cmd_itr++;
     
     ADC_Enable(SEL_PORTB, 1);
     
     // Initialize crc16 code.
     CRC16_Init();
 
+    //LED2_SIGNAL = 1;
+    
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
     XBAPI_HandleFrame(API_RX_INDICATOR); // Freezing here because it never gets any stuff.
     
-    //LED2_SIGNAL = 1;
+    
 
     // Core logic
     while(1) {

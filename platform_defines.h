@@ -12,8 +12,8 @@
 
 #define CURRENT_COMMANDS_REVISION 0
 
-#define TRISC_MASK 0x84
-#define TRISB_MASK 0x80
+#define TRISC_MASK 0x80 | (0x14);
+#define TRISB_MASK 0x0
 #define TRISA_MASK 0x0
 
 #define FOSC_DIV_8 1
