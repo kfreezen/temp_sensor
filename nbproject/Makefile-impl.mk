@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=temp_sensor.X
+PROJECTNAME=temp_sensor
 
 # Active Configuration
 DEFAULTCONF=default

@@ -1,30 +1,44 @@
 Version 3.2 HI-TECH Software Intermediate Code
+"18 packets.h
 [s S1 `us 1 `us 1 `uc 1 `uc 1 `us 1 ]
 [n S1 . magic crc16 revision command reserved ]
-[s S5 `us 1 `us 1 `us 1 `us 1 ]
-[n S5 . thermistorResistance thermistorResistance25C thermistorBeta topResistorValue ]
+"34
+[s S5 `us 1 `us 1 `us 1 `us 1 `uc 1 ]
+[n S5 . thermistorResistance thermistorResistance25C thermistorBeta topResistorValue xbee_reset ]
+"42
 [s S6 `s 1 `s 1 ]
 [n S6 . thermistorResistance25CAdjust topResistorValueAdjust ]
+"47
 [s S7 `us 1 ]
 [n S7 . interval ]
+"51
 [s S8 `us 1 `uc 1 ]
 [n S8 . networkID preambleID ]
+"56
 [s S9 `uc -> 8 `i ]
 [n S9 . address ]
+"32
 [u S4 `S5 1 `S6 1 `S7 1 `S8 1 `S9 1 ]
 [n S4 . report calibration interval set_id receiver_address ]
+"29
 [s S3 `S1 1 `S4 1 ]
 [n S3 . header . ]
+"27
 [u S2 `S3 1 `uc -> 32 `i ]
 [n S2 . . packet_data ]
+"75 xbee.h
 [s S12 `uc -> 8 `i ]
 [n S12 __XBeeAddress addr ]
+"10 packets.c
+[v _xbee_reset_flag `uc ~T0 @X0 0 e ]
+"11
+[v _tmr1_err `uc ~T0 @X0 0 e ]
 "19 crc16.h
 [v _CRC16_Generate `(us ~T0 @X0 0 ef2`*uc`i ]
-"68 packets.h
+"69 packets.h
 [v _SendPacket `(v ~T0 @X0 0 ef1`*S2 ]
 "78 xbee.h
-[v _XBAPI_Transmit `(v ~T0 @X0 0 ef4`*S12`*Cuc`i`i ]
+[v _XBAPI_Transmit `(i ~T0 @X0 0 ef4`*S12`*Cuc`i`i ]
 [; ;globaldef.h: 14: typedef unsigned char byte;
 [; ;globaldef.h: 15: typedef unsigned short word;
 [; ;globaldef.h: 16: typedef unsigned long u32;
@@ -44,28 +58,29 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;packets.h: 36: word thermistorResistance25C;
 [; ;packets.h: 37: word thermistorBeta;
 [; ;packets.h: 38: word topResistorValue;
-[; ;packets.h: 39: } report;
-[; ;packets.h: 41: struct {
-[; ;packets.h: 42: short thermistorResistance25CAdjust;
-[; ;packets.h: 43: short topResistorValueAdjust;
-[; ;packets.h: 44: } calibration;
-[; ;packets.h: 46: struct {
-[; ;packets.h: 47: word interval;
-[; ;packets.h: 48: } interval;
-[; ;packets.h: 50: struct {
-[; ;packets.h: 51: word networkID;
-[; ;packets.h: 52: byte preambleID;
-[; ;packets.h: 53: } set_id;
-[; ;packets.h: 55: struct {
-[; ;packets.h: 56: byte address[8];
-[; ;packets.h: 57: } receiver_address;
-[; ;packets.h: 58: };
+[; ;packets.h: 39: byte xbee_reset;
+[; ;packets.h: 40: } report;
+[; ;packets.h: 42: struct {
+[; ;packets.h: 43: short thermistorResistance25CAdjust;
+[; ;packets.h: 44: short topResistorValueAdjust;
+[; ;packets.h: 45: } calibration;
+[; ;packets.h: 47: struct {
+[; ;packets.h: 48: word interval;
+[; ;packets.h: 49: } interval;
+[; ;packets.h: 51: struct {
+[; ;packets.h: 52: word networkID;
+[; ;packets.h: 53: byte preambleID;
+[; ;packets.h: 54: } set_id;
+[; ;packets.h: 56: struct {
+[; ;packets.h: 57: byte address[8];
+[; ;packets.h: 58: } receiver_address;
 [; ;packets.h: 59: };
-[; ;packets.h: 61: byte packet_data[32];
-[; ;packets.h: 62: } Packet;
-[; ;packets.h: 64: void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
-[; ;packets.h: 66: void SendReceiverBroadcastRequest();
-[; ;packets.h: 68: void SendPacket(Packet* packet);
+[; ;packets.h: 60: };
+[; ;packets.h: 62: byte packet_data[32];
+[; ;packets.h: 63: } Packet;
+[; ;packets.h: 65: void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
+[; ;packets.h: 67: void SendReceiverBroadcastRequest();
+[; ;packets.h: 69: void SendPacket(Packet* packet);
 [; ;platform_defines.h: 38: typedef struct {
 [; ;platform_defines.h: 39: unsigned short magic;
 [; ;platform_defines.h: 40: short thermistorValue25CAdjust;
@@ -75,9 +90,9 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;platform_defines.h: 46: word magic;
 [; ;platform_defines.h: 47: word interval;
 [; ;platform_defines.h: 48: } IntervalData;
-[; ;adc.h: 16: void ADC_Enable(int select, int port_pin);
-[; ;adc.h: 17: unsigned ADC_ReadOne(int channel);
-[; ;adc.h: 18: unsigned ADC_Read(int channel);
+[; ;adc.h: 17: void ADC_Enable(byte select, byte port_pin);
+[; ;adc.h: 18: unsigned ADC_ReadOne(byte channel);
+[; ;adc.h: 19: unsigned ADC_Read(byte channel);
 "14 crc16.h
 [v _CRC16_High `uc ~T0 @X0 1 e ]
 [v _CRC16_Low `uc ~T0 @X0 1 e ]
@@ -89,93 +104,93 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;xbee.h: 25: void XBee_Enable(int baud);
 [; ;xbee.h: 30: inline void XBee_Disable();
 [; ;xbee.h: 31: inline void XBee_Sleep();
-[; ;xbee.h: 32: inline void XBee_Wake();
+[; ;xbee.h: 32: void XBee_Wake();
 [; ;xbee.h: 40: void XBee_Send(const char* msg, int len, const char end_char);
 [; ;xbee.h: 49: void XBee_Recv(char* buf, int max_len, const char end_char);
 [; ;xbee.h: 73: typedef struct __XBeeAddress {
 [; ;xbee.h: 74: unsigned char addr[8];
 [; ;xbee.h: 75: } XBeeAddress;
 [; ;xbee.h: 77: int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid);
-[; ;xbee.h: 78: void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
-[; ;xbee.h: 93: int XBAPI_HandleFrame(int expected);
-[; ;xbee.h: 97: typedef struct {
-[; ;xbee.h: 98: byte start_delimiter;
-[; ;xbee.h: 99: byte length[2];
-[; ;xbee.h: 100: byte frame_type;
-[; ;xbee.h: 101: byte frame_id;
-[; ;xbee.h: 103: union {
-[; ;xbee.h: 104: unsigned short command;
-[; ;xbee.h: 105: byte command_bytes[2];
-[; ;xbee.h: 106: };
-[; ;xbee.h: 108: unsigned long data;
-[; ;xbee.h: 109: byte checksum;
-[; ;xbee.h: 110: } ATCmdFrame;
-[; ;xbee.h: 112: typedef struct {
-[; ;xbee.h: 113: byte start_delimiter;
-[; ;xbee.h: 114: byte length[2];
-[; ;xbee.h: 115: byte frame_type;
-[; ;xbee.h: 116: byte frame_id;
-[; ;xbee.h: 118: union {
-[; ;xbee.h: 119: unsigned short command;
-[; ;xbee.h: 120: byte command_bytes[2];
-[; ;xbee.h: 121: };
-[; ;xbee.h: 123: byte checksum;
-[; ;xbee.h: 124: } ATCmdFrame_NoData;
-[; ;xbee.h: 126: typedef struct {
-[; ;xbee.h: 127: byte start_delimiter;
-[; ;xbee.h: 128: byte length[2];
-[; ;xbee.h: 129: byte frame_type;
-[; ;xbee.h: 130: byte frame_id;
-[; ;xbee.h: 131: XBeeAddress source_address;
-[; ;xbee.h: 132: unsigned short reserved;
-[; ;xbee.h: 133: byte receive_options;
-[; ;xbee.h: 134: Packet packet;
-[; ;xbee.h: 135: byte checksum;
-[; ;xbee.h: 136: } RxFrame;
-[; ;xbee.h: 138: typedef struct {
-[; ;xbee.h: 139: byte start_delimiter;
-[; ;xbee.h: 140: byte length[2];
-[; ;xbee.h: 141: byte frame_type;
-[; ;xbee.h: 142: byte frame_id;
-[; ;xbee.h: 143: XBeeAddress destination_address;
-[; ;xbee.h: 144: unsigned short reserved;
-[; ;xbee.h: 145: byte broadcast_radius;
-[; ;xbee.h: 146: byte transmit_options;
-[; ;xbee.h: 147: Packet packet;
-[; ;xbee.h: 148: byte checksum;
-[; ;xbee.h: 149: } TxFrame;
-[; ;xbee.h: 151: typedef struct {
-[; ;xbee.h: 152: byte start_delimiter;
-[; ;xbee.h: 153: byte length[2];
-[; ;xbee.h: 154: byte frame_type;
-[; ;xbee.h: 155: byte frame_id;
-[; ;xbee.h: 156: unsigned short reserved;
-[; ;xbee.h: 157: byte transmit_retry_count;
-[; ;xbee.h: 158: byte delivery_status;
-[; ;xbee.h: 159: byte discovery_status;
-[; ;xbee.h: 160: byte checksum;
-[; ;xbee.h: 161: } TxStatusFrame;
-[; ;xbee.h: 163: typedef struct {
-[; ;xbee.h: 164: byte start_delimiter;
-[; ;xbee.h: 165: byte length[2];
-[; ;xbee.h: 166: byte frame_type;
-[; ;xbee.h: 167: byte frame_id;
-[; ;xbee.h: 168: union {
-[; ;xbee.h: 169: byte command_bytes[2];
-[; ;xbee.h: 170: unsigned short command;
-[; ;xbee.h: 171: };
-[; ;xbee.h: 173: byte cmd_status;
-[; ;xbee.h: 175: byte data[5];
-[; ;xbee.h: 176: } ATCmdResponse;
-[; ;xbee.h: 178: typedef union {
-[; ;xbee.h: 179: RxFrame rx;
-[; ;xbee.h: 180: TxFrame tx;
-[; ;xbee.h: 181: TxStatusFrame txStatus;
-[; ;xbee.h: 183: ATCmdFrame atCmd;
-[; ;xbee.h: 184: ATCmdFrame_NoData atCmdNoData;
-[; ;xbee.h: 186: ATCmdResponse atCmdResponse;
-[; ;xbee.h: 187: byte buffer[60];
-[; ;xbee.h: 189: } Frame;
+[; ;xbee.h: 78: int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
+[; ;xbee.h: 96: int XBAPI_HandleFrame(int expected, int do_tmo);
+[; ;xbee.h: 100: typedef struct {
+[; ;xbee.h: 101: byte start_delimiter;
+[; ;xbee.h: 102: byte length[2];
+[; ;xbee.h: 103: byte frame_type;
+[; ;xbee.h: 104: byte frame_id;
+[; ;xbee.h: 106: union {
+[; ;xbee.h: 107: unsigned short command;
+[; ;xbee.h: 108: byte command_bytes[2];
+[; ;xbee.h: 109: };
+[; ;xbee.h: 111: unsigned long data;
+[; ;xbee.h: 112: byte checksum;
+[; ;xbee.h: 113: } ATCmdFrame;
+[; ;xbee.h: 115: typedef struct {
+[; ;xbee.h: 116: byte start_delimiter;
+[; ;xbee.h: 117: byte length[2];
+[; ;xbee.h: 118: byte frame_type;
+[; ;xbee.h: 119: byte frame_id;
+[; ;xbee.h: 121: union {
+[; ;xbee.h: 122: unsigned short command;
+[; ;xbee.h: 123: byte command_bytes[2];
+[; ;xbee.h: 124: };
+[; ;xbee.h: 126: byte checksum;
+[; ;xbee.h: 127: } ATCmdFrame_NoData;
+[; ;xbee.h: 129: typedef struct {
+[; ;xbee.h: 130: byte start_delimiter;
+[; ;xbee.h: 131: byte length[2];
+[; ;xbee.h: 132: byte frame_type;
+[; ;xbee.h: 133: byte frame_id;
+[; ;xbee.h: 134: XBeeAddress source_address;
+[; ;xbee.h: 135: unsigned short reserved;
+[; ;xbee.h: 136: byte receive_options;
+[; ;xbee.h: 137: Packet packet;
+[; ;xbee.h: 138: byte checksum;
+[; ;xbee.h: 139: } RxFrame;
+[; ;xbee.h: 141: typedef struct {
+[; ;xbee.h: 142: byte start_delimiter;
+[; ;xbee.h: 143: byte length[2];
+[; ;xbee.h: 144: byte frame_type;
+[; ;xbee.h: 145: byte frame_id;
+[; ;xbee.h: 146: XBeeAddress destination_address;
+[; ;xbee.h: 147: unsigned short reserved;
+[; ;xbee.h: 148: byte broadcast_radius;
+[; ;xbee.h: 149: byte transmit_options;
+[; ;xbee.h: 150: Packet packet;
+[; ;xbee.h: 151: byte checksum;
+[; ;xbee.h: 152: } TxFrame;
+[; ;xbee.h: 154: typedef struct {
+[; ;xbee.h: 155: byte start_delimiter;
+[; ;xbee.h: 156: byte length[2];
+[; ;xbee.h: 157: byte frame_type;
+[; ;xbee.h: 158: byte frame_id;
+[; ;xbee.h: 159: unsigned short reserved;
+[; ;xbee.h: 160: byte transmit_retry_count;
+[; ;xbee.h: 161: byte delivery_status;
+[; ;xbee.h: 162: byte discovery_status;
+[; ;xbee.h: 163: byte checksum;
+[; ;xbee.h: 164: } TxStatusFrame;
+[; ;xbee.h: 166: typedef struct {
+[; ;xbee.h: 167: byte start_delimiter;
+[; ;xbee.h: 168: byte length[2];
+[; ;xbee.h: 169: byte frame_type;
+[; ;xbee.h: 170: byte frame_id;
+[; ;xbee.h: 171: union {
+[; ;xbee.h: 172: byte command_bytes[2];
+[; ;xbee.h: 173: unsigned short command;
+[; ;xbee.h: 174: };
+[; ;xbee.h: 176: byte cmd_status;
+[; ;xbee.h: 178: byte data[5];
+[; ;xbee.h: 179: } ATCmdResponse;
+[; ;xbee.h: 181: typedef union {
+[; ;xbee.h: 182: RxFrame rx;
+[; ;xbee.h: 183: TxFrame tx;
+[; ;xbee.h: 184: TxStatusFrame txStatus;
+[; ;xbee.h: 186: ATCmdFrame atCmd;
+[; ;xbee.h: 187: ATCmdFrame_NoData atCmdNoData;
+[; ;xbee.h: 189: ATCmdResponse atCmdResponse;
+[; ;xbee.h: 190: byte buffer[60];
+[; ;xbee.h: 192: } Frame;
 "7 packets.c
 [v _packet_buffer `S2 ~T0 @X0 1 e ]
 [; ;packets.c: 7: Packet packet_buffer;
@@ -198,113 +213,137 @@ Version 3.2 HI-TECH Software Intermediate Code
 ..
 ]
 [; ;packets.c: 8: XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
-"10
+[; ;packets.c: 10: extern unsigned char xbee_reset_flag;
+[; ;packets.c: 11: extern unsigned char tmr1_err;
+"12
 [v _SendReport `(v ~T0 @X0 1 ef4`i`i`i`i ]
 {
-[; ;packets.c: 10: void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
+[; ;packets.c: 12: void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
 [e :U _SendReport ]
 [v _thermistorResistance `i ~T0 @X0 1 r1 ]
 [v _thermRes25C `i ~T0 @X0 1 r2 ]
 [v _thermBeta `i ~T0 @X0 1 r3 ]
 [v _topResValue `i ~T0 @X0 1 r4 ]
 [f ]
-[; ;packets.c: 12: packet_buffer.header.command = 0x00;
-"12
-[e = . . . _packet_buffer 0 0 3 -> -> 0 `i `uc ]
-[; ;packets.c: 13: packet_buffer.header.magic = 0xAA55;
-"13
-[e = . . . _packet_buffer 0 0 0 -> -> 43605 `ui `us ]
-[; ;packets.c: 14: packet_buffer.header.revision = 0;
+[; ;packets.c: 14: packet_buffer.header.command = 0x00;
 "14
-[e = . . . _packet_buffer 0 0 2 -> -> 0 `i `uc ]
-[; ;packets.c: 15: packet_buffer.report.thermistorBeta = thermBeta;
+[e = . . . _packet_buffer 0 0 3 -> -> 0 `i `uc ]
+[; ;packets.c: 15: packet_buffer.header.magic = 0xAA55;
 "15
-[e = . . . . _packet_buffer 0 1 0 2 -> _thermBeta `us ]
-[; ;packets.c: 16: packet_buffer.report.thermistorResistance = thermistorResistance;
+[e = . . . _packet_buffer 0 0 0 -> -> 43605 `ui `us ]
+[; ;packets.c: 16: packet_buffer.header.revision = 0;
 "16
-[e = . . . . _packet_buffer 0 1 0 0 -> _thermistorResistance `us ]
-[; ;packets.c: 17: packet_buffer.report.thermistorResistance25C = thermRes25C;
+[e = . . . _packet_buffer 0 0 2 -> -> 0 `i `uc ]
+[; ;packets.c: 17: packet_buffer.report.thermistorBeta = thermBeta;
 "17
-[e = . . . . _packet_buffer 0 1 0 1 -> _thermRes25C `us ]
-[; ;packets.c: 18: packet_buffer.report.topResistorValue = topResValue;
+[e = . . . . _packet_buffer 0 1 0 2 -> _thermBeta `us ]
+[; ;packets.c: 18: packet_buffer.report.thermistorResistance = thermistorResistance;
 "18
-[e = . . . . _packet_buffer 0 1 0 3 -> _topResValue `us ]
-[; ;packets.c: 19: packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
+[e = . . . . _packet_buffer 0 1 0 0 -> _thermistorResistance `us ]
+[; ;packets.c: 19: packet_buffer.report.thermistorResistance25C = thermRes25C;
 "19
-[e = . . . _packet_buffer 0 0 1 ( _CRC16_Generate (2 , -> &U _packet_buffer `*uc -> -> # `S2 `ui `i ]
-[; ;packets.c: 21: SendPacket(&packet_buffer);
+[e = . . . . _packet_buffer 0 1 0 1 -> _thermRes25C `us ]
+[; ;packets.c: 20: packet_buffer.report.topResistorValue = topResValue;
+"20
+[e = . . . . _packet_buffer 0 1 0 3 -> _topResValue `us ]
+[; ;packets.c: 21: packet_buffer.report.xbee_reset = xbee_reset_flag | (tmr1_err<<1);
 "21
-[e ( _SendPacket (1 &U _packet_buffer ]
-[; ;packets.c: 22: }
+[e = . . . . _packet_buffer 0 1 0 4 -> | -> _xbee_reset_flag `i << -> _tmr1_err `i -> 1 `i `uc ]
+[; ;packets.c: 22: packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
 "22
+[e = . . . _packet_buffer 0 0 1 ( _CRC16_Generate (2 , -> &U _packet_buffer `*uc -> -> # `S2 `ui `i ]
+[; ;packets.c: 24: xbee_reset_flag = 0;
+"24
+[e = _xbee_reset_flag -> -> 0 `i `uc ]
+[; ;packets.c: 26: SendPacket(&packet_buffer);
+"26
+[e ( _SendPacket (1 &U _packet_buffer ]
+[; ;packets.c: 27: }
+"27
 [e :UE 23 ]
 }
-"24
+"29
 [v _SendReceiverBroadcastRequest `(v ~T0 @X0 1 ef ]
 {
-[; ;packets.c: 24: void SendReceiverBroadcastRequest() {
+[; ;packets.c: 29: void SendReceiverBroadcastRequest() {
 [e :U _SendReceiverBroadcastRequest ]
 [f ]
-[; ;packets.c: 25: packet_buffer.header.command = 0x04;
-"25
-[e = . . . _packet_buffer 0 0 3 -> -> 4 `i `uc ]
-[; ;packets.c: 26: packet_buffer.header.magic = 0xAA55;
-"26
-[e = . . . _packet_buffer 0 0 0 -> -> 43605 `ui `us ]
-[; ;packets.c: 27: packet_buffer.header.revision = 0;
-"27
-[e = . . . _packet_buffer 0 0 2 -> -> 0 `i `uc ]
-[; ;packets.c: 28: packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
-"28
-[e = . . . _packet_buffer 0 0 1 ( _CRC16_Generate (2 , -> &U _packet_buffer `*uc -> -> # `S2 `ui `i ]
-[; ;packets.c: 30: SendPacket(&packet_buffer);
+[; ;packets.c: 30: packet_buffer.header.command = 0x04;
 "30
-[e ( _SendPacket (1 &U _packet_buffer ]
-[; ;packets.c: 31: }
+[e = . . . _packet_buffer 0 0 3 -> -> 4 `i `uc ]
+[; ;packets.c: 31: packet_buffer.header.magic = 0xAA55;
 "31
+[e = . . . _packet_buffer 0 0 0 -> -> 43605 `ui `us ]
+[; ;packets.c: 32: packet_buffer.header.revision = 0;
+"32
+[e = . . . _packet_buffer 0 0 2 -> -> 0 `i `uc ]
+[; ;packets.c: 33: packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
+"33
+[e = . . . _packet_buffer 0 0 1 ( _CRC16_Generate (2 , -> &U _packet_buffer `*uc -> -> # `S2 `ui `i ]
+[; ;packets.c: 35: SendPacket(&packet_buffer);
+"35
+[e ( _SendPacket (1 &U _packet_buffer ]
+[; ;packets.c: 36: }
+"36
 [e :UE 24 ]
 }
-"33
+"38
 [v _frame_id_itr `uc ~T0 @X0 1 e ]
 [i _frame_id_itr
 -> -> 0 `i `uc
 ]
-[; ;packets.c: 33: unsigned char frame_id_itr = 0;
-"35
+[; ;packets.c: 38: unsigned char frame_id_itr = 0;
+"40
 [v ___doTestSendPacket `(v ~T0 @X0 1 ef ]
 {
-[; ;packets.c: 35: void __doTestSendPacket() {
+[; ;packets.c: 40: void __doTestSendPacket() {
 [e :U ___doTestSendPacket ]
 [f ]
-[; ;packets.c: 36: SendPacket(&packet_buffer);
-"36
+[; ;packets.c: 41: SendPacket(&packet_buffer);
+"41
 [e ( _SendPacket (1 &U _packet_buffer ]
-[; ;packets.c: 37: }
-"37
+[; ;packets.c: 42: }
+"42
 [e :UE 25 ]
 }
-"39
+"44
 [v _SendPacket `(v ~T0 @X0 1 ef1`*S2 ]
 {
-[; ;packets.c: 39: void SendPacket(Packet* packet) {
+[; ;packets.c: 44: void SendPacket(Packet* packet) {
 [e :U _SendPacket ]
 [v _packet `*S2 ~T0 @X0 1 r1 ]
 [f ]
-[; ;packets.c: 40: if(frame_id_itr == 0) {
-"40
+[; ;packets.c: 45: if(frame_id_itr == 0) {
+"45
 [e $ ! == -> _frame_id_itr `i -> 0 `i 27  ]
 {
-[; ;packets.c: 41: frame_id_itr++;
-"41
+[; ;packets.c: 46: frame_id_itr++;
+"46
 [e ++ _frame_id_itr -> -> 1 `i `uc ]
-"42
+"47
 }
 [e :U 27 ]
-[; ;packets.c: 42: }
-[; ;packets.c: 43: XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0);
-"43
-[e ( _XBAPI_Transmit (4 , , , &U _dest_address -> -> _packet `*uc `*Cuc -> -> # `S2 `ui `i -> 0 `i ]
-[; ;packets.c: 44: }
-"44
+"48
+[v _status `uc ~T0 @X0 1 a ]
+[; ;packets.c: 47: }
+[; ;packets.c: 48: byte status = 1;
+[e = _status -> -> 1 `i `uc ]
+[; ;packets.c: 49: while(status) {
+"49
+[e $U 28  ]
+[e :U 29 ]
+{
+[; ;packets.c: 50: status = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0);
+"50
+[e = _status -> ( _XBAPI_Transmit (4 , , , &U _dest_address -> -> _packet `*uc `*Cuc -> -> # `S2 `ui `i -> 0 `i `uc ]
+"52
+}
+[e :U 28 ]
+"49
+[e $ != -> _status `i -> -> -> 0 `i `uc `i 29  ]
+[e :U 30 ]
+[; ;packets.c: 52: }
+[; ;packets.c: 54: }
+"54
 [e :UE 26 ]
 }

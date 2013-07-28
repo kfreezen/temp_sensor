@@ -2,4 +2,5 @@
  build/default/production/adc.p1:  \
  adc.c  \
 timer.h  \
+globaldef.h  \
 adc.h 

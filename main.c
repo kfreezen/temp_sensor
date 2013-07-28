@@ -27,6 +27,8 @@
 CalibrationData calibrationData;
 IntervalData intervalData;
 
+unsigned char xbee_reset_flag = 0;
+
 void pulseLed(int ticks) {
     LED1_SIGNAL = 1;
     timer1_poll_delay(ticks, DIVISION_8);
@@ -50,24 +52,19 @@ int GetOhms(int adc_value) {
 
 extern XBeeAddress dest_address;
 
-int therm_debug = 0;
-
 extern void __doTestSendPacket();
 
 int error;
 int cmd_itr = 0;
 
-// TODO:  Enable ADC pins
 int main(int argc, char** argv) {
     TRISC = TRISC_MASK;
     TRISB = TRISB_MASK;
     TRISA = TRISA_MASK;
-
-    unsigned long command_data = 0x1;
     
     pulseLed(5000);
-    timer1_poll_delay(5000, DIVISION_8);
     //LED1_SIGNAL = 1;
+    LED2_SIGNAL = 1;
     
     // Load Calibration
     EEPROM_Read(CALIBRATION_DATA_LOCATION, (byte*)&calibrationData, sizeof(CalibrationData));
@@ -86,9 +83,8 @@ int main(int argc, char** argv) {
     }
 
     XBee_Enable(9600);
-    sleep(1);
     
-    error = XBAPI_Command(CMD_ATSM, command_data, 0xc0, TRUE);
+    error = XBAPI_Command(CMD_ATSM, 1L, 0xc0, TRUE);
     if(error) {
         XBee_Disable();
         while(1){
@@ -117,22 +113,22 @@ int main(int argc, char** argv) {
     
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
-    XBAPI_HandleFrame(API_RX_INDICATOR); // Freezing here because it never gets any stuff.
-    
-    
+    XBAPI_HandleFrame(API_RX_INDICATOR, FALSE);
 
+    LED2_SIGNAL = 0;
+    
     // Core logic
     while(1) {
+        LED1_SIGNAL = 1;
         // Gather data here so that the xbee isn't waiting on it.
         long thermistorResistance = (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(THERMISTOR_CHANNEL))-1000);
-        therm_debug = thermistorResistance;
-        
-        XBee_Wake();
-        //sleep(1); // FIXME: This is an extremely bad way to do this.  Figure out a
-        //timer1_poll_delay_ms(100);
+
+        XBee_Wake(); // It's freezing here anyway so...
+        //sleep(1); // This shouldn't be here, figure out whether the xbee keeps having the same problem with this here.
         SendReport(thermistorResistance, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
         XBee_Sleep();
-
+        LED1_SIGNAL = 0;
+        
         sleep(59);
     }
 }

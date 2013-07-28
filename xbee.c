@@ -12,8 +12,9 @@
 
 extern XBeeAddress dest_address;
 
-int xbee_set_baud_rate = 9600;
+extern unsigned char xbee_reset_flag;
 
+int last_xbee_baud;
 // It may be necessary to delay.
 void XBee_Enable(int baud) {
     XBEE_POWER = 1;
@@ -22,17 +23,39 @@ void XBee_Enable(int baud) {
     while(!XBEE_ON_nSLEEP) {}
     while(XBEE_nCTS) {}
     
-    UART_Init(xbee_set_baud_rate);
+    UART_Init(baud);
+    last_xbee_baud = baud;
+    
+    sleep(1);
+}
+
+void XBee_Reset() {
+    XBee_Disable();
+    timer1_poll_delay_ms(1);
+    XBee_Enable(last_xbee_baud);
 }
 
 inline void XBee_Sleep() {
     XBEE_SLEEP_RQ = 1;
 }
 
-inline void XBee_Wake() {
+void XBee_Wake() {
     XBEE_SLEEP_RQ = 0;
     // wait for nCTS to go low.
-    while(XBEE_nCTS) {}
+    long i = 0;
+    while(XBEE_nCTS && i++ < XTAL_FREQUENCY) {
+    } // FIXME: This is causing a freeze glitch
+
+    // This and that "&& i++ < XTAL_FREQUENCY" should fix the problem of freezing.
+    if(i >= XTAL_FREQUENCY-1 && XBEE_nCTS) {
+        LED2_SIGNAL = 1;
+        XBee_Disable();
+        // The documentation I found said that the minimum reset pulse needed to be 50ns.
+        timer1_poll_delay_ms(1);
+        XBee_Enable(XBEE_BAUD);
+        LED2_SIGNAL = 0;
+        xbee_reset_flag = 1;
+    }
 }
 
 inline void XBee_Disable() {
@@ -53,19 +76,25 @@ void XBee_Recv(char* buf, int max_len, const char end_char) {
 
 Frame apiFrame;
 
-unsigned char checksum_debug = 0;
-void* __addr;
+/*byte checksum(void* addr, int length) {
+    unsigned char* address = (unsigned char*) addr;
+
+    byte checksum = 0;
+    for(; length!=0; length--) {
+        checksum += *address++;
+    }
+
+    return 0xFF - checksum;
+}*/
 
 unsigned char checksum(void* addr, int length) {
     unsigned char* address = (unsigned char*) addr;
-    __addr = addr;
     
     // Calculate checksum
     unsigned char checksum = 0;
     int i;
     for(i=0; i<length; i++) {
         checksum += address[i];
-        checksum_debug = address[i];
     }
 
     return 0xFF - checksum;
@@ -73,7 +102,6 @@ unsigned char checksum(void* addr, int length) {
 
 unsigned char doChecksumVerify(unsigned char* address, int length, unsigned char checksum) {
     unsigned char check = 0;
-    __addr = address;
     
     int i;
     for(i=0; i<length; i++) {
@@ -85,12 +113,13 @@ unsigned char doChecksumVerify(unsigned char* address, int length, unsigned char
     return check;
 }
 
-void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id) {
-    int frame_length = sizeof(TxFrame);
-    
+int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id) {
+    //byte frame_length = sizeof(TxFrame); // I highly doubt that the frame will be over 256 bytes
+    // long, so for now we'll just use a byte as it saves us space.
+
     apiFrame.tx.start_delimiter = 0x7e;
-    apiFrame.tx.length[0] = (sizeof(TxFrame)-4) >> 8;
-    apiFrame.tx.length[1] = (sizeof(TxFrame)-4) & 0xFF;
+    apiFrame.tx.length[0] = 0; // Also we'll put this as a zero. (sizeof(TxFrame)-4) >> 8;
+    apiFrame.tx.length[1] = sizeof(TxFrame)-4;
     apiFrame.tx.frame_id = id;
     apiFrame.tx.frame_type = API_TRANSMIT_FRAME;
     memcpy(&apiFrame.tx.destination_address, address, sizeof(XBeeAddress));
@@ -98,20 +127,33 @@ void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length,
     apiFrame.tx.transmit_options = 0;
     apiFrame.tx.broadcast_radius = 0;
     memcpy(&apiFrame.tx.packet, data, (length>sizeof(Packet)) ? sizeof(Packet) : length);
-    apiFrame.tx.checksum = checksum(apiFrame.buffer+3, frame_length-4);
+    apiFrame.tx.checksum = checksum(apiFrame.buffer+3, sizeof(TxFrame)-4);
 
     UART_TransmitMsg((byte*)&apiFrame, sizeof(TxFrame), 0);
 
     int error = 0;
     if(id) {
-        error = XBAPI_HandleFrame(API_TRANSMIT_STATUS);
+        error = XBAPI_HandleFrame(API_TRANSMIT_STATUS, TRUE);
+        if(error == XBEE_TIMEOUT_OCCURRED) {
+            // Reset the xbee.
+            XBee_Reset();
+        }
     }
     
-    if(error) {
-        LED1_SIGNAL = !LED1_SIGNAL;
-    }
+    return error;
     
 }
+
+/*u32 swap_endian_32(u32 n) {
+    unsigned char* p_n = (unsigned char*) n;
+    unsigned char p_ret[4];
+    p_ret[0] = p_n[3];
+    p_ret[1] = p_n[2];
+    p_ret[2] = p_n[1];
+    p_ret[3] = p_n[0];
+
+    return *((u32*)p_ret);
+}*/
 
 u32 swap_endian_32(u32 n) {
     unsigned long r = 0;
@@ -138,7 +180,7 @@ int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_v
     apiFrame.buffer[total_packet_length] = checksum(apiFrame.buffer+3, total_packet_length);
     */
     
-    int atCmdLength = (data_valid) ? sizeof(ATCmdFrame) : sizeof(ATCmdFrame_NoData);
+    byte atCmdLength = (data_valid) ? sizeof(ATCmdFrame) : sizeof(ATCmdFrame_NoData);
 
     apiFrame.atCmd.start_delimiter = 0x7e;
     apiFrame.atCmd.length[0] = (atCmdLength-4) >> 8;
@@ -160,25 +202,30 @@ int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_v
     UART_TransmitMsg(apiFrame.buffer, atCmdLength, 0);
 
     if(id) {
-        return XBAPI_HandleFrame(API_AT_CMD_RESPONSE);
+        return XBAPI_HandleFrame(API_AT_CMD_RESPONSE, TRUE);
     } else {
         return 0;
     }
     
-    
     // TODO:  Add checksum verification and a way to discard bytes that aren't in a frame.
 }
 
-int XBAPI_HandleFrame(int expected) {
+// Returns -2 if a timeout occurs.
+int XBAPI_HandleFrame(int expected, int do_tmo) {
     // TODO:  Add verification of frames
 
+    long tmo = (do_tmo) ? XTAL_FREQUENCY>>1 : 0;
+    
     while (1) {
-        UART_ReceiveMsg(apiFrame.buffer, 3, 0);
-
+        int bytes_read = UART_ReceiveMsgTmo(apiFrame.buffer, 3, 0, tmo);
+        if(bytes_read<3) {
+            return XBEE_TIMEOUT_OCCURRED;
+        }
+        
         unsigned short received_length = apiFrame.buffer[2];
         received_length |= (apiFrame.buffer[1] << 8);
 
-        UART_ReceiveMsg(apiFrame.buffer + 3, received_length + 1, 0);
+        UART_ReceiveMsgTmo(apiFrame.buffer + 3, received_length + 1, 0, tmo);
 
         if (apiFrame.rx.frame_type != expected && expected) {
             // This is better than before, but I don't know if it's the best way.
@@ -193,7 +240,6 @@ int XBAPI_HandleFrame(int expected) {
     
     switch(apiFrame.rx.frame_type) { // It's all the same frame type so it doesn't really matter which struct in the union I choose to access it.
         case API_RX_INDICATOR: {
-            // TODO:  Implement
             Packet* packet = &apiFrame.rx.packet;
             switch(packet->header.command) {
                 case REQUEST_RECEIVER:

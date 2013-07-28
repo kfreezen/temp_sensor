@@ -7,6 +7,8 @@
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
+extern unsigned char xbee_reset_flag;
+extern unsigned char tmr1_err;
 void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
     
     packet_buffer.header.command = REPORT;
@@ -16,7 +18,10 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
     packet_buffer.report.thermistorResistance = thermistorResistance;
     packet_buffer.report.thermistorResistance25C = thermRes25C;
     packet_buffer.report.topResistorValue = topResValue;
+    packet_buffer.report.xbee_reset = xbee_reset_flag | (tmr1_err<<1);
     packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
+
+    xbee_reset_flag = 0;
     
     SendPacket(&packet_buffer);
 }
@@ -40,5 +45,10 @@ void SendPacket(Packet* packet) {
     if(frame_id_itr == 0) {
         frame_id_itr++;
     }
-    XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0); // FIXME:  Some time I may want to know what the transmit status is.
+    byte status = 1;
+    while(status) {
+        status = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0); // FIXME:  Some time I may want to know what the transmit status is.
+
+    }
+
 }

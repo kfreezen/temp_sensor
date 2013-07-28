@@ -36,6 +36,7 @@ typedef union {
                 word thermistorResistance25C;
                 word thermistorBeta;
                 word topResistorValue;
+                byte xbee_reset;
             } report;
 
             struct {

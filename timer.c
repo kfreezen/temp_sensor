@@ -10,6 +10,10 @@ void Timer1_Init(int tmr1cs, int t1ckps) {
     T1CONbits.T1CKPS = t1ckps;
 }
 
+#define TIMER1_INIT_TRIES 3
+
+unsigned char tmr1_err = 0;
+
 void timer1_poll_delay(unsigned short ticks, int division) {
     //unsigned char TMR1L_cmp = ticks & 0xFF;
     //unsigned char TMR1H_cmp = ticks >> 8;
@@ -20,12 +24,27 @@ void timer1_poll_delay(unsigned short ticks, int division) {
 
     Timer1_Init(SYS_CLOCK, division);
 
-    while(1) {
+    unsigned char tmr1_turned_on = 0;
+
+    while(tmr1_turned_on < TIMER1_INIT_TRIES) {
+        // For some reason TMR1ON is 0.
+
+        if(T1CONbits.TMR1ON == 0) {
+            // I shouldn't have to have this "if" here.
+            Timer1_Init(SYS_CLOCK, division);
+            TMR1 = 0;
+            tmr1_turned_on ++;
+        }
+
         if(TMR1 >= ticks) {
             break;
         }
     }
 
+    if(tmr1_turned_on >= TIMER1_INIT_TRIES) {
+        tmr1_err = 1;
+    }
+    
     Timer1_Disable();
 }
 

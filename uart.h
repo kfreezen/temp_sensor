@@ -18,7 +18,7 @@ void UART_Transmit(volatile char c);
 
 void UART_TransmitMsg(volatile const unsigned char* msg, int len, const char end_char);
 short UART_Receive(long tmo);
-void UART_ReceiveMsgTmo(char* msg, int len, const char end_char, long tmo);
+int UART_ReceiveMsgTmo(char* msg, int len, const char end_char, long tmo);
 
 inline void UART_ReceiveMsg(char* msg, int len, const char end_char);
 

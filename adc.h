@@ -12,10 +12,11 @@
 #define SEL_PORTB 1
 #define ADC_NUM_READS 4 // This specifies how many reads the program should average.
 #define FOSC_DIV_8 1
+#include "globaldef.h"
 
-void ADC_Enable(int select, int port_pin);
-unsigned ADC_ReadOne(int channel);
-unsigned ADC_Read(int channel);
+void ADC_Enable(byte select, byte port_pin);
+unsigned ADC_ReadOne(byte channel);
+unsigned ADC_Read(byte channel);
 
 #endif	/* ADC_H */
 

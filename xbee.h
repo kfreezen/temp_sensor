@@ -29,7 +29,7 @@ void XBee_Enable(int baud);
  */
 inline void XBee_Disable();
 inline void XBee_Sleep();
-inline void XBee_Wake();
+void XBee_Wake();
 
 /**
  *
@@ -75,7 +75,7 @@ typedef struct __XBeeAddress {
 } XBeeAddress;
 
 int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid);
-void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
+int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
 
 // These defines are for the Transmit Status's delivery status field in the xbee 900hp pro (frame type 0x8B)
 // They are also defines for XBAPI_HandleFrame's return value
@@ -88,9 +88,12 @@ void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length,
 
 // Generic XBAPI_HandleFrame return values
 #define NOT_HANDLED -1
+#define XBEE_TIMEOUT_OCCURRED -2
+
+#define XBEE_BAUD 9600
 
 // This will need to handle RX Indicators and transmit statuses.
-int XBAPI_HandleFrame(int expected);
+int XBAPI_HandleFrame(int expected, int do_tmo);
 
 #include "packets.h"
 

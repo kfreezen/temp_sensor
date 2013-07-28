@@ -28,6 +28,7 @@ word thermistorResistance;
 word thermistorResistance25C;
 word thermistorBeta;
 word topResistorValue;
+byte xbee_reset;
 } report;
 
 struct {
@@ -72,10 +73,10 @@ word magic;
 word interval;
 } IntervalData;
 
-# 16 "adc.h"
-void ADC_Enable(int select, int port_pin);
-unsigned ADC_ReadOne(int channel);
-unsigned ADC_Read(int channel);
+# 17 "adc.h"
+void ADC_Enable(byte select, byte port_pin);
+unsigned ADC_ReadOne(byte channel);
+unsigned ADC_Read(byte channel);
 
 # 14 "crc16.h"
 unsigned char CRC16_High, CRC16_Low;
@@ -91,7 +92,7 @@ void XBee_Enable(int baud);
 # 30
 inline void XBee_Disable();
 inline void XBee_Sleep();
-inline void XBee_Wake();
+void XBee_Wake();
 
 # 40
 void XBee_Send(const char* msg, int len, const char end_char);
@@ -105,12 +106,12 @@ unsigned char addr[8];
 } XBeeAddress;
 
 int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid);
-void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
+int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
 
-# 93
-int XBAPI_HandleFrame(int expected);
+# 96
+int XBAPI_HandleFrame(int expected, int do_tmo);
 
-# 97
+# 100
 typedef struct {
 byte start_delimiter;
 byte length[2];
@@ -209,6 +210,8 @@ byte buffer[60];
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
+extern unsigned char xbee_reset_flag;
+extern unsigned char tmr1_err;
 void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
 
 packet_buffer.header.command = 0x00;
@@ -218,7 +221,10 @@ packet_buffer.report.thermistorBeta = thermBeta;
 packet_buffer.report.thermistorResistance = thermistorResistance;
 packet_buffer.report.thermistorResistance25C = thermRes25C;
 packet_buffer.report.topResistorValue = topResValue;
+packet_buffer.report.xbee_reset = xbee_reset_flag | (tmr1_err<<1);
 packet_buffer.header.crc16 = CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
+
+xbee_reset_flag = 0;
 
 SendPacket(&packet_buffer);
 }
@@ -242,5 +248,10 @@ void SendPacket(Packet* packet) {
 if(frame_id_itr == 0) {
 frame_id_itr++;
 }
-XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0);
+byte status = 1;
+while(status) {
+status = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0);
+
+}
+
 }
