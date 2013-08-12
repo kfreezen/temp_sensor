@@ -51,7 +51,7 @@ void timer1_poll_delay(unsigned short ticks, int division) {
 void timer1_poll_delay_ms(unsigned short ms) {
     // How many ticks in one ms.
 
-    timer1_poll_delay(ms*(XTAL_FREQUENCY/1000), DIVISION_1);
+    timer1_poll_delay(ms*(XTAL_FREQUENCY/1000), DIVISION_1); // This /1000 is causing freezing for some reason.
 }
 
 void sleep(unsigned short seconds) {

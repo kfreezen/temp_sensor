@@ -6467,6 +6467,7 @@ int error;
 int cmd_itr = 0;
 
 int main(int argc, char** argv) {
+
 TRISC = 0x80 | (0x14);;
 TRISB = 0x0;
 TRISA = 0x0;
@@ -6524,13 +6525,15 @@ CRC16_Init();
 SendReceiverBroadcastRequest();
 XBAPI_HandleFrame(0x90, 0);
 
+
 PORTBbits.RB0 = 0;
 
 
 while(1) {
 PORTCbits.RC3 = 1;
 
-long thermistorResistance = (16200 * 1000L) / ((4096000L/ADC_Read(10))-1000);
+
+long thermistorResistance = ADC_Read(10);
 
 XBee_Wake();
 

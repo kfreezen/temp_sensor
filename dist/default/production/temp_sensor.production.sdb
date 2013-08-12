@@ -410,12 +410,12 @@
 "60 C:\Users\Kent\Documents\GitHub\temp_sensor\main.c
 [v _main main `(i  1 e 2 0 ]
 {
-"123
-[v main@thermistorResistance thermistorResistance `l  1 a 4 5 ]
+"127
+[v main@thermistorResistance thermistorResistance `l  1 a 4 58 ]
 "60
-[v main@argc argc `i  1 p 2 72 ]
-[v main@argv argv `*.1*.1uc  1 p 2 74 ]
-"134
+[v main@argc argc `i  1 p 2 53 ]
+[v main@argv argv `*.1*.1uc  1 p 2 55 ]
+"137
 } 0
 "38 C:\Users\Kent\Documents\GitHub\temp_sensor\xbee.c
 [v _XBee_Sleep XBee_Sleep `T(v  1 e 0 0 ]
@@ -425,30 +425,31 @@
 "12 C:\Users\Kent\Documents\GitHub\temp_sensor\packets.c
 [v _SendReport SendReport `(v  1 e 0 0 ]
 {
-[v SendReport@thermistorResistance thermistorResistance `i  1 p 2 63 ]
-[v SendReport@thermRes25C thermRes25C `i  1 p 2 65 ]
-[v SendReport@thermBeta thermBeta `i  1 p 2 67 ]
-[v SendReport@topResValue topResValue `i  1 p 2 69 ]
+[v SendReport@thermistorResistance thermistorResistance `i  1 p 2 44 ]
+[v SendReport@thermRes25C thermRes25C `i  1 p 2 46 ]
+[v SendReport@thermBeta thermBeta `i  1 p 2 48 ]
+[v SendReport@topResValue topResValue `i  1 p 2 50 ]
 "27
 } 0
 "42 C:\Users\Kent\Documents\GitHub\temp_sensor\xbee.c
 [v _XBee_Wake XBee_Wake `(v  1 e 0 0 ]
 {
 "45
-[v XBee_Wake@i i `l  1 a 4 48 ]
+[v XBee_Wake@i i `l  1 a 4 15 ]
 "59
 } 0
 "39 C:\Users\Kent\Documents\GitHub\temp_sensor\adc.c
 [v _ADC_Read ADC_Read `(ui  1 e 2 0 ]
 {
+[v ADC_Read@channel channel `uc  1 a 1 19 ]
 "40
 [v ADC_Read@res res `[4]i  1 a 8 11 ]
 "46
-[v ADC_Read@sum sum `i  1 a 2 19 ]
+[v ADC_Read@sum sum `i  1 a 2 20 ]
 "41
-[v ADC_Read@i i `uc  1 a 1 21 ]
+[v ADC_Read@i i `uc  1 a 1 22 ]
 "39
-[v ADC_Read@channel channel `uc  1 p 1 7 ]
+[v ADC_Read@channel channel `uc  1 a 1 19 ]
 "52
 } 0
 "5 C:\Program Files (x86)\Microchip\xc8\v1.20\sources\pic\awdiv.c
@@ -491,25 +492,25 @@
 [u S586 . 9 `S570 1 report 9 0 `S576 1 calibration 4 0 `S579 1 interval 2 0 `S581 1 set_id 3 0 `S584 1 receiver_address 8 0 ]
 [s S592 . 17 `S564 1 header 8 0 `S586 1 . 9 8 ]
 [u S595 . 32 `S592 1 . 17 0 `[32]uc 1 packet_data 32 0 ]
-[v SendPacket@packet packet `*.4S595  1 a 1 61 ]
+[v SendPacket@packet packet `*.4S595  1 a 1 42 ]
 "48
-[v SendPacket@status status `uc  1 a 1 62 ]
+[v SendPacket@status status `uc  1 a 1 43 ]
 "44
-[v SendPacket@packet packet `*.4S595  1 a 1 61 ]
+[v SendPacket@packet packet `*.4S595  1 a 1 42 ]
 "54
 } 0
 "116 C:\Users\Kent\Documents\GitHub\temp_sensor\xbee.c
 [v _XBAPI_Transmit XBAPI_Transmit `(i  1 e 2 0 ]
 {
 [s S562 __XBeeAddress 8 `[8]uc 1 addr 8 0 ]
-[v XBAPI_Transmit@address address `*.4S562  1 a 1 54 ]
+[v XBAPI_Transmit@address address `*.4S562  1 a 1 35 ]
 "134
-[v XBAPI_Transmit@error error `i  1 a 2 57 ]
+[v XBAPI_Transmit@error error `i  1 a 2 38 ]
 "116
-[v XBAPI_Transmit@address address `*.4S562  1 a 1 54 ]
-[v XBAPI_Transmit@data data `*.4DCCuc  1 p 1 48 ]
-[v XBAPI_Transmit@length length `i  1 p 2 49 ]
-[v XBAPI_Transmit@id id `i  1 p 2 51 ]
+[v XBAPI_Transmit@address address `*.4S562  1 a 1 35 ]
+[v XBAPI_Transmit@data data `*.4DCCuc  1 p 1 29 ]
+[v XBAPI_Transmit@length length `i  1 p 2 30 ]
+[v XBAPI_Transmit@id id `i  1 p 2 32 ]
 "145
 } 0
 "32
@@ -541,29 +542,29 @@
 "19
 [v _XBee_Enable XBee_Enable `(v  1 e 0 0 ]
 {
-[v XBee_Enable@baud baud `i  1 p 2 46 ]
+[v XBee_Enable@baud baud `i  1 p 2 13 ]
 "30
 } 0
 "7 C:\Users\Kent\Documents\GitHub\temp_sensor\uart.c
 [v _UART_Init UART_Init `(v  1 e 0 0 ]
 {
 "13
-[v UART_Init@spbrg spbrg `i  1 a 2 44 ]
+[v UART_Init@spbrg spbrg `i  1 a 2 10 ]
 "7
-[v UART_Init@baud baud `i  1 p 2 37 ]
+[v UART_Init@baud baud `i  1 p 2 6 ]
 "15
 } 0
 "5 C:\Program Files (x86)\Microchip\xc8\v1.20\sources\pic\aldiv.c
 [v ___aldiv __aldiv `(l  1 e 4 0 ]
 {
 "6
-[v ___aldiv@quotient quotient `l  1 a 4 33 ]
+[v ___aldiv@quotient quotient `l  1 a 4 2 ]
 "7
-[v ___aldiv@sign sign `uc  1 a 1 32 ]
-[v ___aldiv@counter counter `uc  1 a 1 31 ]
+[v ___aldiv@sign sign `uc  1 a 1 1 ]
+[v ___aldiv@counter counter `uc  1 a 1 0 ]
 "5
-[v ___aldiv@divisor divisor `l  1 p 4 22 ]
-[v ___aldiv@dividend dividend `l  1 p 4 26 ]
+[v ___aldiv@divisor divisor `l  1 p 4 1 ]
+[v ___aldiv@dividend dividend `l  1 p 4 5 ]
 "37
 } 0
 "57 C:\Users\Kent\Documents\GitHub\temp_sensor\timer.c

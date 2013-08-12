@@ -58,6 +58,7 @@ int error;
 int cmd_itr = 0;
 
 int main(int argc, char** argv) {
+    
     TRISC = TRISC_MASK;
     TRISB = TRISB_MASK;
     TRISA = TRISA_MASK;
@@ -115,13 +116,15 @@ int main(int argc, char** argv) {
     SendReceiverBroadcastRequest();
     XBAPI_HandleFrame(API_RX_INDICATOR, FALSE);
 
+
     LED2_SIGNAL = 0;
     
     // Core logic
     while(1) {
         LED1_SIGNAL = 1;
         // Gather data here so that the xbee isn't waiting on it.
-        long thermistorResistance = (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(THERMISTOR_CHANNEL))-1000);
+        // Temporary fix to determine if this is what's causing it to freeze.
+        long thermistorResistance = ADC_Read(THERMISTOR_CHANNEL); //(TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(THERMISTOR_CHANNEL))-1000);
 
         XBee_Wake(); // It's freezing here anyway so...
         //sleep(1); // This shouldn't be here, figure out whether the xbee keeps having the same problem with this here.
