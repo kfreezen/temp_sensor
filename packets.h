@@ -17,7 +17,10 @@
 // This is an application-defined, arbitrary format.
 typedef struct {
     unsigned short magic; // 0xAA55
-    unsigned short crc16;
+    union {
+        unsigned short crc16;
+        unsigned char crc16_bytes[2];
+    } crc;
     byte revision;
     byte command;
     unsigned short reserved;
@@ -27,7 +30,7 @@ typedef struct {
 typedef union {
 
      struct {
-        PacketHeader header;
+        PacketHeader header; // 8B
 
         union {
 

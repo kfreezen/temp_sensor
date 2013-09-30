@@ -1,2 +1,5 @@
 dist/*
 build/*
+*.p1
+*.pre
+*~

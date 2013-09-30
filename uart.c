@@ -43,9 +43,15 @@ void UART_TransmitMsg(volatile const byte* _msg, int len, const char end_char) {
 short UART_Receive(long tmo) {
     while(!OSCSTATbits.OSTS) {} // Wait for external oscillator to start running.
     long i=0;
-    //asm("clrwdt"); // Probably not necessary to do this.
-    while(!PIR1bits.RCIF) {i++; if(tmo && i>=tmo) {break;} }
-    //asm("clrwdt");
+    asm("clrwdt"); // Probably not necessary to do this.
+    while(!PIR1bits.RCIF) {
+        i++;
+        if(tmo && i>=tmo) {
+            break;
+        }
+    }
+
+    asm("clrwdt");
     return (i<tmo || !tmo) ? RC1REG : 0x100;
 }
 
@@ -71,7 +77,7 @@ int UART_ReceiveMsgTmo(char* msg, int len, char end_char, long tmo) {
     int i;
 
     // Ensure that the sensor doesn't freeze for some stupid non-reply
-    //SWDTEN = 1; // FIXME Using a timeout would really be better than this.
+    SWDTEN = 1; // FIXME Using a timeout would really be better than this.
     for(i=0; i<len; i++) {
         short c;
         c = UART_Receive(tmo);

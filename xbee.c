@@ -16,6 +16,17 @@ extern unsigned char xbee_reset_flag;
 
 int last_xbee_baud;
 // It may be necessary to delay.
+
+XBeeAddress* debug_dest;
+XBeeAddress_7Bytes* debug_src;
+
+void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src) {
+    debug_dest = dest;
+    debug_src = src;
+    memset(dest->addr, 0, sizeof(XBeeAddress));
+    memcpy(dest->addr+1, src, sizeof(XBeeAddress_7Bytes));
+}
+
 void XBee_Enable(int baud) {
     XBEE_POWER = 1;
     XBEE_SLEEP_RQ = 0;
@@ -244,7 +255,8 @@ int XBAPI_HandleFrame(int expected, int do_tmo) {
             switch(packet->header.command) {
                 case REQUEST_RECEIVER:
                 {
-                    memcpy(&dest_address, &apiFrame.rx.source_address, sizeof(XBeeAddress));
+                    memset(dest_address.addr, 0, sizeof(XBeeAddress));
+                    memcpy(dest_address.addr+1, &(apiFrame.rx.source_address), sizeof(XBeeAddress_7Bytes));
                     // These nodes will only need to ever reply to one address,
                     // allowing us to just use dest_address for this purpose.
                     // TODO:  change dest_address to receiver_address.

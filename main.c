@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     }
 
     XBee_Enable(9600);
-    
+
     error = XBAPI_Command(CMD_ATSM, 1L, 0xc0, TRUE);
     if(error) {
         XBee_Disable();
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
         LED1_SIGNAL = 1;
         // Gather data here so that the xbee isn't waiting on it.
         // Temporary fix to determine if this is what's causing it to freeze.
-        long thermistorResistance = ADC_Read(THERMISTOR_CHANNEL); //(TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(THERMISTOR_CHANNEL))-1000);
+        long thermistorResistance = (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(THERMISTOR_CHANNEL))-1000);
 
         XBee_Wake(); // It's freezing here anyway so...
         //sleep(1); // This shouldn't be here, figure out whether the xbee keeps having the same problem with this here.

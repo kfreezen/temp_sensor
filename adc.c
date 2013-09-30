@@ -37,6 +37,10 @@ unsigned ADC_ReadOne(byte channel) {
 }
 
 unsigned ADC_Read(byte channel) {
+    while(!OSCSTATbits.OSTS) {}
+    
+    ADC_ReadOne(channel); // discard this in case it's necessary.
+
     int res[ADC_NUM_READS];
     byte i;
     for(i=0; i<ADC_NUM_READS; i++) {

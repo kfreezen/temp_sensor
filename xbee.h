@@ -74,6 +74,10 @@ typedef struct __XBeeAddress {
     unsigned char addr[8];
 } XBeeAddress;
 
+typedef struct __XBeeAddress_7Bytes {
+    unsigned char addr[7];
+} XBeeAddress_7Bytes;
+
 int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid);
 int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
 
@@ -131,7 +135,7 @@ typedef struct {
     byte length[2]; // Big-endian length of frame not counting first three bytes or checksum
     byte frame_type;
     byte frame_id;
-    XBeeAddress source_address;
+    XBeeAddress_7Bytes source_address;
     unsigned short reserved; // Should equal 0xFEFF
     byte receive_options;
     Packet packet;
@@ -190,6 +194,8 @@ typedef union {
     byte buffer[60];
     
 } Frame;
+
+void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src);
 
 #endif	/* XBEE_H */
 
