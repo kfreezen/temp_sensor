@@ -1,5 +1,5 @@
 #include "timer.h"
-#include <pic16lf1783.h>
+#include <pic16f1788.h>
 #include "platform_defines.h"
 
 void Timer1_Init(int tmr1cs, int t1ckps) {
@@ -8,6 +8,7 @@ void Timer1_Init(int tmr1cs, int t1ckps) {
     T1GCONbits.TMR1GE = 0;
 
     T1CONbits.T1CKPS = t1ckps;
+    T1CONbits.T1OSCEN = 1;
 }
 
 #define TIMER1_INIT_TRIES 3
@@ -22,7 +23,7 @@ void timer1_poll_delay(unsigned short ticks, int division) {
 
     TMR1 = 0;
 
-    Timer1_Init(SYS_CLOCK, division);
+    Timer1_Init(TMR1_PINOSC, division);
 
     unsigned char tmr1_turned_on = 0;
 

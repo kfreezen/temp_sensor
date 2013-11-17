@@ -14,9 +14,17 @@
 #define FOSC_DIV_8 1
 #include "globaldef.h"
 
-void ADC_Enable(byte select, byte port_pin);
+void ADC_EnablePin(byte select, byte port_pin);
+void ADC_Enable(void);
+
+void ADC_DisablePin(byte select, byte port_pin);
+void ADC_Disable(void);
+
 unsigned ADC_ReadOne(byte channel);
 unsigned ADC_Read(byte channel);
+
+inline byte PROBE_PIN(byte pin);
+inline byte PROBE_PORT(byte port);
 
 #endif	/* ADC_H */
 

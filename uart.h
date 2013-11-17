@@ -17,10 +17,11 @@ void UART_Init(int baud);
 void UART_Transmit(volatile char c);
 
 void UART_TransmitMsg(volatile const unsigned char* msg, int len, const char end_char);
-short UART_Receive(long tmo);
-int UART_ReceiveMsgTmo(char* msg, int len, const char end_char, long tmo);
+unsigned char UART_Receive();
+int UART_ReceiveMsg(char* msg, int len, const char end_char);
 
-inline void UART_ReceiveMsg(char* msg, int len, const char end_char);
+void UART_HandleInterrupt();
+void UART_ClearBuffer();
 
 #ifdef	__cplusplus
 }

@@ -2,7 +2,8 @@
 #include "timer.h"
 #include "platform_defines.h"
 
-#include <pic16lf1783.h>
+#include <pic16f1788.h>
+#include <string.h>
 
 void UART_Init(int baud) {
     TX1STAbits.SYNC = 0;
@@ -40,19 +41,31 @@ void UART_TransmitMsg(volatile const byte* _msg, int len, const char end_char) {
 
 #define UART_TIMEOUT 0x100
 
-short UART_Receive(long tmo) {
-    while(!OSCSTATbits.OSTS) {} // Wait for external oscillator to start running.
-    long i=0;
-    asm("clrwdt"); // Probably not necessary to do this.
-    while(!PIR1bits.RCIF) {
-        i++;
-        if(tmo && i>=tmo) {
-            break;
-        }
-    }
+byte UART_Receive() {
+	while(!OSCSTATbits.OSTS) {}
 
-    asm("clrwdt");
-    return (i<tmo || !tmo) ? RC1REG : 0x100;
+	asm("clrwdt");
+	while(!PIR1bits.RCIF) {}
+	asm("clrwdt");
+
+	return RC1REG;
+}
+
+#define UART_BUFFER_LEN 128
+unsigned char UART_Buffer[UART_BUFFER_LEN];
+unsigned char UART_BufferItr = 0;
+
+void UART_HandleInterrupt() {
+	if(UART_BufferItr + 1 > UART_BUFFER_LEN) {
+		return;
+	}
+	
+	UART_Buffer[UART_BufferItr++] = UART_Receive();
+}
+
+void UART_ClearBuffer() {
+	memset(UART_Buffer, 0, UART_BUFFER_LEN);
+	UART_BufferItr = 0;
 }
 
 /*int UART_ReceiveMsgTmo(char* msg, int len, char end_char, long tmo) {
@@ -73,14 +86,13 @@ short UART_Receive(long tmo) {
     return len;
 }*/
 
-int UART_ReceiveMsgTmo(char* msg, int len, char end_char, long tmo) {
+int UART_ReceiveMsg(char* msg, int len, char end_char) {
     int i;
 
     // Ensure that the sensor doesn't freeze for some stupid non-reply
-    SWDTEN = 1; // FIXME Using a timeout would really be better than this.
     for(i=0; i<len; i++) {
         short c;
-        c = UART_Receive(tmo);
+        c = UART_Receive();
         if(c!=UART_TIMEOUT) {
             msg[i] = c;
         } else {
@@ -91,10 +103,6 @@ int UART_ReceiveMsgTmo(char* msg, int len, char end_char, long tmo) {
             break;
         }
     }
-    //asm("clrwdt");
-    SWDTEN = 0;
-}
 
-inline void UART_ReceiveMsg(char* msg, int len, const char end_char) {
-    UART_ReceiveMsgTmo(msg, len, end_char, 0);
+	return i;
 }

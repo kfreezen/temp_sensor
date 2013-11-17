@@ -1,7 +1,7 @@
 #include "eeprom.h"
 #include "globaldef.h"
 
-#include <pic16lf1783.h>
+#include <pic16f1788.h>
 
 void EEPROM_Read(byte address, byte* data, int length) {
     unsigned char i;

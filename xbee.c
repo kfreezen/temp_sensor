@@ -6,7 +6,7 @@
 #include "platform_defines.h"
 #include "eeprom.h"
 
-#include <pic16lf1783.h>
+#include <pic16f1788.h>
 #include <string.h>
 #include <stddef.h>
 
@@ -59,12 +59,10 @@ void XBee_Wake() {
 
     // This and that "&& i++ < XTAL_FREQUENCY" should fix the problem of freezing.
     if(i >= XTAL_FREQUENCY-1 && XBEE_nCTS) {
-        LED2_SIGNAL = 1;
         XBee_Disable();
         // The documentation I found said that the minimum reset pulse needed to be 50ns.
-        timer1_poll_delay_ms(1);
+        timer1_poll_delay(40, DIVISION_8);
         XBee_Enable(XBEE_BAUD);
-        LED2_SIGNAL = 0;
         xbee_reset_flag = 1;
     }
 }
@@ -124,7 +122,7 @@ unsigned char doChecksumVerify(unsigned char* address, int length, unsigned char
     return check;
 }
 
-int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id) {
+char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, byte id) {
     //byte frame_length = sizeof(TxFrame); // I highly doubt that the frame will be over 256 bytes
     // long, so for now we'll just use a byte as it saves us space.
 
@@ -155,18 +153,19 @@ int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, 
     
 }
 
-/*u32 swap_endian_32(u32 n) {
-    unsigned char* p_n = (unsigned char*) n;
+u32 swap_endian_32(u32 n) {
+    unsigned char* p_n = (unsigned char*) &n;
     unsigned char p_ret[4];
+	//unsigned char tmp;
     p_ret[0] = p_n[3];
     p_ret[1] = p_n[2];
     p_ret[2] = p_n[1];
     p_ret[3] = p_n[0];
 
     return *((u32*)p_ret);
-}*/
+}
 
-u32 swap_endian_32(u32 n) {
+/*u32 swap_endian_32(u32 n) {
     unsigned long r = 0;
     r |= (n&0xFF) << 24;
     r |= ((n>>8)&0xFF) << 16;
@@ -174,10 +173,10 @@ u32 swap_endian_32(u32 n) {
     r |= ((n>>24)&0xFF);
 
     return r;
-}
+}*/
 
 byte calc_checksum;
-int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid) {
+char XBAPI_Command(unsigned short command, unsigned long data, byte id, byte data_valid) {
     
     /*int total_packet_length = 4 + length;
 
@@ -222,13 +221,11 @@ int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_v
 }
 
 // Returns -2 if a timeout occurs.
-int XBAPI_HandleFrame(int expected, int do_tmo) {
+char XBAPI_HandleFrame(int expected, int do_tmo) {
     // TODO:  Add verification of frames
-
-    long tmo = (do_tmo) ? XTAL_FREQUENCY>>1 : 0;
     
     while (1) {
-        int bytes_read = UART_ReceiveMsgTmo(apiFrame.buffer, 3, 0, tmo);
+        int bytes_read = UART_ReceiveMsg(apiFrame.buffer, 3, 0);
         if(bytes_read<3) {
             return XBEE_TIMEOUT_OCCURRED;
         }
@@ -236,7 +233,7 @@ int XBAPI_HandleFrame(int expected, int do_tmo) {
         unsigned short received_length = apiFrame.buffer[2];
         received_length |= (apiFrame.buffer[1] << 8);
 
-        UART_ReceiveMsgTmo(apiFrame.buffer + 3, received_length + 1, 0, tmo);
+        UART_ReceiveMsg(apiFrame.buffer + 3, received_length + 1, 0);
 
         if (apiFrame.rx.frame_type != expected && expected) {
             // This is better than before, but I don't know if it's the best way.

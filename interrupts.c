@@ -1,5 +1,5 @@
 #include "interrupts.h"
-#include <pic16lf1783.h>
+#include <pic16f1788.h>
 
 inline void EnableInterrupts() {
     INTCONbits.GIE = 1;

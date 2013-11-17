@@ -9,11 +9,7 @@
 #define	XBEE_H
 
 #include "globaldef.h"
-
-// Pin name defines
-#define XBEE_POWER PORTCbits.RC0
-#define XBEE_SLEEP_RQ PORTCbits.RC1
-#define XBEE_ON_nSLEEP PORTCbits.RC2
+#include "platform_defines.h"
 
 #define NO_RESULT 0
 #define RETURNS_RESULT 1
@@ -49,6 +45,9 @@ void XBee_Send(const char* msg, int len, const char end_char);
 void XBee_Recv(char* buf, int max_len, const char end_char);
 
 // API Mode
+
+#define API_START_DELIM 0x7E
+
 // Frame types
 #define API_AT_CMD_FRAME 0x8
 #define API_TRANSMIT_FRAME 0x10
@@ -78,8 +77,8 @@ typedef struct __XBeeAddress_7Bytes {
     unsigned char addr[7];
 } XBeeAddress_7Bytes;
 
-int XBAPI_Command(unsigned short command, unsigned long data, int id, int data_valid);
-int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, int id);
+char XBAPI_Command(unsigned short command, unsigned long data, byte id, byte data_valid);
+char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, byte id);
 
 // These defines are for the Transmit Status's delivery status field in the xbee 900hp pro (frame type 0x8B)
 // They are also defines for XBAPI_HandleFrame's return value
@@ -97,7 +96,8 @@ int XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, 
 #define XBEE_BAUD 9600
 
 // This will need to handle RX Indicators and transmit statuses.
-int XBAPI_HandleFrame(int expected, int do_tmo);
+// And command replies as well.
+char XBAPI_HandleFrame(int expected, int do_tmo);
 
 #include "packets.h"
 

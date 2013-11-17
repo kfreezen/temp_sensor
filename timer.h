@@ -34,7 +34,7 @@ extern "C" {
 
 void Timer1_Init(int t1cs, int t1ckps);
 
-#include <pic16lf1783.h>
+#include <pic16f1788.h>
 
 void Timer1_Disable();
 
