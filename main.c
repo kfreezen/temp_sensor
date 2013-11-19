@@ -24,6 +24,9 @@
 #include "adc.h"
 #include "eeprom.h"
 #include "crc16.h"
+#include "test.h"
+#include "interrupts.h"
+#include "asm.h"
 
 CalibrationData calibrationData;
 IntervalData intervalData;
@@ -44,22 +47,17 @@ extern XBeeAddress dest_address;
 
 extern void __doTestSendPacket();
 
-int error;
-int cmd_itr = 0;
+char error;
 
 int main(int argc, char** argv) {
-    
-    TRISC = TRISC_MASK;
-    TRISB = TRISB_MASK;
-    TRISA = TRISA_MASK;
-
+	SET_TRIS(__TRISC, TRISC_MASK);
+	SET_TRIS(__TRISB, TRISB_MASK);
+	SET_TRIS(__TRISA, TRISA_MASK);
+	
 	// These are 0 because the ADC_Enable will enable as necessary.
 	ANSELA = 0;
 	ANSELB = 0;
-
-    pulseLed(20);
-    timer1_poll_delay(40, DIVISION_8);
-    
+	
     //sleep(1);
     LED2_SIGNAL = 1;
     
@@ -81,33 +79,48 @@ int main(int argc, char** argv) {
 
     asm("clrwdt");
 
+	EnableInterrupts();
+
+	INTCONbits.PEIE = 1;
+	PIE1bits.RCIE = 1;
+
     XBee_Enable(9600);
 
     //LED1_SIGNAL = 1;
     //LED2_SIGNAL = 1;
-    
-    error = XBAPI_Command(CMD_ATSM, 1L, 0xc0, TRUE);
-    if(error) {
+
+	/* So basically, the way this will work is
+	 * we will register a XBee packet (a command in this case)
+	 * in the packet queue.  The interrupt handler will handle
+	 * the response and put the relevant information in the response's
+	 * corresponding info struct.
+	 */
+
+    byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
+	XBAPI_ReplyStruct* replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
+	
+	if(replyStruct->status) {
 		LED2_SIGNAL = 0;
+		LED1_SIGNAL = 1;
+		
         XBee_Disable();
         while(1){
             //LED1_SIGNAL = !LED1_SIGNAL;
         }
     }
+	XBAPI_FreePacket(cmdId);
 
-    cmd_itr++;
-
-    error = XBAPI_Command(CMD_ATAC, 0, 0xc1, FALSE);
-    if(error) {
+    cmdId = XBAPI_Command(CMD_ATAC, 0, FALSE);
+    if(replyStruct->status) {
 		LED2_SIGNAL = 0;
+		LED3_SIGNAL = 1;
         XBee_Disable();
         while(1){
             //LED1_SIGNAL = !LED1_SIGNAL;
         }
     }
-
-    cmd_itr++;
-    
+	XBAPI_FreePacket(cmdId);
+	
     // Initialize crc16 code.
     CRC16_Init();
     
@@ -132,7 +145,7 @@ int main(int argc, char** argv) {
 
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
-    XBAPI_HandleFrame(API_RX_INDICATOR, FALSE);
+    XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
 
     LED2_SIGNAL = 0;
     LED1_SIGNAL = 0;

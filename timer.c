@@ -55,16 +55,41 @@ void timer1_poll_delay_ms(unsigned short ms) {
     timer1_poll_delay(ms*(XTAL_FREQUENCY/1000), DIVISION_1); // This /1000 is causing freezing for some reason.
 }
 
+
+void timer1_sleep(unsigned short periods) {
+	Timer1_Init(TMR1_PINOSC, DIVISION_1);
+	PIE1bits.TMR1IE = 1;
+	T1CONbits.nT1SYNC = 1;
+	//T1GCONbits.TMR1GE = 1;
+	
+	while(periods --) {
+		asm("sleep");
+	}
+
+	Timer1_Disable();
+	while(!OSCSTATbits.OSTS) {}
+}
+
 void sleep(unsigned short seconds) {
-    int i;
+    /*int i;
     for(i=0; i<seconds; i++) {
         WDTCONbits.SWDTEN = 1;
         WDTCONbits.WDTPS = INTERVAL_1S;
         asm("sleep");
         WDTCONbits.SWDTEN = 0;
-    }
+    }*/
+
+	timer1_sleep(seconds >> 1);
 }
 
 void Timer1_Disable()  {
     T1CONbits.TMR1ON = 0;
+}
+
+inline unsigned int timer1_getValue() {
+	return TMR1;
+}
+
+inline void timer1_setValue(unsigned int val) {
+	TMR1 = val;
 }

@@ -53,10 +53,12 @@ void SendPacket(Packet* packet) {
     if(frame_id_itr == 0) {
         frame_id_itr++;
     }
-    byte status = 1;
-    while(status) {
-        status = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), 0); // FIXME:  Some time I may want to know what the transmit status is.
 
-    }
+    char id = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet)); // FIXME:  Some time I may want to know what the transmit status is.
+	if(id == -1) {
+		return;
+	}
 
+	/*XBAPI_ReplyStruct* reply = */ XBAPI_WaitForReply(id);
+	XBAPI_FreePacket(id);
 }

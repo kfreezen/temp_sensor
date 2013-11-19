@@ -91,13 +91,9 @@ int UART_ReceiveMsg(char* msg, int len, char end_char) {
 
     // Ensure that the sensor doesn't freeze for some stupid non-reply
     for(i=0; i<len; i++) {
-        short c;
+        char c;
         c = UART_Receive();
-        if(c!=UART_TIMEOUT) {
-            msg[i] = c;
-        } else {
-            return i;
-        }
+		msg[i] = c;
         
         if(msg[i] == end_char && end_char) {
             break;

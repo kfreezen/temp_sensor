@@ -14,6 +14,9 @@
       <itemPath>eeprom.h</itemPath>
       <itemPath>crc16.h</itemPath>
       <itemPath>test.h</itemPath>
+      <itemPath>bits.h</itemPath>
+      <itemPath>interrupts.h</itemPath>
+      <itemPath>asm.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -31,6 +34,8 @@
       <itemPath>packets.c</itemPath>
       <itemPath>crc16.c</itemPath>
       <itemPath>test.c</itemPath>
+      <itemPath>bits.c</itemPath>
+      <itemPath>interrupts.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

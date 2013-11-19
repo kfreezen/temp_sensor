@@ -3,6 +3,7 @@
 #include "uart.h"
 #include "timer.h"
 #include "xbee.h"
+#include "adc.h"
 
 #include <pic16f1788.h>
 
@@ -65,32 +66,44 @@ void tasking_scheduler() {
 }*/
 
 void interrupt isr() {
-	if(PIR1bits.RCIF==1) {
-		UART_HandleInterrupt();
-		PIR1bits.RCIF = 0;
-	}
-}
-
-void* XBee_Task(void* param) {
 	extern unsigned char UART_Buffer[];
 	extern unsigned char UART_BufferItr;
 
+	if(PIR1bits.TMR1IF == 1) {
+		PIR1bits.TMR1IF = 0;
+	}
+
+	if(PIR1bits.RCIF==1) {
+		UART_HandleInterrupt();
+		PIR1bits.RCIF = 0;
+
+		char valid = XBAPI_HandleFrameIfValid((Frame*) &UART_Buffer, 0, UART_BufferItr);
+		if(valid == 0) {
+			UART_ClearBuffer();
+		}
+	}
+}
+
+/*void* XBee_Task(void* param) {
+	extern unsigned char UART_Buffer[];
+	extern unsigned char UART_BufferItr;
+	
 	if(UART_Buffer[0] == API_START_DELIM && UART_BufferItr >= 3) {
 		// Now, let's see if it's been filled out to the necessary limit.
 		Frame* frame = (Frame*) UART_Buffer;
 		int length = (frame->rx.length[0] << 8) | frame->rx.length[1];
 		// UART_BufferItr needs to be length + 4 (start_delim + length + checksum)
 		if(UART_BufferItr == length + 4) {
-			XBAPI_HandleFrame(0, 0);
+			XBAPI_HandleFrame(frame, 0);
 			UART_ClearBuffer();
-			//LED3_SIGNAL = 1;
+			LED3_SIGNAL = 1;
 			timer1_poll_delay(750, DIVISION_8);
 			LED3_SIGNAL = 0;
 		}
 	}
 
 	return param;
-}
+}*/
 
 void* MainTask(void* param) {
 	if(param == 0) {
@@ -102,17 +115,16 @@ void* MainTask(void* param) {
 		return 2;
 	}
 }
-inline void EnableInterrupts() {
-	INTCONbits.GIE = 1;
+
+void* GatherCalibrationDataTask(void* param) {
+	ADC_Enable();
+	
+	return param;
 }
 
 int testMain() {
-	EnableInterrupts();
 
-	INTCONbits.PEIE = 1;
-	PIE1bits.RCIE = 1;
-
-	tasking_initTask(XBee_Task, 0);
+	//tasking_initTask(XBee_Task, 0);
 	tasking_initTask(MainTask, 0);
 
 	// And start it.

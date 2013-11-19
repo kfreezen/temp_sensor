@@ -43,6 +43,9 @@ void sleep(unsigned short seconds);
 
 void timer1_poll_delay_ms(unsigned short ms);
 
+inline unsigned int timer1_getValue();
+inline void timer1_setValue(unsigned int val);
+
 #define INTERVAL_1S 10
 #define INTERVAL_2S 11
 

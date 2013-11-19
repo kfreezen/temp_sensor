@@ -41,18 +41,20 @@
 
 #define THERMISTOR_CHANNEL 0
 
-#define CALIBRATION_DATA_MAGIC 0xF00D
+#define CALIBRATION_DATA_MAGIC 0xF00E
 
 typedef struct {
     unsigned short magic;
     short thermistorValue25CAdjust;
     short topResistorValueAdjust;
+	unsigned char reserved[26];
 } CalibrationData;
 
-#define INTERVAL_MAGIC 0xFACE
+#define INTERVAL_MAGIC 0xFACF
 typedef struct {
     word magic;
     word interval;
+	unsigned char reserved[12];
 } IntervalData;
 /////////////////////////////////////////
 // KEEP ALL EEPROM MANAGEMENT DEFINES //
@@ -61,7 +63,7 @@ typedef struct {
 #define CALIBRATION_DATA_LOCATION 0x00
 #define INTERVAL_LOCATION (CALIBRATION_DATA_LOCATION+sizeof(CalibrationData))
 
-#define PROGRAM_REVISION 1
+#define PROGRAM_REVISION 0
 
 #endif	/* PLATFORM_DEFINES_H */
 
