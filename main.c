@@ -50,9 +50,9 @@ extern void __doTestSendPacket();
 char error;
 
 int main(int argc, char** argv) {
-	SET_TRIS(__TRISC, TRISC_MASK);
-	SET_TRIS(__TRISB, TRISB_MASK);
-	SET_TRIS(__TRISA, TRISA_MASK);
+	TRISA = TRISA_MASK;
+	TRISB = TRISB_MASK;
+	TRISC = TRISC_MASK;
 	
 	// These are 0 because the ADC_Enable will enable as necessary.
 	ANSELA = 0;

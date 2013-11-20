@@ -28,6 +28,14 @@
 #define LED2_SIGNAL PORTBbits.RB6
 #define LED3_SIGNAL PORTBbits.RB7
 
+#define POT1_PIN 1
+#define POT2_PIN 2
+#define POT3_PIN 3
+
+#define POT1_CHANNEL 9
+#define POT2_CHANNEL 8
+#define POT3_CHANNEL 10
+
 #define XBEE_nCTS PORTCbits.RC5
 #define XBEE_POWER PORTCbits.RC2
 #define XBEE_SLEEP_RQ PORTCbits.RC3
@@ -37,17 +45,25 @@
 
 #define XTAL_FREQUENCY 8000000
 
+#define RESET_SIGNAL PORTEbits.RE3
 #define TEST_SIGNAL PORTCbits.RC4
 
 #define THERMISTOR_CHANNEL 0
+
+#define TEST_SIGNAL_IOCN IOCCNbits.IOCCN4
+#define TEST_SIGNAL_IOCF IOCCFbits.IOCCF4
+
+#define RESET_BUTTON_IOCN IOCEPbits.IOCEN3
+#define RESET_SIGNAL_IOCF IOCEFbits.IOCEF3
 
 #define CALIBRATION_DATA_MAGIC 0xF00E
 
 typedef struct {
     unsigned short magic;
-    short thermistorValue25CAdjust;
-    short topResistorValueAdjust;
-	unsigned char reserved[26];
+	short probe0ValueAdjust;
+    short probe1ValueAdjust;
+	short probe2ValueAdjust;
+	unsigned char reserved[24];
 } CalibrationData;
 
 #define INTERVAL_MAGIC 0xFACF

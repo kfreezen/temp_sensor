@@ -9,12 +9,14 @@
 #define	ASM_H
 
 #define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
 
 #define __TRISA 5
 #define __TRISB 6
 #define __TRISC 7
 
-#define SET_TRIS(p, v) asm("movlw " STR_HELPER(v) "; tris " STR_HELPER(p))
+#define SET_TRIS(p, v) asm("movlw " STR(v) "; \
+							tris " STR(p) "; ")
 
 #endif	/* ASM_H */
 

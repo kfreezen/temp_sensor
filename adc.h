@@ -10,7 +10,7 @@
 
 #define SEL_PORTA 0
 #define SEL_PORTB 1
-#define ADC_NUM_READS 4 // This specifies how many reads the program should average.
+#define ADC_NUM_READS 8 // This specifies how many reads the program should average.
 #define FOSC_DIV_8 1
 #include "globaldef.h"
 
