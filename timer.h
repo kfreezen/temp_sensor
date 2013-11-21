@@ -32,13 +32,17 @@ extern "C" {
 #define SLEEP_500KHZ 4
 #define SLEEP_250KHZ 5
 
-void Timer1_Init(int t1cs, int t1ckps);
+#include "globaldef.h"
+
+void Timer1_Init(byte t1cs, byte t1ckps);
 
 #include <pic16f1788.h>
 
 void Timer1_Disable();
 
-void timer1_poll_delay(unsigned short ticks, int division);
+void timer1_poll_delay(unsigned short ticks, byte division);
+void timer1_poll_delay_fast(unsigned short ticks, byte division);
+
 void sleep(unsigned short seconds);
 
 void timer1_poll_delay_ms(unsigned short ms);

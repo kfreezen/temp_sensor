@@ -87,7 +87,7 @@ void interrupt isr() {
 	}
 
 	if(INTCONbits.IOCIF == 1) {
-		if(RESET_SIGNAL == 0 || (TEST_SIGNAL_IOCN == 1 && TEST_SIGNAL_IOCF == 1)) {
+		if(RESET_SIGNAL == 0 && TEST_SIGNAL == 1) {
 			// save stuff and reset.
 			EEPROM_Write(CALIBRATION_DATA_LOCATION, (byte*)&calibrationData, sizeof(CalibrationData));
 			TEST_SIGNAL_IOCF = 0;
@@ -98,27 +98,6 @@ void interrupt isr() {
 		INTCONbits.IOCIF = 0;
 	}
 }
-
-/*void* XBee_Task(void* param) {
-	extern unsigned char UART_Buffer[];
-	extern unsigned char UART_BufferItr;
-	
-	if(UART_Buffer[0] == API_START_DELIM && UART_BufferItr >= 3) {
-		// Now, let's see if it's been filled out to the necessary limit.
-		Frame* frame = (Frame*) UART_Buffer;
-		int length = (frame->rx.length[0] << 8) | frame->rx.length[1];
-		// UART_BufferItr needs to be length + 4 (start_delim + length + checksum)
-		if(UART_BufferItr == length + 4) {
-			XBAPI_HandleFrame(frame, 0);
-			UART_ClearBuffer();
-			LED3_SIGNAL = 1;
-			timer1_poll_delay(750, DIVISION_8);
-			LED3_SIGNAL = 0;
-		}
-	}
-
-	return param;
-}*/
 
 void* MainTask(void* param) {
 	if(param == 0) {
@@ -131,6 +110,14 @@ void* MainTask(void* param) {
 	}
 }
 
+inline void SET_LED(byte i, byte n) {
+	switch(i) {
+		case 0: LED1_SIGNAL = n; break;
+		case 1: LED2_SIGNAL = n; break;
+		case 2: LED3_SIGNAL = n; break;
+	}
+}
+
 void* GatherCalibrationDataTask(void* param) {
 	extern CalibrationData calibrationData;
 
@@ -140,35 +127,46 @@ void* GatherCalibrationDataTask(void* param) {
 	ADC_EnablePin(SEL_PORTB, POT2_PIN);
 	ADC_EnablePin(SEL_PORTB, POT3_PIN);
 
-	calibrationData.probe0ValueAdjust = ADC_Read(POT1_CHANNEL);
-	calibrationData.probe1ValueAdjust = ADC_Read(POT2_CHANNEL);
-	calibrationData.probe2ValueAdjust = ADC_Read(POT3_CHANNEL);
+	byte i;
+	for(i=0; i<3; i++) {
+		ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
+	}
 
-	calibrationData.probe0ValueAdjust = (calibrationData.probe0ValueAdjust >> 4) - 128;
-	calibrationData.probe1ValueAdjust = (calibrationData.probe1ValueAdjust >> 4) - 128;
-	calibrationData.probe2ValueAdjust = (calibrationData.probe2ValueAdjust >> 4) - 128;
+	// wait 500 ns.
+	timer1_poll_delay_fast(1, DIVISION_4);
+	
+	unsigned short probeValues[3];
+	byte calibrating[3];
 
+	for(i=0; i<3; i++) {
+		probeValues[i] = ADC_Read(PROBE_CHANNEL(i));
+		if(probeValues[i] <= THERMISTOR_RESISTANCE_0C + (THERMISTOR_RESISTANCE_0C/100) && probeValues[i] >= THERMISTOR_RESISTANCE_0C - (THERMISTOR_RESISTANCE_0C/100)) {
+			calibrating[i] = 1;
+			calibrationData.probeValueAdjust[i] = ADC_Read(POT_CHANNEL(i));
+			calibrationData.probeValueAdjust[0] = (calibrationData.probeValueAdjust[0] >> 6) - 32;
+			SET_LED(i, 1);
+		} else {
+			calibrating[i] = 0;
+			SET_LED(i, 0);
+		}
+	}
+	
+	
+	/*calibrationData.probeValueAdjust[1] = ADC_Read(POT2_CHANNEL);
+	calibrationData.probeValueAdjust[2] = ADC_Read(POT3_CHANNEL);
+
+	calibrationData.probeValueAdjust[1] = (calibrationData.probeValueAdjust[1] >> 6) - 32;
+	calibrationData.probeValueAdjust[2] = (calibrationData.probeValueAdjust[2] >> 6) - 32;
+	*/
+	
 	ADC_DisablePin(SEL_PORTB, POT3_PIN);
 	ADC_DisablePin(SEL_PORTB, POT2_PIN);
 	ADC_DisablePin(SEL_PORTB, POT1_PIN);
 
-	if(calibrationData.probe0ValueAdjust < 16 && calibrationData.probe0ValueAdjust > -16) {
-		LED1_SIGNAL = 1;
-	} else {
-		LED1_SIGNAL = 0;
+	for(i=0; i<3; i++) {
+		ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
 	}
-
-	if(calibrationData.probe1ValueAdjust < 16 && calibrationData.probe1ValueAdjust > -16) {
-		LED2_SIGNAL = 1;
-	} else {
-		LED2_SIGNAL = 0;
-	}
-
-	if(calibrationData.probe2ValueAdjust < 16 && calibrationData.probe2ValueAdjust > -16) {
-		LED3_SIGNAL = 1;
-	} else {
-		LED3_SIGNAL = 0;
-	}
+	
 	ADC_Disable();
 	
 	return param;

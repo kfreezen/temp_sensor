@@ -18,8 +18,10 @@
 
 #define FOSC_DIV_8 1
 
-#define THERMISTOR_BETA 3948
+#define THERMISTOR_BETA 3892
 #define THERMISTOR_RESISTANCE_25C 10000
+#define THERMISTOR_RESISTANCE_0C 32650
+
 #define TOP_RESISTOR_VALUE 31600
 
 #define DEFAULT_INTERVAL 60
@@ -53,16 +55,14 @@
 #define TEST_SIGNAL_IOCN IOCCNbits.IOCCN4
 #define TEST_SIGNAL_IOCF IOCCFbits.IOCCF4
 
-#define RESET_BUTTON_IOCN IOCEPbits.IOCEN3
+#define RESET_SIGNAL_IOCN IOCENbits.IOCEN3
 #define RESET_SIGNAL_IOCF IOCEFbits.IOCEF3
 
 #define CALIBRATION_DATA_MAGIC 0xF00E
 
 typedef struct {
     unsigned short magic;
-	short probe0ValueAdjust;
-    short probe1ValueAdjust;
-	short probe2ValueAdjust;
+	short probeValueAdjust[3];
 	unsigned char reserved[24];
 } CalibrationData;
 

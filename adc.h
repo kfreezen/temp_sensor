@@ -23,8 +23,11 @@ void ADC_Disable(void);
 unsigned ADC_ReadOne(byte channel);
 unsigned ADC_Read(byte channel);
 
-inline byte PROBE_PIN(byte pin);
-inline byte PROBE_PORT(byte port);
+inline byte PROBE_PIN(byte probe);
+inline byte PROBE_PORT(byte probe);
+
+inline byte PROBE_CHANNEL(byte probe);
+inline byte POT_CHANNEL(byte pot);
 
 #endif	/* ADC_H */
 

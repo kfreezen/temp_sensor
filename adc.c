@@ -20,6 +20,14 @@ const byte PROBE_PINS[3] = {
 	0, 1, 5
 };
 
+const byte PROBE_CHANNELS[3] = {
+	0, 1, 4
+};
+
+const byte POT_CHANNELS[3] = {
+	POT1_CHANNEL, POT2_CHANNEL, POT3_CHANNEL
+};
+
 inline byte PROBE_PORT(byte port) {
 	return PROBE_PORTS[port];
 }
@@ -28,9 +36,16 @@ inline byte PROBE_PIN(byte pin) {
 	return PROBE_PINS[pin];
 }
 
+inline byte PROBE_CHANNEL(byte probe) {
+	return PROBE_CHANNELS[probe];
+}
+
+inline byte POT_CHANNEL(byte pot) {
+	return POT_CHANNELS[pot];
+}
 void ADC_Enable() {
 	ANALOG_POWER_TOGGLE = 1;
-
+	
 	ADCON1bits.ADCS = FOSC_DIV_8;
 	ADCON1bits.ADPREF = PREF_VDD; // We have to detect the VREF+ voltage.
 	ADCON1bits.ADNREF = 0;

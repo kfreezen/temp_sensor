@@ -45,7 +45,8 @@ void XBee_Enable(int baud) {
 
 void XBee_Reset() {
     XBee_Disable();
-    timer1_poll_delay_ms(1);
+	// about 1.2 ms.
+    timer1_poll_delay(40, DIVISION_1);
     XBee_Enable(last_xbee_baud);
 }
 

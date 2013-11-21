@@ -59,6 +59,9 @@ void SendPacket(Packet* packet) {
 		return;
 	}
 
-	/*XBAPI_ReplyStruct* reply = */ XBAPI_WaitForReply(id);
+	XBAPI_ReplyStruct* reply = XBAPI_WaitForReply(id);
+	if(reply->frameType != API_RX_INDICATOR) {
+		reply = XBAPI_WaitForReply(id);
+	}
 	XBAPI_FreePacket(id);
 }

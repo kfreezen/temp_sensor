@@ -49,10 +49,18 @@ extern void __doTestSendPacket();
 
 char error;
 
+short _adc_read;
+
+long GetProbeResistance(byte probe) {
+	_adc_read = ADC_Read(PROBE_CHANNEL(probe));
+	return (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/_adc_read)-1000);
+}
 int main(int argc, char** argv) {
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
 	TRISC = TRISC_MASK;
+
+	pulseLed(80);
 	
 	// These are 0 because the ADC_Enable will enable as necessary.
 	ANSELA = 0;
@@ -84,6 +92,10 @@ int main(int argc, char** argv) {
 	INTCONbits.PEIE = 1;
 	PIE1bits.RCIE = 1;
 
+	// Enable interrupt on change for the reset button.
+	RESET_SIGNAL_IOCN = 1;
+	INTCONbits.IOCIE = 1;
+	
     XBee_Enable(9600);
 
     //LED1_SIGNAL = 1;
@@ -145,7 +157,7 @@ int main(int argc, char** argv) {
 
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
-    XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
+    //XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
 
     LED2_SIGNAL = 0;
     LED1_SIGNAL = 0;
@@ -158,13 +170,18 @@ int main(int argc, char** argv) {
 		ADC_Enable();
 		
 		ADC_EnablePin(PROBE_PORT(0), PROBE_PIN(0));
-		
+
+		// Give the external cap time to charge.
+		// The external cap is around 0.047uf, and according to my calculations
+		// should be sufficiently charged in around 500 ns. (4 cycles)
+		timer1_poll_delay_fast(4, DIVISION_1);
+
 		// Gather data here so that the xbee isn't waiting on it.
         // Temporary fix to determine if this is what's causing it to freeze.
-        long thermistorResistance = (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(THERMISTOR_CHANNEL))-1000);
+		long probeResistance0 = GetProbeResistance(0);
 
         XBee_Wake();
-        SendReport(thermistorResistance, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
+        SendReport(probeResistance0, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
         XBee_Sleep();
 
 		ADC_DisablePin(PROBE_PORT(0), PROBE_PIN(0));
