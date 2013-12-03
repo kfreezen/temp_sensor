@@ -15,6 +15,8 @@
 #include "globaldef.h"
 
 void ADC_EnablePin(byte select, byte port_pin);
+
+void ADC_EnableEx(byte pvrefSel);
 void ADC_Enable(void);
 
 void ADC_DisablePin(byte select, byte port_pin);
@@ -28,6 +30,11 @@ inline byte PROBE_PORT(byte probe);
 
 inline byte PROBE_CHANNEL(byte probe);
 inline byte POT_CHANNEL(byte pot);
+
+long GetProbeResistance(byte probe);
+
+#define PIN_PVREF 1
+#define VDD_PVREF 0
 
 #endif	/* ADC_H */
 

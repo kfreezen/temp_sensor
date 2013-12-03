@@ -49,12 +49,9 @@ extern void __doTestSendPacket();
 
 char error;
 
-short _adc_read;
+unsigned batt_level;
+long probeResistance0;
 
-long GetProbeResistance(byte probe) {
-	_adc_read = ADC_Read(PROBE_CHANNEL(probe));
-	return (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/_adc_read)-1000);
-}
 int main(int argc, char** argv) {
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
@@ -65,7 +62,7 @@ int main(int argc, char** argv) {
 	// These are 0 because the ADC_Enable will enable as necessary.
 	ANSELA = 0;
 	ANSELB = 0;
-	
+
     //sleep(1);
     LED2_SIGNAL = 1;
     
@@ -125,10 +122,12 @@ int main(int argc, char** argv) {
     cmdId = XBAPI_Command(CMD_ATAC, 0, FALSE);
     if(replyStruct->status) {
 		LED2_SIGNAL = 0;
-		LED3_SIGNAL = 1;
         XBee_Disable();
         while(1){
-            //LED1_SIGNAL = !LED1_SIGNAL;
+			LED1_SIGNAL = 1;
+			timer1_poll_delay(16000, DIVISION_1);
+			LED1_SIGNAL = 0;
+			timer1_poll_delay(16000, DIVISION_1);
         }
     }
 	XBAPI_FreePacket(cmdId);
@@ -168,23 +167,23 @@ int main(int argc, char** argv) {
         
         LED1_SIGNAL = 1;
 		ADC_Enable();
-		
-		ADC_EnablePin(PROBE_PORT(0), PROBE_PIN(0));
 
+		ADC_EnablePin(PROBE_PORT(1), PROBE_PIN(1));
+		
 		// Give the external cap time to charge.
 		// The external cap is around 0.047uf, and according to my calculations
 		// should be sufficiently charged in around 500 ns. (4 cycles)
-		timer1_poll_delay_fast(4, DIVISION_1);
+		timer1_poll_delay(120, DIVISION_1);
 
 		// Gather data here so that the xbee isn't waiting on it.
         // Temporary fix to determine if this is what's causing it to freeze.
-		long probeResistance0 = GetProbeResistance(0);
+		probeResistance0 = GetProbeResistance(1);
 
         XBee_Wake();
         SendReport(probeResistance0, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
         XBee_Sleep();
 
-		ADC_DisablePin(PROBE_PORT(0), PROBE_PIN(0));
+		ADC_DisablePin(PROBE_PORT(1), PROBE_PIN(1));
 
 		ADC_Disable();
 		

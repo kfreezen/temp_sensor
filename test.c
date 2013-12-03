@@ -118,6 +118,8 @@ inline void SET_LED(byte i, byte n) {
 	}
 }
 
+long probeValues[3];
+
 void* GatherCalibrationDataTask(void* param) {
 	extern CalibrationData calibrationData;
 
@@ -132,18 +134,18 @@ void* GatherCalibrationDataTask(void* param) {
 		ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 	}
 
-	// wait 500 ns.
-	timer1_poll_delay_fast(1, DIVISION_4);
+	// wait about 3.75ms
+	timer1_poll_delay(120, DIVISION_1);
 	
-	unsigned short probeValues[3];
+	//long probeValues[3];
 	byte calibrating[3];
 
 	for(i=0; i<3; i++) {
-		probeValues[i] = ADC_Read(PROBE_CHANNEL(i));
+		probeValues[i] = GetProbeResistance(i);
 		if(probeValues[i] <= THERMISTOR_RESISTANCE_0C + (THERMISTOR_RESISTANCE_0C/100) && probeValues[i] >= THERMISTOR_RESISTANCE_0C - (THERMISTOR_RESISTANCE_0C/100)) {
 			calibrating[i] = 1;
 			calibrationData.probeValueAdjust[i] = ADC_Read(POT_CHANNEL(i));
-			calibrationData.probeValueAdjust[0] = (calibrationData.probeValueAdjust[0] >> 6) - 32;
+			calibrationData.probeValueAdjust[i] = (calibrationData.probeValueAdjust[i] >> 6) - 32;
 			SET_LED(i, 1);
 		} else {
 			calibrating[i] = 0;
@@ -166,7 +168,24 @@ void* GatherCalibrationDataTask(void* param) {
 	for(i=0; i<3; i++) {
 		ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
 	}
-	
+
+	timer1_poll_delay(100, DIVISION_1);
+
+	// Now we want to go through and calculate the calibrated resistance, and
+	// turn off the LEDs corresponding to the calibration pots if the resistance
+	// is within 0.1% (or some other arbitrary value) of the correct value.  That effect will
+	// be that the LEDs blink if they are within 1% of 0 degrees celsius, and will
+	// stay on if they are within 0.1% (or some other arbitrary value between
+	// 0% and 1%
+	for(i=0; i < 3; i++) {
+		if(calibrating[i]) {
+			long calibratedValue = probeValues[i] + (probeValues[i]*calibrationData.probeValueAdjust[i]) / 3200;
+			if(calibratedValue >= THERMISTOR_RESISTANCE_0C_TOP || calibratedValue <= THERMISTOR_RESISTANCE_0C_BOTTOM) {
+				SET_LED(i, 0);
+			}
+		}
+	}
+
 	ADC_Disable();
 	
 	return param;
