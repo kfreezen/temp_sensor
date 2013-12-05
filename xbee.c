@@ -195,7 +195,7 @@ char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length)
     apiFrame.tx.reserved = 0xFEFF;
     apiFrame.tx.transmit_options = 0;
     apiFrame.tx.broadcast_radius = 0;
-    memcpy(&apiFrame.tx.packet, data, (length>sizeof(Packet)) ? sizeof(Packet) : length);
+    memcpy(&apiFrame.tx.packet, data, ((unsigned)length>sizeof(Packet)) ? sizeof(Packet) : length);
     apiFrame.tx.checksum = checksum(apiFrame.buffer+3, sizeof(TxFrame)-4);
 
     UART_TransmitMsg((byte*)&apiFrame, sizeof(TxFrame), 0);
@@ -214,7 +214,7 @@ char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length)
 	return id;
 }
 
-u32 swap_endian_32(u32 n) {
+uint32 swap_endian_32(uint32 n) {
     unsigned char* p_n = (unsigned char*) &n;
     unsigned char p_ret[4];
 	//unsigned char tmp;
@@ -223,7 +223,7 @@ u32 swap_endian_32(u32 n) {
     p_ret[2] = p_n[1];
     p_ret[3] = p_n[0];
 
-    return *((u32*)p_ret);
+    return *((uint32*)p_ret);
 }
 
 /*u32 swap_endian_32(u32 n) {
@@ -346,7 +346,7 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
         case API_RX_INDICATOR: {
 			Packet* packet = &frame->rx.packet;
             switch(packet->header.command) {
-                case REQUEST_RECEIVER:
+                case RECEIVER_ACK:
                 {
                     memset(dest_address.addr, 0, sizeof(XBeeAddress));
                     memcpy(dest_address.addr+1, &(frame->rx.source_address), sizeof(XBeeAddress_7Bytes));

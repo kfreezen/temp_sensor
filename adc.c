@@ -105,7 +105,7 @@ void ADC_DisablePin(byte select, byte port_pin) {
 	}
 }
 
-unsigned ADC_ReadOne(byte channel) {
+uint16 ADC_ReadOne(byte channel) {
 	ADCON0bits.CHS = channel;
 	
 	// Wait (1/8000000)*50 seconds (6.25us) for the ADC to charge the holding capacitor.
@@ -123,7 +123,7 @@ unsigned ADC_ReadOne(byte channel) {
 	return result;
 }
 
-unsigned ADC_Read(byte channel) {
+uint16 ADC_Read(byte channel) {
 	while (!OSCSTATbits.OSTS) {
 	}
 
@@ -140,7 +140,7 @@ unsigned ADC_Read(byte channel) {
 		sum += res[i];
 	}
 
-	return (unsigned) (sum / (long) ADC_NUM_READS);
+	return (unsigned) 0xFFFF; //(sum / (long) ADC_NUM_READS);
 }
 
 // Probably doesn't belong in adc.c

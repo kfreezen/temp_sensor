@@ -10,6 +10,7 @@
 
 #include "globaldef.h"
 #include "platform_defines.h"
+#include "packets.h"
 
 #define NO_RESULT 0
 #define RETURNS_RESULT 1
@@ -67,15 +68,6 @@ void XBee_Recv(char* buf, int max_len, const char end_char);
 #define ERROR 1
 #define INVALID_COMMAND 2
 #define INVALID_PARAM 3
-
-// This is for the 64-bit XBee address.
-typedef struct __XBeeAddress {
-    unsigned char addr[8];
-} XBeeAddress;
-
-typedef struct __XBeeAddress_7Bytes {
-    unsigned char addr[7];
-} XBeeAddress_7Bytes;
 
 char XBAPI_Command(unsigned short command, unsigned long data, byte data_valid);
 char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length);

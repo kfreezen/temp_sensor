@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
 	TRISC = TRISC_MASK;
-
+	
 	pulseLed(80);
 	
 	// These are 0 because the ADC_Enable will enable as necessary.
@@ -172,7 +172,7 @@ int main(int argc, char** argv) {
 		
 		// Give the external cap time to charge.
 		// The external cap is around 0.047uf, and according to my calculations
-		// should be sufficiently charged in around 500 ns. (4 cycles)
+		// should be sufficiently charged in whatever 120 ticks is, I guess?
 		timer1_poll_delay(120, DIVISION_1);
 
 		// Gather data here so that the xbee isn't waiting on it.

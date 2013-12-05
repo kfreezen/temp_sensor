@@ -22,8 +22,8 @@ void ADC_Enable(void);
 void ADC_DisablePin(byte select, byte port_pin);
 void ADC_Disable(void);
 
-unsigned ADC_ReadOne(byte channel);
-unsigned ADC_Read(byte channel);
+uint16 ADC_ReadOne(byte channel);
+uint16 ADC_Read(byte channel);
 
 inline byte PROBE_PIN(byte probe);
 inline byte PROBE_PORT(byte probe);
