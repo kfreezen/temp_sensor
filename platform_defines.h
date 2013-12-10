@@ -74,8 +74,8 @@ typedef struct {
 // KEEP ALL EEPROM MANAGEMENT DEFINES //
 // HERE                              //
 //////////////////////////////////////
-#define CALIBRATION_DATA_LOCATION 0x00
-#define INTERVAL_LOCATION (CALIBRATION_DATA_LOCATION+sizeof(CalibrationData))
+//#define CALIBRATION_DATA_LOCATION 0x00
+//#define INTERVAL_LOCATION (CALIBRATION_DATA_LOCATION+sizeof(CalibrationData))
 
 #define PROGRAM_REVISION 1
 

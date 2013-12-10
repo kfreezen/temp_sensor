@@ -74,7 +74,7 @@ char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length)
 
 // These defines are for the Transmit Status's delivery status field in the xbee 900hp pro (frame type 0x8B)
 // They are also defines for XBAPI_HandleFrame's return value
-#define SUCCESS 0x00
+#define TRANSMIT_SUCCESS 0x00
 #define MAC_ACK_FAIL 0x01
 #define NETWORK_ACK_FAIL 0x21
 #define ROUTE_NOT_FOUND 0x25

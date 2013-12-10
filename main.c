@@ -67,6 +67,7 @@ int main(int argc, char** argv) {
     
 	EEPROM_Read(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 	if(eepromData.magic != EEPROM_DATA_MAGIC) {
+		eepromData.magic = EEPROM_DATA_MAGIC;
 		memset(&eepromData.calibration, 0, sizeof(CalibrationData));
 		eepromData.interval.interval = DEFAULT_INTERVAL;
 		memset(&eepromData.sensorId, 0xFF, sizeof(SensorId));
@@ -84,8 +85,7 @@ int main(int argc, char** argv) {
 	RESET_SIGNAL_IOCN = 1;
 	INTCONbits.IOCIE = 1;
 	
-    XBee_Enable(9600);
-
+    XBee_Enable(9600); // Between here and... (see fixme comment)
     //LED1_SIGNAL = 1;
     //LED2_SIGNAL = 1;
 
@@ -96,6 +96,8 @@ int main(int argc, char** argv) {
 	 * corresponding info struct.
 	 */
 
+	// FIXME:  Somewhere in here, there is a corruption.
+	
     byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
 	XBAPI_ReplyStruct* replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
 	
@@ -108,7 +110,7 @@ int main(int argc, char** argv) {
             //LED1_SIGNAL = !LED1_SIGNAL;
         }
     }
-	XBAPI_FreePacket(cmdId);
+	XBAPI_FreePacket(cmdId); // here there is corruption in eepromData ?
 
     cmdId = XBAPI_Command(CMD_ATAC, 1L, FALSE);
 	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);

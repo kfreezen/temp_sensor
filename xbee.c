@@ -359,7 +359,7 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 					}
 
 					// This means that sensorId is invalid, so we have to load the proper one, and save it to EEPROM.
-					if(i == 8) {
+					if(i >= 8) {
 						memcpy(&eepromData.sensorId, &packet->header.sensorId, sizeof(SensorId));
 						EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 					}
@@ -368,13 +368,13 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 						// These nodes will only need to ever reply to one address,
 						// allowing us to just use dest_address for this purpose.
 						// TODO:  change dest_address to receiver_address.
-					} break;
-				}
+				} break;
+			}
 
-				if(frameIdBool) {
-					reply->status = 0;
-				}
-			} break;
+			if(frameIdBool) {
+				reply->status = 0;
+			}
+		} break;
 
         case API_TRANSMIT_STATUS: {
             // TODO:  Add error handling code here.

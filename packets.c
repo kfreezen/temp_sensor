@@ -3,8 +3,11 @@
 #include "adc.h"
 #include "crc16.h"
 #include "xbee.h"
+#include "eeprom.h"
 
 #include <string.h>
+
+extern EEPROM_Structure eepromData;
 
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
@@ -27,7 +30,12 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
     packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
     packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
 
-    SendPacket(&packet_buffer);
+    char id = SendPacket(&packet_buffer);
+
+	XBAPI_ReplyStruct* reply = XBAPI_WaitForReplyTmo(id, 256);
+	if(reply->frameType == API_TRANSMIT_STATUS && reply->status != TRANSMIT_SUCCESS) {
+
+	}
 }
 
 void SendReceiverBroadcastRequest() {
@@ -38,13 +46,18 @@ void SendReceiverBroadcastRequest() {
     packet_buffer.header.revision = PROGRAM_REVISION;
 
 	// add an if here, when we get around to it.
-	memset(&packet_buffer.header.sensorId, 0xFF, sizeof(SensorId));
+	memcpy(&packet_buffer.header.sensorId, &eepromData.sensorId, sizeof(SensorId));
 	
     CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
 
 	packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
     packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
-    SendPacket(&packet_buffer);
+    char id = SendPacket(&packet_buffer);
+
+	XBAPI_ReplyStruct* reply;
+	do {
+		reply = XBAPI_WaitForReply(id);
+	} while(reply->frameType != API_RX_INDICATOR);
 }
 
 unsigned char frame_id_itr = 0;
@@ -53,7 +66,7 @@ void __doTestSendPacket() {
     SendPacket(&packet_buffer);
 }
 
-void SendPacket(Packet* packet) {
+char SendPacket(Packet* packet) {
     if(frame_id_itr == 0) {
         frame_id_itr++;
     }
@@ -63,9 +76,5 @@ void SendPacket(Packet* packet) {
 		return;
 	}
 
-	XBAPI_ReplyStruct* reply = XBAPI_WaitForReply(id);
-	if(reply->frameType != API_RX_INDICATOR) {
-		reply = XBAPI_WaitForReply(id);
-	}
-	XBAPI_FreePacket(id);
+	return id;
 }

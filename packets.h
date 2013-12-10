@@ -120,7 +120,7 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
 
 void SendReceiverBroadcastRequest();
 
-void SendPacket(Packet* packet);
+char SendPacket(Packet* packet);
 
 #endif	/* PACKETS_H */
 
