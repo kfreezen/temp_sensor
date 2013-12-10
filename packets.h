@@ -11,6 +11,8 @@
 #define TEMP_REPORT 0x00
 #define REPORT 0x00
 #define CALIBRATE 0x01
+
+#define RECEIVER_ACK 0x04
 #define REQUEST_RECEIVER 0x04
 
 #include "globaldef.h"
@@ -32,7 +34,7 @@ typedef struct __XBeeAddress_7Bytes {
 } XBeeAddress_7Bytes;
 
 // This is an application-defined, arbitrary format.
-struct PacketHeaderRev0 {
+/*struct PacketHeaderRev0 {
     unsigned short magic; // 0xAA55
     union {
         unsigned short crc16;
@@ -41,7 +43,7 @@ struct PacketHeaderRev0 {
     byte revision;
     byte command;
     unsigned short reserved;
-} PACKED_STRUCT;
+} PACKED_STRUCT;*/
 
 struct PacketHeaderRev1 {
 	uint8 flags;
@@ -83,7 +85,7 @@ typedef struct ReportRev1 Report;
 } PACKED_STRUCT;*/
 
 struct RequestReceiverRev1 {
-	SensorId sensorId;
+	byte reserved[32];
 } PACKED_STRUCT;
 
 typedef struct RequestReceiverRev1 RequestReceiver;
@@ -93,8 +95,7 @@ struct ReceiverAckRev0 {
 } PACKED_STRUCT;
 
 struct ReceiverAckRev1 {
-	struct __XBeeAddress receiverAddress;
-	SensorId sensorId;
+	byte reserved[32];
 } PACKED_STRUCT;
 
 typedef struct ReceiverAckRev1 ReceiverAck;
@@ -112,7 +113,7 @@ typedef union {
         };
     };
 
-    byte packet_data[64];
+    byte packet_data[48];
 } Packet;
 
 void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);

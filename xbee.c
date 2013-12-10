@@ -14,6 +14,7 @@
 #include <stddef.h>
 
 extern XBeeAddress dest_address;
+extern EEPROM_Structure eepromData;
 
 extern unsigned char xbee_reset_flag;
 
@@ -350,7 +351,10 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
                 {
                     memset(dest_address.addr, 0, sizeof(XBeeAddress));
                     memcpy(dest_address.addr+1, &(frame->rx.source_address), sizeof(XBeeAddress_7Bytes));
-                    // These nodes will only need to ever reply to one address,
+
+					memcpy(&eepromData.sensorId, &packet->header.sensorId, sizeof(SensorId));
+					
+					// These nodes will only need to ever reply to one address,
                     // allowing us to just use dest_address for this purpose.
                     // TODO:  change dest_address to receiver_address.
                 } break;

@@ -140,7 +140,7 @@ uint16 ADC_Read(byte channel) {
 		sum += res[i];
 	}
 
-	return (unsigned) 0xFFFF; //(sum / (long) ADC_NUM_READS);
+	return (unsigned) (sum / (long) ADC_NUM_READS);
 }
 
 // Probably doesn't belong in adc.c

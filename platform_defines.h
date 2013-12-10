@@ -62,19 +62,13 @@
 #define RESET_SIGNAL_IOCN IOCENbits.IOCEN3
 #define RESET_SIGNAL_IOCF IOCEFbits.IOCEF3
 
-#define CALIBRATION_DATA_MAGIC 0xF00E
-
 typedef struct {
-    unsigned short magic;
 	short probeValueAdjust[3];
-	unsigned char reserved[24];
+	unsigned char reserved[10];
 } CalibrationData;
 
-#define INTERVAL_MAGIC 0xFACF
 typedef struct {
-    word magic;
     word interval;
-	unsigned char reserved[12];
 } IntervalData;
 /////////////////////////////////////////
 // KEEP ALL EEPROM MANAGEMENT DEFINES //
@@ -83,7 +77,7 @@ typedef struct {
 #define CALIBRATION_DATA_LOCATION 0x00
 #define INTERVAL_LOCATION (CALIBRATION_DATA_LOCATION+sizeof(CalibrationData))
 
-#define PROGRAM_REVISION 0
+#define PROGRAM_REVISION 1
 
 #endif	/* PLATFORM_DEFINES_H */
 

@@ -37,7 +37,8 @@ void SendReceiverBroadcastRequest() {
     packet_buffer.header.flags = 0;
     packet_buffer.header.revision = PROGRAM_REVISION;
 
-	memset(&packet_buffer.requestReceiver.sensorId, 0xFF, sizeof(SensorId));
+	// add an if here, when we get around to it.
+	memset(&packet_buffer.header.sensorId, 0xFF, sizeof(SensorId));
 	
     CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
 
@@ -58,7 +59,7 @@ void SendPacket(Packet* packet) {
     }
 
     char id = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet)); // FIXME:  Some time I may want to know what the transmit status is.
-	if(id == -1) {
+	if(id == 0xFF) {
 		return;
 	}
 

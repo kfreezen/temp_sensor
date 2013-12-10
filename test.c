@@ -10,6 +10,8 @@
 
 #define MAX_TASKS 4
 
+extern EEPROM_Structure eepromData;
+
 typedef void* (*TaskFunc)(void*);
 
 byte curTask = 0;
@@ -69,8 +71,6 @@ void tasking_scheduler() {
 void interrupt isr() {
 	extern unsigned char UART_Buffer[];
 	extern unsigned char UART_BufferItr;
-
-	extern CalibrationData calibrationData;
 	
 	if(PIR1bits.TMR1IF == 1) {
 		PIR1bits.TMR1IF = 0;
@@ -89,7 +89,7 @@ void interrupt isr() {
 	if(INTCONbits.IOCIF == 1) {
 		if(RESET_SIGNAL == 0 && TEST_SIGNAL == 1) {
 			// save stuff and reset.
-			EEPROM_Write(CALIBRATION_DATA_LOCATION, (byte*)&calibrationData, sizeof(CalibrationData));
+			EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 			TEST_SIGNAL_IOCF = 0;
 			RESET_SIGNAL_IOCF = 0;
 			asm("reset");
@@ -121,7 +121,6 @@ inline void SET_LED(byte i, byte n) {
 long probeValues[3];
 
 void* GatherCalibrationDataTask(void* param) {
-	extern CalibrationData calibrationData;
 
 	ADC_Enable();
 
@@ -144,8 +143,8 @@ void* GatherCalibrationDataTask(void* param) {
 		probeValues[i] = GetProbeResistance(i);
 		if(probeValues[i] <= THERMISTOR_RESISTANCE_0C + (THERMISTOR_RESISTANCE_0C/100) && probeValues[i] >= THERMISTOR_RESISTANCE_0C - (THERMISTOR_RESISTANCE_0C/100)) {
 			calibrating[i] = 1;
-			calibrationData.probeValueAdjust[i] = ADC_Read(POT_CHANNEL(i));
-			calibrationData.probeValueAdjust[i] = (calibrationData.probeValueAdjust[i] >> 6) - 32;
+			eepromData.calibration.probeValueAdjust[i] = ADC_Read(POT_CHANNEL(i));
+			eepromData.calibration.probeValueAdjust[i] = (eepromData.calibration.probeValueAdjust[i] >> 6) - 32;
 			SET_LED(i, 1);
 		} else {
 			calibrating[i] = 0;
@@ -154,12 +153,11 @@ void* GatherCalibrationDataTask(void* param) {
 	}
 	
 	
-	/*calibrationData.probeValueAdjust[1] = ADC_Read(POT2_CHANNEL);
-	calibrationData.probeValueAdjust[2] = ADC_Read(POT3_CHANNEL);
+	eepromData.calibration.probeValueAdjust[1] = ADC_Read(POT2_CHANNEL);
+	eepromData.calibration.probeValueAdjust[2] = ADC_Read(POT3_CHANNEL);
 
-	calibrationData.probeValueAdjust[1] = (calibrationData.probeValueAdjust[1] >> 6) - 32;
-	calibrationData.probeValueAdjust[2] = (calibrationData.probeValueAdjust[2] >> 6) - 32;
-	*/
+	eepromData.calibration.probeValueAdjust[1] = (eepromData.calibration.probeValueAdjust[1] >> 6) - 32;
+	eepromData.calibration.probeValueAdjust[2] = (eepromData.calibration.probeValueAdjust[2] >> 6) - 32;
 	
 	ADC_DisablePin(SEL_PORTB, POT3_PIN);
 	ADC_DisablePin(SEL_PORTB, POT2_PIN);
@@ -179,7 +177,7 @@ void* GatherCalibrationDataTask(void* param) {
 	// 0% and 1%
 	for(i=0; i < 3; i++) {
 		if(calibrating[i]) {
-			long calibratedValue = probeValues[i] + (probeValues[i]*calibrationData.probeValueAdjust[i]) / 3200;
+			long calibratedValue = probeValues[i] + (probeValues[i]*eepromData.calibration.probeValueAdjust[i]) / 3200;
 			if(calibratedValue >= THERMISTOR_RESISTANCE_0C_TOP || calibratedValue <= THERMISTOR_RESISTANCE_0C_BOTTOM) {
 				SET_LED(i, 0);
 			}

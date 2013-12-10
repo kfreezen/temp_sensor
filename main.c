@@ -28,8 +28,7 @@
 #include "interrupts.h"
 #include "asm.h"
 
-CalibrationData calibrationData;
-IntervalData intervalData;
+EEPROM_Structure eepromData;
 
 unsigned char xbee_reset_flag = 0;
 
@@ -66,21 +65,13 @@ int main(int argc, char** argv) {
     //sleep(1);
     LED2_SIGNAL = 1;
     
-    // Load Calibration
-    EEPROM_Read(CALIBRATION_DATA_LOCATION, (byte*)&calibrationData, sizeof(CalibrationData));
-    if(calibrationData.magic != CALIBRATION_DATA_MAGIC) { // Calibration data is invalid, write default to EEPROM.
-        memset(&calibrationData, 0, sizeof(CalibrationData));
-        calibrationData.magic = CALIBRATION_DATA_MAGIC;
-        EEPROM_Write(CALIBRATION_DATA_LOCATION, (byte*)&calibrationData, sizeof(CalibrationData));
-    }
-
-    // Load Interval
-    EEPROM_Read(INTERVAL_LOCATION, (byte*)&intervalData, sizeof(IntervalData));
-    if(intervalData.magic != INTERVAL_MAGIC) {
-        intervalData.magic = INTERVAL_MAGIC;
-        intervalData.interval = DEFAULT_INTERVAL;
-        EEPROM_Write(INTERVAL_LOCATION, (byte*)&intervalData, sizeof(IntervalData));
-    }
+	EEPROM_Read(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
+	if(eepromData.magic != EEPROM_DATA_MAGIC) {
+		memset(&eepromData.calibration, 0, sizeof(CalibrationData));
+		eepromData.interval.interval = DEFAULT_INTERVAL;
+		memset(&eepromData.sensorId, 0xFF, sizeof(SensorId));
+		EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
+	}
 
     asm("clrwdt");
 
@@ -119,7 +110,8 @@ int main(int argc, char** argv) {
     }
 	XBAPI_FreePacket(cmdId);
 
-    cmdId = XBAPI_Command(CMD_ATAC, 0, FALSE);
+    cmdId = XBAPI_Command(CMD_ATAC, 1L, FALSE);
+	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
     if(replyStruct->status) {
 		LED2_SIGNAL = 0;
         XBee_Disable();
