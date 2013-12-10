@@ -343,27 +343,38 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 		reply = &replies[frameId];
 	}
 
-    switch(frame->rx.frame_type) { // It's all the same frame type so it doesn't really matter which struct in the union I choose to access it.
-        case API_RX_INDICATOR: {
+	switch(frame->rx.frame_type) { // It's all the same frame type so it doesn't really matter which struct in the union I choose to access it.
+		case API_RX_INDICATOR: {
 			Packet* packet = &frame->rx.packet;
-            switch(packet->header.command) {
-                case RECEIVER_ACK:
-                {
-                    memset(dest_address.addr, 0, sizeof(XBeeAddress));
-                    memcpy(dest_address.addr+1, &(frame->rx.source_address), sizeof(XBeeAddress_7Bytes));
+			switch(packet->header.command) {
+				case RECEIVER_ACK: {
+					memset(dest_address.addr, 0, sizeof(XBeeAddress));
+					memcpy(dest_address.addr+1, &(frame->rx.source_address), sizeof(XBeeAddress_7Bytes));
 
-					memcpy(&eepromData.sensorId, &packet->header.sensorId, sizeof(SensorId));
-					
-					// These nodes will only need to ever reply to one address,
-                    // allowing us to just use dest_address for this purpose.
-                    // TODO:  change dest_address to receiver_address.
-                } break;
-            }
+					byte i;
+					for(i=0; i<sizeof(SensorId); i++) {
+					    if(eepromData.sensorId.id[i] != 0xFF) {
+					    	break;
+					    }
+					}
 
-			if(frameIdBool) {
-				reply->status = 0;
-			}
-        } break;
+					// This means that sensorId is invalid, so we have to load the proper one, and save it to EEPROM.
+					if(i == 8) {
+						memcpy(&eepromData.sensorId, &packet->header.sensorId, sizeof(SensorId));
+						EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
+					}
+					    
+
+						// These nodes will only need to ever reply to one address,
+						// allowing us to just use dest_address for this purpose.
+						// TODO:  change dest_address to receiver_address.
+					} break;
+				}
+
+				if(frameIdBool) {
+					reply->status = 0;
+				}
+			} break;
 
         case API_TRANSMIT_STATUS: {
             // TODO:  Add error handling code here.
