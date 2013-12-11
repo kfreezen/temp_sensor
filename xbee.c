@@ -131,15 +131,15 @@ byte XBAPI_RegisteredPacketsBits = 0;
 byte XBAPI_RepliesBits = 0;
 XBAPI_ReplyStruct replies[8];
 
-char XBAPI_PacketRegistered(byte bitnum) {
+byte XBAPI_PacketRegistered(byte bitnum) {
 	return (XBAPI_RegisteredPacketsBits & (1 << bitnum)) >> bitnum;
 }
 
-char XBAPI_RegisterPacket() {
-	char bitnum = bitset_getFirstFree(XBAPI_RegisteredPacketsBits);
+byte XBAPI_RegisterPacket() {
+	byte bitnum = bitset_getFirstFree(XBAPI_RegisteredPacketsBits);
 
-	if(bitnum == -1) {
-		return -1;
+	if(bitnum == 0xFF) {
+		return 0xFF;
 	}
 
 	XBAPI_RegisteredPacketsBits |= 1 << bitnum;
@@ -148,6 +148,10 @@ char XBAPI_RegisterPacket() {
 }
 
 void XBAPI_NotifyReply(byte id) {
+	if(id >= MAX_XBEE_REPLIES) {
+		return;
+	}
+	
 	XBAPI_RepliesBits |= 1 << id;
 }
 
@@ -156,6 +160,10 @@ inline XBAPI_ReplyStruct* XBAPI_WaitForReply(byte replyId) {
 }
 
 XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
+	if(replyId >= MAX_XBEE_REPLIES) {
+		return NULL; // FIXME:  We should be checking for NULL on our pointers.
+	}
+	
 	timer1_setValue(0);
 	
 	if(tmo) {
@@ -174,17 +182,24 @@ XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
 }
 
 void XBAPI_FreePacket(byte id) {
+	// Possible values should be -1 through 7.
+	// valid values are 0 through 7.
+	// since -1 signed == 0xFF unsigned, we only need one compare.
+	if(id >= MAX_XBEE_REPLIES) {
+		return;
+	}
+	
 	XBAPI_RepliesBits &= ~(1 << id);
 	XBAPI_RegisteredPacketsBits &= ~(1 << id);
 }
 
-char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length) {
+byte XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length) {
     //byte frame_length = sizeof(TxFrame); // I highly doubt that the frame will be over 256 bytes
     // long, so for now we'll just use a byte as it saves us space.
 
-	char id = XBAPI_RegisterPacket();
-	if(id == -1) {
-		return -1;
+	byte id = XBAPI_RegisterPacket();
+	if(id == 0xFF) {
+		return 0xFF;
 	}
 	
     apiFrame.tx.start_delimiter = 0x7e;
@@ -238,7 +253,7 @@ uint32 swap_endian_32(uint32 n) {
 }*/
 
 byte calc_checksum;
-char XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) {
+byte XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) {
 
     /*int total_packet_length = 4 + length;
 
@@ -252,9 +267,9 @@ char XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) 
     apiFrame.buffer[total_packet_length] = checksum(apiFrame.buffer+3, total_packet_length);
     */
 
-	char id = XBAPI_RegisterPacket();
-	if(id == -1) {
-		return -1;
+	byte id = XBAPI_RegisterPacket();
+	if(id == 0xFF) {
+		return 0xFF;
 	}
 
     byte atCmdLength = (data_valid) ? sizeof(ATCmdFrame) : sizeof(ATCmdFrame_NoData);
@@ -378,17 +393,23 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 
         case API_TRANSMIT_STATUS: {
             // TODO:  Add error handling code here.
-			reply->status = frame->txStatus.delivery_status;
-			reply->frameType = frame->txStatus.frame_type;
+			if(frameIdBool) {
+				reply->status = frame->txStatus.delivery_status;
+				reply->frameType = frame->txStatus.frame_type;
+			}
         } break;
 
         case API_AT_CMD_RESPONSE: {
-			reply->status = frame->atCmdResponse.cmd_status;
-			reply->frameType = frame->atCmdResponse.frame_type;
+			if(frameIdBool) {
+				reply->status = frame->atCmdResponse.cmd_status;
+				reply->frameType = frame->atCmdResponse.frame_type;
+			}
         } break;
 
         default:
-			reply->status = NOT_HANDLED;
+			if(frameIdBool) {
+				reply->status = NOT_HANDLED;
+			}
             break;
     }
 

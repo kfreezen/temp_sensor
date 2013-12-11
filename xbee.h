@@ -15,6 +15,8 @@
 #define NO_RESULT 0
 #define RETURNS_RESULT 1
 
+#define MAX_XBEE_REPLIES 8
+
 /**
  *
  * @param baud This sets up the UART to the baud rate selected.  Parameter ignored.
@@ -69,8 +71,8 @@ void XBee_Recv(char* buf, int max_len, const char end_char);
 #define INVALID_COMMAND 2
 #define INVALID_PARAM 3
 
-char XBAPI_Command(unsigned short command, unsigned long data, byte data_valid);
-char XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length);
+byte XBAPI_Command(unsigned short command, unsigned long data, byte data_valid);
+byte XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length);
 
 // These defines are for the Transmit Status's delivery status field in the xbee 900hp pro (frame type 0x8B)
 // They are also defines for XBAPI_HandleFrame's return value
@@ -199,7 +201,7 @@ char XBAPI_HandleFrameIfValid(Frame* frame, byte expectedFrameType, int length);
 
 char XBAPI_ReadFrame(Frame* frame);
 
-char XBAPI_RegisterPacket();
+byte XBAPI_RegisterPacket();
 void XBAPI_NotifyReply(byte id);
 
 inline XBAPI_ReplyStruct* XBAPI_WaitForReply(byte replyId);

@@ -31,11 +31,12 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
     packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
 
     char id = SendPacket(&packet_buffer);
-
-	XBAPI_ReplyStruct* reply = XBAPI_WaitForReplyTmo(id, 256);
-	if(reply->frameType == API_TRANSMIT_STATUS && reply->status != TRANSMIT_SUCCESS) {
-
-	}
+	
+	XBAPI_ReplyStruct* reply;
+	do {
+		reply = XBAPI_WaitForReplyTmo(id, 256);
+	} while(!reply || (reply->frameType == API_TRANSMIT_STATUS && reply->status != TRANSMIT_SUCCESS));
+	XBAPI_FreePacket(id);
 }
 
 void SendReceiverBroadcastRequest() {
@@ -57,7 +58,8 @@ void SendReceiverBroadcastRequest() {
 	XBAPI_ReplyStruct* reply;
 	do {
 		reply = XBAPI_WaitForReply(id);
-	} while(reply->frameType != API_RX_INDICATOR);
+	} while(!reply || reply->frameType != API_RX_INDICATOR);
+	XBAPI_FreePacket(id);
 }
 
 unsigned char frame_id_itr = 0;

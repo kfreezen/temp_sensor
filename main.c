@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
     byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
 	XBAPI_ReplyStruct* replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
 	
-	if(replyStruct->status) {
+	if(!replyStruct || replyStruct->status) {
 		LED2_SIGNAL = 0;
 		LED1_SIGNAL = 1;
 		
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 
     cmdId = XBAPI_Command(CMD_ATAC, 1L, FALSE);
 	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
-    if(replyStruct->status) {
+    if(!replyStruct || replyStruct->status) {
 		LED2_SIGNAL = 0;
         XBee_Disable();
         while(1){
