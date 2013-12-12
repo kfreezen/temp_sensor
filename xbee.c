@@ -132,6 +132,11 @@ byte XBAPI_RepliesBits = 0;
 XBAPI_ReplyStruct replies[8];
 
 byte XBAPI_PacketRegistered(byte bitnum) {
+	bitnum--;
+	if(bitnum >= MAX_XBEE_REPLIES) {
+		return 0;
+	}
+	
 	return (XBAPI_RegisteredPacketsBits & (1 << bitnum)) >> bitnum;
 }
 
@@ -144,10 +149,11 @@ byte XBAPI_RegisterPacket() {
 
 	XBAPI_RegisteredPacketsBits |= 1 << bitnum;
 
-	return bitnum;
+	return bitnum+1;
 }
 
 void XBAPI_NotifyReply(byte id) {
+	id --;
 	if(id >= MAX_XBEE_REPLIES) {
 		return;
 	}
@@ -160,6 +166,7 @@ inline XBAPI_ReplyStruct* XBAPI_WaitForReply(byte replyId) {
 }
 
 XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
+	replyId --;
 	if(replyId >= MAX_XBEE_REPLIES) {
 		return NULL; // FIXME:  We should be checking for NULL on our pointers.
 	}
@@ -169,8 +176,16 @@ XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
 	if(tmo) {
 		Timer1_Init(TMR1_PINOSC, DIVISION_1);
 	}
-	
-	while(bitset_test(XBAPI_RepliesBits, replyId) == 0 && timer1_getValue() < tmo);
+
+	while(1) {
+		if(tmo && timer1_getValue() < tmo) {
+			break;
+		}
+
+		if(bitset_test(XBAPI_RepliesBits, replyId)) {
+			break;
+		}
+	}
 
 	if(timer1_getValue() >= tmo) {
 		return NULL;
@@ -182,6 +197,8 @@ XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
 }
 
 void XBAPI_FreePacket(byte id) {
+	id --;
+	
 	// Possible values should be -1 through 7.
 	// valid values are 0 through 7.
 	// since -1 signed == 0xFF unsigned, we only need one compare.
@@ -351,10 +368,14 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 
 	XBAPI_ReplyStruct* reply;
 
-	byte frameIdBool = (frameId && frameId < 8);
-
+	byte frameIdBool = (frameId && frameId <= 8);
+	// We have to have an offset of one in our reply/reply ID, due
+	// to the fact that 0 is not a properly valid frame ID in the xbee.
+	
 	if(frameIdBool) {
 		XBAPI_NotifyReply(frameId);
+
+		frameId --;
 		reply = &replies[frameId];
 	}
 

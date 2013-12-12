@@ -51,6 +51,8 @@ char error;
 unsigned batt_level;
 long probeResistance0;
 
+XBAPI_ReplyStruct* replyStruct;
+
 int main(int argc, char** argv) {
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
@@ -99,7 +101,7 @@ int main(int argc, char** argv) {
 	// FIXME:  Somewhere in here, there is a corruption.
 	
     byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
-	XBAPI_ReplyStruct* replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
+	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
 	
 	if(!replyStruct || replyStruct->status) {
 		LED2_SIGNAL = 0;

@@ -10,8 +10,8 @@
 
 #include "platform_defines.h"
 
-char bitset_getFirstFree(byte set);
-char bitset_test(byte set, char num);
+byte bitset_getFirstFree(byte set);
+byte bitset_test(byte set, char num);
 
 #endif	/* BITS_H */
 

@@ -22,6 +22,6 @@ typedef struct EEPROM_Structure {
 	SensorId sensorId;
 } EEPROM_Structure;
 
-#define EEPROM_DATA_MAGIC 0x1233
+#define EEPROM_DATA_MAGIC 0x1234
 #endif	/* EEPROM_H */
 
