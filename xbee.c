@@ -187,7 +187,7 @@ XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
 		}
 	}
 
-	if(timer1_getValue() >= tmo) {
+	if(timer1_getValue() >= tmo && tmo) {
 		return NULL;
 	}
 
@@ -208,6 +208,7 @@ void XBAPI_FreePacket(byte id) {
 	
 	XBAPI_RepliesBits &= ~(1 << id);
 	XBAPI_RegisteredPacketsBits &= ~(1 << id);
+	memset(&replies[id], 0, sizeof(XBAPI_ReplyStruct));
 }
 
 byte XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length) {

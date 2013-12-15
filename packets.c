@@ -4,6 +4,7 @@
 #include "crc16.h"
 #include "xbee.h"
 #include "eeprom.h"
+#include "timer.h"
 
 #include <string.h>
 
@@ -20,7 +21,10 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
     packet_buffer.header.command = TEMP_REPORT;
     packet_buffer.header.flags = 0;
     packet_buffer.header.revision = PROGRAM_REVISION;
-    packet_buffer.report.probeBeta = thermBeta;
+
+	memcpy(&packet_buffer.header.sensorId, &eepromData.sensorId, sizeof(SensorId));
+	
+	packet_buffer.report.probeBeta = thermBeta;
     packet_buffer.report.probeResistance[0] = thermistorResistance;
     packet_buffer.report.probeResistance25C = thermRes25C;
     packet_buffer.report.topResistorValue = topResValue;
@@ -56,9 +60,24 @@ void SendReceiverBroadcastRequest() {
     char id = SendPacket(&packet_buffer);
 
 	XBAPI_ReplyStruct* reply;
-	do {
-		reply = XBAPI_WaitForReply(id);
-	} while(!reply || reply->frameType != API_RX_INDICATOR);
+	reply = XBAPI_WaitForReply(id);
+	int i;
+	for(i=0; i<1; i++) {
+		if(reply->frameType == API_RX_INDICATOR) {
+			break;
+		} else if(reply->frameType == API_TRANSMIT_STATUS) {
+			if(reply->status != TRANSMIT_SUCCESS) {
+				LED3_SIGNAL = 0;
+				while(1) {
+					LED1_SIGNAL = 1;
+					timer1_poll_delay(8192, DIVISION_1);
+					LED1_SIGNAL = 0;
+					timer1_poll_delay(8192, DIVISION_1);
+				}
+			}
+		}
+	}
+
 	XBAPI_FreePacket(id);
 }
 

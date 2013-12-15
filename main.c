@@ -132,8 +132,6 @@ int main(int argc, char** argv) {
     CRC16_Init();
     
 	LED3_SIGNAL = 1;
-	timer1_poll_delay(75, DIVISION_8);
-	LED3_SIGNAL = 0;
 
 	LED2_SIGNAL = 0;
 	
@@ -154,6 +152,7 @@ int main(int argc, char** argv) {
     SendReceiverBroadcastRequest();
     //XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
 
+	LED3_SIGNAL = 0;
     LED2_SIGNAL = 0;
     LED1_SIGNAL = 0;
     
