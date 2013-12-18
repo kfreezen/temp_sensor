@@ -11,6 +11,7 @@
 #pragma config MCLRE = OFF
 #pragma config LVP = OFF
 
+#pragma config BOREN = OFF // Brown-out reset.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +58,14 @@ int main(int argc, char** argv) {
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
 	TRISC = TRISC_MASK;
-	
+
+	//if(REVID == 0) {
+	//	LED1_SIGNAL = 1;
+	//}
+
+	// Wait for the oscillator to stabilize.
+	while(!OSCSTATbits.OSTS) {}
+
 	pulseLed(80);
 	
 	// These are 0 because the ADC_Enable will enable as necessary.
@@ -77,17 +85,8 @@ int main(int argc, char** argv) {
 	}
 
     asm("clrwdt");
-
-	EnableInterrupts();
-
-	INTCONbits.PEIE = 1;
-	PIE1bits.RCIE = 1;
-
-	// Enable interrupt on change for the reset button.
-	RESET_SIGNAL_IOCN = 1;
-	INTCONbits.IOCIE = 1;
 	
-    XBee_Enable(9600); // Between here and... (see fixme comment)
+    XBee_Enable(9600);
     //LED1_SIGNAL = 1;
     //LED2_SIGNAL = 1;
 
@@ -98,7 +97,14 @@ int main(int argc, char** argv) {
 	 * corresponding info struct.
 	 */
 
-	// FIXME:  Somewhere in here, there is a corruption.
+	EnableInterrupts();
+
+	INTCONbits.PEIE = 1;
+	PIE1bits.RCIE = 1;
+
+	// Enable interrupt on change for the reset button.
+	RESET_SIGNAL_IOCN = 1;
+	INTCONbits.IOCIE = 1;
 	
     byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
 	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
@@ -112,7 +118,7 @@ int main(int argc, char** argv) {
             //LED1_SIGNAL = !LED1_SIGNAL;
         }
     }
-	XBAPI_FreePacket(cmdId); // here there is corruption in eepromData ?
+	XBAPI_FreePacket(cmdId);
 
     cmdId = XBAPI_Command(CMD_ATAC, 1L, FALSE);
 	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);

@@ -62,7 +62,7 @@ void tasking_scheduler() {
 		curTask = 0;
 	}
 
-	byte taskMask = 1 << curTask;main.c:121: error: too few function arguments
+	byte taskMask = 1 << curTask
 	if(taskBits & taskMask) {
 		tasks[curTask](savedParams[curTask]);
 	}
@@ -87,10 +87,20 @@ void interrupt isr() {
 	}
 
 	if(INTCONbits.IOCIF == 1) {
-		if(RESET_SIGNAL == 0 && TEST_SIGNAL == 1) {
+
+		if((RESET_SIGNAL == 0 && TEST_SIGNAL == 1) || TEST_SIGNAL_IOCF) {
+			// either RESET btn being set, or TEST_SIGNAL going low
+			// constitute a reset.
+
 			// save stuff and reset.
 			EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 			TEST_SIGNAL_IOCF = 0;
+			RESET_SIGNAL_IOCF = 0;
+			asm("reset");
+		}
+
+		if(RESET_SIGNAL == 0) {
+			// We'll just assume that we aren't in TEST mode.
 			RESET_SIGNAL_IOCF = 0;
 			asm("reset");
 		}

@@ -167,6 +167,7 @@ inline XBAPI_ReplyStruct* XBAPI_WaitForReply(byte replyId) {
 
 XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
 	replyId --;
+
 	if(replyId >= MAX_XBEE_REPLIES) {
 		return NULL; // FIXME:  We should be checking for NULL on our pointers.
 	}
@@ -410,6 +411,7 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 
 			if(frameIdBool) {
 				reply->status = 0;
+				reply->frameType = API_RX_INDICATOR;
 			}
 		} break;
 

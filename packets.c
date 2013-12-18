@@ -44,7 +44,8 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
 }
 
 void SendReceiverBroadcastRequest() {
-    memset(&packet_buffer, 0, sizeof(Packet));
+restartSend:
+	memset(&packet_buffer, 0, sizeof(Packet));
     
     packet_buffer.header.command = REQUEST_RECEIVER;
     packet_buffer.header.flags = 0;
@@ -60,13 +61,19 @@ void SendReceiverBroadcastRequest() {
     char id = SendPacket(&packet_buffer);
 
 	XBAPI_ReplyStruct* reply;
-	reply = XBAPI_WaitForReply(id);
-	int i;
-	for(i=0; i<1; i++) {
+	byte retries = 0;
+
+	while(1) {
+		reply = XBAPI_WaitForReply(id);
 		if(reply->frameType == API_RX_INDICATOR) {
 			break;
 		} else if(reply->frameType == API_TRANSMIT_STATUS) {
 			if(reply->status != TRANSMIT_SUCCESS) {
+				if(retries < 3) {
+					retries++;
+					goto restartSend;
+				}
+				
 				LED3_SIGNAL = 0;
 				while(1) {
 					LED1_SIGNAL = 1;
@@ -76,6 +83,9 @@ void SendReceiverBroadcastRequest() {
 				}
 			}
 		}
+		// XBAPI_AckReply(id);
+		reply->frameType = 0;
+		reply->status = 0;
 	}
 
 	XBAPI_FreePacket(id);
