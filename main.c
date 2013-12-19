@@ -11,7 +11,9 @@
 #pragma config MCLRE = OFF
 #pragma config LVP = OFF
 
-#pragma config BOREN = OFF // Brown-out reset.
+#pragma config PWRTE = ON // Power-on reset timer.
+#pragma config BOREN = ON
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,10 +41,6 @@ void pulseLed(int ticks) {
     LED1_SIGNAL = 0;
 }
 
-int GetOhms(int adc_value) {
-    return 16200000/((4096000/adc_value)-1000);
-}
-
 extern XBeeAddress dest_address;
 
 extern void __doTestSendPacket();
@@ -53,8 +51,27 @@ unsigned batt_level;
 long probeResistance0;
 
 XBAPI_ReplyStruct* replyStruct;
+unsigned vdd;
 
 int main(int argc, char** argv) {
+	if(PCONbits.nBOR == 0) {
+		// Brown-out reset.
+		// I don't know how to handle these,
+		// so for now I'll just do a software reset.
+		PCONbits.nBOR = 1;
+		asm("reset");
+	}
+	
+	// The ports are in an unknown state at startup, so we need to
+	// set them to a known state.
+	PORTA = 0;
+	PORTB = 0;
+	PORTC = 0;
+	
+	// These are 0 because the ADC_Enable will enable as necessary.
+	ANSELA = 0;
+	ANSELB = 0;
+
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
 	TRISC = TRISC_MASK;
@@ -66,11 +83,38 @@ int main(int argc, char** argv) {
 	// Wait for the oscillator to stabilize.
 	while(!OSCSTATbits.OSTS) {}
 
-	pulseLed(80);
+
+	// Here we need to wait till VDD is within 3% of 3.3V
+	ADC_EnableEx(VDD_PVREF);
+	while(1) {
+		vdd = DetectVdd();
+		int length;
+		if(vdd < 2000) {
+			length = 1;
+		} else if(vdd < 2500) {
+			length = 2000;
+		} else if(vdd < 3000) {
+			length = 64000;
+		} else {
+			length = 2;
+		}
+
+		if(vdd < 3350 && vdd > 3250) {
+			break;
+		} else {
+			LED1_SIGNAL = 1;
+			LED2_SIGNAL = 1;
+			LED3_SIGNAL = 1;
+			timer1_poll_delay(length/2, DIVISION_1);
+			LED1_SIGNAL = 0;
+			LED2_SIGNAL = 0;
+			LED3_SIGNAL = 0;
+			timer1_poll_delay(length/2, DIVISION_1);
+		}
+	}
+	ADC_Disable();
 	
-	// These are 0 because the ADC_Enable will enable as necessary.
-	ANSELA = 0;
-	ANSELB = 0;
+	pulseLed(80);
 
     //sleep(1);
     LED2_SIGNAL = 1;

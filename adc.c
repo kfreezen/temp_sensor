@@ -9,8 +9,11 @@
 #define PVREF_PIN 3
 #define PVREF_CHANNEL 3
 
-#define MINIMUM_ANALOG_VOLTAGE 3009 // This equals 2.42 volts with
-// a VDD of 3.3
+#define FVR_VALUE_AT_MIN_ANALOG_VOLTAGE 1733 // This equals 2.42 volts with
+// an FVR of 1.024V
+
+#define FVR_VALUE_AT_MAX_ANALOG_VOLTAGE 1497
+
 
 const byte PROBE_PORTS[3] = {
 	SEL_PORTA, SEL_PORTA, SEL_PORTA
@@ -44,17 +47,34 @@ inline byte POT_CHANNEL(byte pot) {
 	return POT_CHANNELS[pot];
 }
 
+unsigned DetectVdd() {
+	ADCON1bits.ADPREF = VDD_PVREF;
+	// Use FVR to detect the voltage.
+	FVRCONbits.FVREN = 1;
+	FVRCONbits.ADFVR = 1; // 1.024V
+	while(!FVRCONbits.FVRRDY);
+
+	unsigned result = 0;
+
+	result = ADC_Read(FVR_CHANNEL);
+	result = ADC_Read(FVR_CHANNEL);
+	result = (16384 / result) * 1024;
+	result /= 4;
+
+	FVRCONbits.FVREN = 0;
+	return result;
+}
+
 void ADC_EnableEx(byte pvrefSel) {
 	if(pvrefSel == PIN_PVREF) {
 		ANALOG_POWER_TOGGLE = 1;
 
 		// OK, what we want to do here is poll the VREF+ pin until the value reaches
 		// roughly 2.425 (2.5-(3% * 2.5))
-		ADC_EnablePin(SEL_PORTA, PVREF_PIN);
+		//ADC_EnablePin(SEL_PORTA, PVREF_PIN);
 	}
 
 	ADCON1bits.ADCS = FOSC_DIV_8;
-	ADCON1bits.ADPREF = PREF_VDD; // We have to detect the VREF+ voltage.
 	ADCON1bits.ADNREF = 0;
 	ADCON1bits.ADFM = 1;
 	ADCON0bits.ADRMD = 0;
@@ -63,12 +83,23 @@ void ADC_EnableEx(byte pvrefSel) {
 	//timer1_poll_delay(120, DIVISION_1);
 
 	if(pvrefSel == PIN_PVREF) {
+		ADCON1bits.ADPREF = PIN_PVREF;
+		// Use FVR to detect the voltage.
+		FVRCONbits.FVREN = 1;
+		FVRCONbits.ADFVR = 1; // 1.024V
+		while(!FVRCONbits.FVRRDY);
+
 		unsigned result = 0;
-		while(result < MINIMUM_ANALOG_VOLTAGE) {
-			result = ADC_Read(PVREF_CHANNEL);
+
+		while(result > 2420 || result < 2800) {
+			result = ADC_Read(FVR_CHANNEL);
+			result = (16384 / result) * 1024;
+			result /= 4;
 		}
-		ADC_DisablePin(SEL_PORTA, PVREF_PIN);
-		ADCON1bits.ADPREF = PREF_VREFPIN;
+
+		FVRCONbits.FVREN = 0;
+		
+		//ADC_DisablePin(SEL_PORTA, PVREF_PIN);
 	} else {
 		ADCON1bits.ADPREF = VDD_PVREF;
 	}

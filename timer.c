@@ -55,12 +55,12 @@ void timer1_poll_delay(unsigned short ticks, byte division) {
     while(tmr1_turned_on < TIMER1_INIT_TRIES) {
         // For some reason TMR1ON is 0.
 
-        if(T1CONbits.TMR1ON == 0) {
+        /*if(T1CONbits.TMR1ON == 0) {
             // I shouldn't have to have this "if" here.
-            Timer1_Init(SYS_CLOCK, division);
-            TMR1 = 0;
+            Timer1_Init(TMR1_PINOSC, division);
+            //TMR1 = 0;
             tmr1_turned_on ++;
-        }
+        }*/
 
         if(TMR1 >= ticks) {
             break;

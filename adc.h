@@ -33,8 +33,12 @@ inline byte POT_CHANNEL(byte pot);
 
 long GetProbeResistance(byte probe);
 
+unsigned DetectVdd();
+
 #define PIN_PVREF 1
 #define VDD_PVREF 0
+
+#define FVR_CHANNEL 0x1F
 
 #endif	/* ADC_H */
 
