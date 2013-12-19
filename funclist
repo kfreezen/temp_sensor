@@ -16,7 +16,7 @@ _memset: CODE, 5113 0 37
 _UART_Init: CODE, 5867 0 53
 _EEPROM_Write: CODE, 5920 0 55
 _main: CODE, 934 0 601
-_DisableInterrupts: CODE, 4608 0 2
+_DisableInterrupts: CODE, 4610 0 2
 _XBAPI_ReadFrame: CODE, 2608 0 82
 _pulseLed: CODE, 2049 0 19
 _timer1_getValue: CODE, 4689 0 12
@@ -46,7 +46,7 @@ _XBAPI_HandleFrameIfValid: CODE, 2462 0 73
 _PROBE_CHANNEL: CODE, 4651 0 9
 ___lwdiv: CODE, 2320 0 70
 _CRC16_GetLow: CODE, 4621 0 4
-_EnableInterrupts: CODE, 4610 0 2
+_EnableInterrupts: CODE, 2 0 2
 _isr: CODE, 4 0 98
 _XBAPI_Command: CODE, 3911 0 185
 _swap_endian_32: CODE, 5668 0 48
@@ -66,7 +66,7 @@ _SendPacket: CODE, 5355 0 43
 _ADC_Enable: CODE, 4629 0 5
 _CRC16_Generate: CODE, 5398 0 43
 _DetectVdd: CODE, 2858 0 89
-i1_EnableInterrupts: CODE, 4606 0 2
+i1_EnableInterrupts: CODE, 4608 0 2
 __fptable: CODE, 256 0 9
 _ADC_EnableEx: CODE, 3485 0 119
 _GatherCalibrationDataTask: CODE, 265 0 669
