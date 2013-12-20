@@ -18,6 +18,10 @@ extern "C" {
 #define DIVISION_4 2
 #define DIVISION_8 3
 
+#define TMR0_DIV_2 1
+#define TMR0_DIV_4 2
+#define TMR0_DIV_8 3
+	
 // Timer1 clock source select
 #define INST_CLOCK 0
 #define SYS_CLOCK 1
@@ -34,14 +38,14 @@ extern "C" {
 
 #include "globaldef.h"
 
-void Timer1_Init(byte t1cs, byte t1ckps);
+void Timer1_Init();
 
 #include <pic16f1788.h>
 
 void Timer1_Disable();
 
+void timer0_poll_delay(unsigned char ticks, byte division);
 void timer1_poll_delay(unsigned short ticks, byte division);
-void timer1_poll_delay_fast(unsigned short ticks, byte division);
 
 void sleep(unsigned short seconds);
 

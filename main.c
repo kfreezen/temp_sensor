@@ -79,7 +79,8 @@ int main(int argc, char** argv) {
 	//if(REVID == 0) {
 	//	LED1_SIGNAL = 1;
 	//}
-
+	Timer1_Init();
+	
 	// Wait for the oscillator to stabilize.
 	while(!OSCSTATbits.OSTS) {}
 
@@ -113,7 +114,8 @@ int main(int argc, char** argv) {
 		}
 	}
 	ADC_Disable();
-	
+
+	timer1_poll_delay(1, DIVISION_8);
 	pulseLed(80);
 
     //sleep(1);
@@ -129,6 +131,15 @@ int main(int argc, char** argv) {
 	}
 
     asm("clrwdt");
+
+	EnableInterrupts();
+
+	INTCONbits.PEIE = 1;
+	PIE1bits.RCIE = 1;
+
+	// Enable interrupt on change for the reset button.
+	RESET_SIGNAL_IOCN = 1;
+	INTCONbits.IOCIE = 1;
 	
     XBee_Enable(9600);
     //LED1_SIGNAL = 1;
@@ -140,15 +151,6 @@ int main(int argc, char** argv) {
 	 * the response and put the relevant information in the response's
 	 * corresponding info struct.
 	 */
-
-	EnableInterrupts();
-
-	INTCONbits.PEIE = 1;
-	PIE1bits.RCIE = 1;
-
-	// Enable interrupt on change for the reset button.
-	RESET_SIGNAL_IOCN = 1;
-	INTCONbits.IOCIE = 1;
 	
     byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
 	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);

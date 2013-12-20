@@ -32,12 +32,27 @@ void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src) {
 }
 
 void XBee_Enable(int baud) {
+XBee_Enable_restart:
+
     XBEE_POWER = 1;
     XBEE_SLEEP_RQ = 0;
     
     while(!XBEE_ON_nSLEEP) {}
-    while(XBEE_nCTS) {}
-    
+
+	byte tmo = 0;
+    while(XBEE_nCTS && tmo++ < 255) {
+		timer1_poll_delay(40, DIVISION_1);
+	}
+
+	if(XBEE_nCTS) {
+		XBEE_POWER = 0;
+		timer1_poll_delay(60, DIVISION_1);
+
+		// I hate using goto's but I think this
+		// is better than two while loops.
+		goto XBee_Enable_restart;
+	}
+	
     UART_Init(baud);
     last_xbee_baud = baud;
     

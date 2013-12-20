@@ -54,12 +54,12 @@ unsigned DetectVdd() {
 	FVRCONbits.ADFVR = 1; // 1.024V
 	while(!FVRCONbits.FVRRDY);
 
-	unsigned result = 0;
+	unsigned short long result = 0;
 
 	result = ADC_Read(FVR_CHANNEL);
-	result = ADC_Read(FVR_CHANNEL);
-	result = (16384 / result) * 1024;
-	result /= 4;
+	//result = ADC_Read(FVR_CHANNEL);
+	result = (131072 / result) * 1024;
+	result >>= 5;
 
 	FVRCONbits.FVREN = 0;
 	return result;
@@ -140,7 +140,7 @@ uint16 ADC_ReadOne(byte channel) {
 	ADCON0bits.CHS = channel;
 	
 	// Wait (1/8000000)*50 seconds (6.25us) for the ADC to charge the holding capacitor.
-	timer1_poll_delay_fast(50, DIVISION_1);
+	timer0_poll_delay(50, DIVISION_1);
 
 	ADCON0bits.GO = 1;
 	while (ADCON0bits.GO) {

@@ -45,8 +45,8 @@
 #define POT3_CHANNEL 10
 
 #define XBEE_nCTS PORTCbits.RC5
-#define XBEE_POWER PORTCbits.RC2
-#define XBEE_SLEEP_RQ PORTCbits.RC3
+#define XBEE_POWER LATCbits.LATC2
+#define XBEE_SLEEP_RQ LATCbits.LATC3
 #define XBEE_ON_nSLEEP PORTBbits.RB5
 
 #define ANALOG_POWER_TOGGLE PORTAbits.RA4
