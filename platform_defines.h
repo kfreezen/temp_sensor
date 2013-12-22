@@ -12,11 +12,18 @@
 
 #define CURRENT_COMMANDS_REVISION 0
 
+#define INPUT 1
+#define OUTPUT 0
+
 #define TRISC_MASK 0xB0
 
 #define TRISB_MASK 0x20
 #define TRISB_MASK_DEBUG 0xe0
 #define TRISA_MASK 0x00
+
+#define WPUA_MASK 0xFF
+#define WPUB_MASK 0xFF
+#define WPUC_MASK 0xBF
 
 #define FOSC_DIV_8 1
 
@@ -44,8 +51,11 @@
 #define POT2_CHANNEL 8
 #define POT3_CHANNEL 10
 
+#define XBEE_nRESET_TRIS TRISCbits.TRISC2
+#define XBEE_nRESET_LATCH LATCbits.LATC2
+
 #define XBEE_nCTS PORTCbits.RC5
-#define XBEE_POWER LATCbits.LATC2
+
 #define XBEE_SLEEP_RQ LATCbits.LATC3
 #define XBEE_ON_nSLEEP PORTBbits.RB5
 

@@ -31,23 +31,37 @@ void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src) {
     memcpy(dest->addr+1, src, sizeof(XBeeAddress_7Bytes));
 }
 
-void XBee_Enable(int baud) {
-XBee_Enable_restart:
+void XBee_StopReset() {
+	XBEE_nRESET_TRIS = INPUT;
+	XBEE_nRESET_LATCH = 0;
+}
 
-    XBEE_POWER = 1;
+void XBee_StartReset() {
+	XBEE_nRESET_TRIS = OUTPUT;
+	XBEE_nRESET_LATCH = 0;
+}
+
+void XBee_Enable(int baud) {
+	XBee_Enable_restart:
+
+	XBee_StartReset();
+	timer1_poll_delay(40, DIVISION_1);
+	XBee_StopReset();
+	
     XBEE_SLEEP_RQ = 0;
     
     while(!XBEE_ON_nSLEEP) {}
 
-	byte tmo = 0;
-    while(XBEE_nCTS && tmo++ < 255) {
+	int tmo = 0;
+    while(XBEE_nCTS && tmo++ < 1024) {
 		timer1_poll_delay(40, DIVISION_1);
 	}
 
 	if(XBEE_nCTS) {
-		XBEE_POWER = 0;
-		timer1_poll_delay(60, DIVISION_1);
-
+		XBee_StartReset();
+		timer1_poll_delay(40, DIVISION_1);
+		XBee_StopReset();
+		
 		// I hate using goto's but I think this
 		// is better than two while loops.
 		goto XBee_Enable_restart;
@@ -88,7 +102,8 @@ void XBee_Wake() {
 }
 
 inline void XBee_Disable() {
-    XBEE_POWER = 0;
+    XBEE_nRESET_LATCH = 0;
+	XBEE_nRESET_TRIS = OUTPUT;
 }
 
 void XBee_Send(const char* msg, int len, const char end_char) {

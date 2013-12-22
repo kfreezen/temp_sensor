@@ -61,6 +61,17 @@ int main(int argc, char** argv) {
 		PCONbits.nBOR = 1;
 		asm("reset");
 	}
+	TRISA = TRISA_MASK;
+	TRISB = TRISB_MASK;
+	TRISC = TRISC_MASK;
+
+	// These are 0 because the ADC_Enable will enable as necessary.
+	ANSELA = 0;
+	ANSELB = 0;
+
+	WPUA = WPUA_MASK;
+	WPUB = WPUB_MASK;
+	WPUC = WPUC_MASK;
 	
 	// The ports are in an unknown state at startup, so we need to
 	// set them to a known state.
@@ -68,14 +79,6 @@ int main(int argc, char** argv) {
 	PORTB = 0;
 	PORTC = 0;
 	
-	// These are 0 because the ADC_Enable will enable as necessary.
-	ANSELA = 0;
-	ANSELB = 0;
-
-	TRISA = TRISA_MASK;
-	TRISB = TRISB_MASK;
-	TRISC = TRISC_MASK;
-
 	//if(REVID == 0) {
 	//	LED1_SIGNAL = 1;
 	//}
