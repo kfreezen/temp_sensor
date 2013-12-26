@@ -176,7 +176,7 @@ int main(int argc, char** argv) {
 		LED2_SIGNAL = 0;
 		LED1_SIGNAL = 1;
 		
-        XBee_Disable();
+        //XBee_Disable();
         while(1){
 			timer1_poll_delay(16384, DIVISION_1);
 			LED1_SIGNAL = 0;

@@ -43,20 +43,19 @@ void XBee_StartReset() {
 	XBEE_nRESET_LATCH = 0;
 }
 
-XBAPI_ReplyStruct* ___reply;
-
 void XBee_Enable(int baud) {
 	XBee_Enable_restart:
 
-	XBee_StartReset(); // Stepped into ADC function?  Clue maybe?  don't pursue too hard.
+	UART_Init(baud);
+    last_xbee_baud = baud;
+	
+	XBee_StartReset();
 	timer1_poll_delay(40, DIVISION_1);
 	XBee_StopReset();
 	
     XBEE_SLEEP_RQ = 0;
     
     while(!XBEE_ON_nSLEEP) {}
-
-	byte working = 0;
     while(XBEE_nCTS) {
 		//timer1_poll_delay(40, DIVISION_1);
 		/*byte id = XBAPI_Command(CMD_ATVR, 0L, 0);
@@ -74,13 +73,6 @@ void XBee_Enable(int baud) {
 			XBee_StopReset();
 		}*/
 	}
-
-	if(!XBEE_nCTS) {
-		working = 1;
-	}
-	
-    UART_Init(baud);
-    last_xbee_baud = baud;
     
     sleep(1);
 }
