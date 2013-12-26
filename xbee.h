@@ -64,6 +64,7 @@ void XBee_Recv(char* buf, int max_len, const char end_char);
 #define CMD_ATBD 0x4442
 #define CMD_ATSM 0x4D53
 #define CMD_ATAC 0x4341
+#define CMD_ATVR 0x5256
 
 // Command response codes
 #define OK 0

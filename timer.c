@@ -81,7 +81,6 @@ void timer1_sleep(unsigned short periods) {
 		asm("sleep");
 	}
 
-	Timer1_Disable();
 	while(!OSCSTATbits.OSTS) {}
 }
 

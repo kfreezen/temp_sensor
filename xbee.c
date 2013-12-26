@@ -13,6 +13,8 @@
 #include <string.h>
 #include <stddef.h>
 
+byte nCTS_Valid = 0;
+
 extern XBeeAddress dest_address;
 extern EEPROM_Structure eepromData;
 
@@ -41,10 +43,12 @@ void XBee_StartReset() {
 	XBEE_nRESET_LATCH = 0;
 }
 
+XBAPI_ReplyStruct* ___reply;
+
 void XBee_Enable(int baud) {
 	XBee_Enable_restart:
 
-	XBee_StartReset();
+	XBee_StartReset(); // Stepped into ADC function?  Clue maybe?  don't pursue too hard.
 	timer1_poll_delay(40, DIVISION_1);
 	XBee_StopReset();
 	
@@ -52,19 +56,27 @@ void XBee_Enable(int baud) {
     
     while(!XBEE_ON_nSLEEP) {}
 
-	int tmo = 0;
-    while(XBEE_nCTS && tmo++ < 1024) {
-		timer1_poll_delay(40, DIVISION_1);
+	byte working = 0;
+    while(XBEE_nCTS) {
+		//timer1_poll_delay(40, DIVISION_1);
+		/*byte id = XBAPI_Command(CMD_ATVR, 0L, 0);
+		___reply = XBAPI_WaitForReplyTmo(id, 32768);
+		if(___reply) {
+			if(XBEE_nCTS) {
+				nCTS_Valid = 0;
+			}
+
+			working = 1;
+			break;
+		} else {
+			XBee_StartReset();
+			timer1_poll_delay(40, DIVISION_1);
+			XBee_StopReset();
+		}*/
 	}
 
-	if(XBEE_nCTS) {
-		XBee_StartReset();
-		timer1_poll_delay(40, DIVISION_1);
-		XBee_StopReset();
-		
-		// I hate using goto's but I think this
-		// is better than two while loops.
-		goto XBee_Enable_restart;
+	if(!XBEE_nCTS) {
+		working = 1;
 	}
 	
     UART_Init(baud);
@@ -203,13 +215,9 @@ XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
 	}
 	
 	timer1_setValue(0);
-	
-	if(tmo) {
-		Timer1_Init(TMR1_PINOSC, DIVISION_1);
-	}
 
 	while(1) {
-		if(tmo && timer1_getValue() < tmo) {
+		if(tmo && timer1_getValue() > tmo) {
 			break;
 		}
 
@@ -221,8 +229,6 @@ XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
 	if(timer1_getValue() >= tmo && tmo) {
 		return NULL;
 	}
-
-	Timer1_Disable();
 	
 	return &replies[replyId];
 }

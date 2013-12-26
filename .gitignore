@@ -3,3 +3,4 @@ build/*
 *.p1
 *.pre
 *~
+funclist

@@ -11,7 +11,7 @@
 #include "platform_defines.h"
 
 byte bitset_getFirstFree(byte set);
-byte bitset_test(byte set, char num);
+byte bitset_test(byte set, byte num);
 
 #endif	/* BITS_H */
 

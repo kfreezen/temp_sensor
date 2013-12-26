@@ -71,22 +71,18 @@ void tasking_scheduler() {
 void interrupt isr() {
 	extern unsigned char UART_Buffer[];
 	extern unsigned char UART_BufferItr;
-	
-	if(PIR1bits.TMR1IF == 1) {
-		PIR1bits.TMR1IF = 0;
-	}
 
-	if(PIR1bits.RCIF==1) {
+	if (PIR1bits.TMR1IF) {
+		PIR1bits.TMR1IF = 0;
+	} else if (PIR1bits.RCIF) {
 		UART_HandleInterrupt();
 		PIR1bits.RCIF = 0;
 
-		char valid = XBAPI_HandleFrameIfValid((Frame*) &UART_Buffer, 0, UART_BufferItr);
-		if(valid == 0) {
+		char valid = XBAPI_HandleFrameIfValid((Frame*) & UART_Buffer, 0, UART_BufferItr);
+		if (valid == 0) {
 			UART_ClearBuffer();
 		}
-	}
-
-	if(INTCONbits.IOCIF == 1) {
+	} else if(INTCONbits.IOCIF) {
 
 		if((RESET_SIGNAL == 0 && TEST_SIGNAL == 1) || TEST_SIGNAL_IOCF) {
 			// either RESET btn being set, or TEST_SIGNAL going low
@@ -106,7 +102,14 @@ void interrupt isr() {
 		}
 
 		INTCONbits.IOCIF = 0;
+	} else {
+		LED1_SIGNAL = 1;
+		timer1_poll_delay(16384, DIVISION_1);
+		LED1_SIGNAL = 0;
+		timer1_poll_delay(16384, DIVISION_1);
+		//Error here
 	}
+	
 }
 
 void* MainTask(void* param) {
@@ -114,9 +117,9 @@ void* MainTask(void* param) {
 		XBee_Wake();
 		UART_Init(9600);
 		SendReceiverBroadcastRequest();
-		return 1;
+		return (void*) 1;
 	} else {
-		return 2;
+		return (void*) 2;
 	}
 }
 

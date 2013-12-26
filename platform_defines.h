@@ -39,9 +39,9 @@
 
 #define DEFAULT_INTERVAL 60
 
-#define LED1_SIGNAL PORTBbits.RB0
-#define LED2_SIGNAL PORTBbits.RB6
-#define LED3_SIGNAL PORTBbits.RB7
+#define LED1_SIGNAL LATBbits.LATB0
+#define LED2_SIGNAL LATBbits.LATB6
+#define LED3_SIGNAL LATBbits.LATB7
 
 #define POT1_PIN 1
 #define POT2_PIN 2

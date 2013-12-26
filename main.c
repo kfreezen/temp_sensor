@@ -13,6 +13,7 @@
 
 #pragma config PWRTE = ON // Power-on reset timer.
 #pragma config BOREN = ON
+#pragma config BORV = HI
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,13 +55,27 @@ XBAPI_ReplyStruct* replyStruct;
 unsigned vdd;
 
 int main(int argc, char** argv) {
-	if(PCONbits.nBOR == 0) {
+	if(PCONbits.STKOVF || PCONbits.STKUNF) {
+		LED1_SIGNAL = 1;
+		LED2_SIGNAL = 0;
+		timer1_poll_delay(16384, DIVISION_1);
+		LED1_SIGNAL = 0;
+		LED2_SIGNAL = 1;
+		timer1_poll_delay(16384, DIVISION_1);
+		
+	}
+	/*if(PCONbits.nBOR == 0) {
 		// Brown-out reset.
 		// I don't know how to handle these,
 		// so for now I'll just do a software reset.
 		PCONbits.nBOR = 1;
 		asm("reset");
-	}
+	}*/
+
+	PIE1 = 0;
+	PIE2 = 0;
+	INTCON = 0;
+	
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
 	TRISC = TRISC_MASK;
@@ -86,7 +101,6 @@ int main(int argc, char** argv) {
 	
 	// Wait for the oscillator to stabilize.
 	while(!OSCSTATbits.OSTS) {}
-
 
 	// Here we need to wait till VDD is within 3% of 3.3V
 	ADC_EnableEx(VDD_PVREF);
@@ -158,13 +172,18 @@ int main(int argc, char** argv) {
     byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
 	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
 	
-	if(!replyStruct || replyStruct->status) {
+	if(replyStruct == NULL || replyStruct->status) {
 		LED2_SIGNAL = 0;
 		LED1_SIGNAL = 1;
 		
         XBee_Disable();
         while(1){
-            //LED1_SIGNAL = !LED1_SIGNAL;
+			timer1_poll_delay(16384, DIVISION_1);
+			LED1_SIGNAL = 0;
+			LED3_SIGNAL = 1;
+			timer1_poll_delay(16384, DIVISION_1);
+			LED3_SIGNAL = 0;
+			LED1_SIGNAL = 1;
         }
     }
 	XBAPI_FreePacket(cmdId);

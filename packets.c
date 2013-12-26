@@ -97,14 +97,14 @@ void __doTestSendPacket() {
     SendPacket(&packet_buffer);
 }
 
-char SendPacket(Packet* packet) {
+unsigned char SendPacket(Packet* packet) {
     if(frame_id_itr == 0) {
         frame_id_itr++;
     }
 
     char id = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet)); // FIXME:  Some time I may want to know what the transmit status is.
 	if(id == 0xFF) {
-		return;
+		return 0xFF;
 	}
 
 	return id;

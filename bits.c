@@ -19,8 +19,8 @@ byte bitset_getFirstFree(byte set) {
 	}
 }
 
-char bitset_test(byte set, char bitnum) {
-	if(bitnum >= 0) {
+byte bitset_test(byte set, byte bitnum) {
+	if(bitnum < 8) {
 		return (set & (1 << bitnum)) >> bitnum;
 	} else {
 		return 0;
