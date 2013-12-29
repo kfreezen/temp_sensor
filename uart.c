@@ -5,14 +5,21 @@
 #include <pic16f1788.h>
 #include <string.h>
 
-void UART_Init(int baud) {
+void UART_Init(long baud) {
     TX1STAbits.SYNC = 0;
     RC1STAbits.SPEN = 1;
     RC1STAbits.CREN = 1;
     TX1STAbits.TXEN = 1;
+	BAUDCONbits.BRG16 = 1;
+	TX1STAbits.BRGH = 1;
+	
+    int spbrg;
+	//spbrg = ((XTAL_FREQUENCY/baud)>>6) - 1; // >>6 == /64
+	spbrg = ((XTAL_FREQUENCY/baud)>>2) - 1;
 
-    int spbrg = ((XTAL_FREQUENCY/baud)>>6) - 1; // >>6 == /64
-    SPBRG = spbrg;
+	SPBRGL = spbrg & 0xFF;
+	SPBRGH = spbrg >> 8;
+	
 }
 
 void UART_Transmit(volatile char c) {

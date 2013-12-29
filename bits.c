@@ -15,7 +15,7 @@ byte bitset_getFirstFree(byte set) {
 	if(!(set & n)) {
 		return i;
 	} else {
-		return -1;
+		return 0xFF;
 	}
 }
 

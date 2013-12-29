@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-void UART_Init(int baud);
+void UART_Init(long baud);
 
 void UART_Transmit(volatile char c);
 

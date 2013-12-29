@@ -71,7 +71,7 @@ struct ReportRev0 {
 } PACKED_STRUCT;
 
 struct ReportRev1 {
-	int32 probeResistance[3];
+	int32 probeResistances[3];
 	int32 probeResistance25C;
 	uint16 probeBeta;
 	uint16 reserved0;
@@ -116,11 +116,11 @@ typedef union {
     byte packet_data[48];
 } Packet;
 
-void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue);
+void SendReport(long* thermistorResistances, long thermRes25C, long thermBeta, long topResValue);
 
 void SendReceiverBroadcastRequest();
 
-unsigned char SendPacket(Packet* packet);
+void SendPacket(Packet* packet, byte id);
 
 #endif	/* PACKETS_H */
 

@@ -78,7 +78,7 @@ void interrupt isr() {
 		UART_HandleInterrupt();
 		PIR1bits.RCIF = 0;
 
-		char valid = XBAPI_HandleFrameIfValid((Frame*) & UART_Buffer, 0, UART_BufferItr);
+		char valid = XBAPI_HandleFrameIfValid((Frame*) & UART_Buffer, UART_BufferItr);
 		if (valid == 0) {
 			UART_ClearBuffer();
 		}

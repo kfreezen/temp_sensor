@@ -72,8 +72,10 @@ void XBee_Recv(char* buf, int max_len, const char end_char);
 #define INVALID_COMMAND 2
 #define INVALID_PARAM 3
 
-byte XBAPI_Command(unsigned short command, unsigned long data, byte data_valid);
-byte XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length);
+void XBAPI_Command(unsigned short command, unsigned long data, byte data_valid);
+void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, byte id);
+
+#define CMD_SUCCESS 0
 
 // These defines are for the Transmit Status's delivery status field in the xbee 900hp pro (frame type 0x8B)
 // They are also defines for XBAPI_HandleFrame's return value
@@ -88,7 +90,9 @@ byte XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length)
 #define NOT_HANDLED -1
 #define XBEE_TIMEOUT_OCCURRED -2
 
-#define XBEE_BAUD 9600
+#define XBEE_BAUD 111111
+
+#define DEFAULT_XBEE_BAUD 9600
 
 #include "packets.h"
 
@@ -186,27 +190,19 @@ typedef union {
     
 } Frame;
 
-typedef struct XBAPI_ReplyStruct {
-	byte status;
-	byte frameType;
-} XBAPI_ReplyStruct;
-
 void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src);
 
 // This will need to handle RX Indicators and transmit statuses.
 // And command replies as well.
 
 // expectedFrameType is ignored if frame is not null.
-char XBAPI_HandleFrame(Frame* frame, byte expectedFrameType);
-char XBAPI_HandleFrameIfValid(Frame* frame, byte expectedFrameType, int length);
+byte XBAPI_HandleFrame(Frame* frame);
+int XBAPI_HandleFrameIfValid(Frame* frame, int length);
+
+int XBAPI_Wait(byte expectedFrame);
 
 char XBAPI_ReadFrame(Frame* frame);
 
-byte XBAPI_RegisterPacket();
-void XBAPI_NotifyReply(byte id);
-
-inline XBAPI_ReplyStruct* XBAPI_WaitForReply(byte replyId);
-XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo);
-void XBAPI_FreePacket(byte id);
+void XBee_SwitchBaud(long baud);
 #endif	/* XBEE_H */
 

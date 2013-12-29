@@ -20,7 +20,7 @@ extern EEPROM_Structure eepromData;
 
 extern unsigned char xbee_reset_flag;
 
-int last_xbee_baud;
+long last_xbee_baud;
 // It may be necessary to delay.
 
 XBeeAddress* debug_dest;
@@ -43,8 +43,21 @@ void XBee_StartReset() {
 	XBEE_nRESET_LATCH = 0;
 }
 
+void XBee_SwitchBaud(long baud) {
+	XBAPI_Command(CMD_ATBD, baud, TRUE);
+	
+	// There's no guarantee we'll receive something here, so
+	// lets just switch UART speed and wait for reply.
+	// If none received, revert to default in the MCU side.
+	UART_Init(baud);
+
+	int status = XBAPI_Wait(API_AT_CMD_RESPONSE);
+	if(status != 0) {
+		UART_Init(DEFAULT_XBEE_BAUD);
+	}
+}
+
 void XBee_Enable(int baud) {
-	XBee_Enable_restart:
 
 	UART_Init(baud);
     last_xbee_baud = baud;
@@ -100,7 +113,10 @@ void XBee_Wake() {
         XBee_Disable();
         // The documentation I found said that the minimum reset pulse needed to be 50ns.
         timer1_poll_delay(40, DIVISION_8);
-        XBee_Enable(XBEE_BAUD);
+        XBee_Enable(DEFAULT_XBEE_BAUD);
+		long tmp = last_xbee_baud;
+		XBee_SwitchBaud(tmp);
+		
         xbee_reset_flag = 1;
     }
 }
@@ -161,93 +177,24 @@ unsigned char doChecksumVerify(unsigned char* address, int length, unsigned char
     return check;
 }
 
-byte XBAPI_RegisteredPacketsBits = 0;
-byte XBAPI_RepliesBits = 0;
-XBAPI_ReplyStruct replies[8];
+byte lastFrameType = 0;
+int status = 0;
 
-byte XBAPI_PacketRegistered(byte bitnum) {
-	bitnum--;
-	if(bitnum >= MAX_XBEE_REPLIES) {
-		return 0;
-	}
-	
-	return (XBAPI_RegisteredPacketsBits & (1 << bitnum)) >> bitnum;
-}
-
-byte XBAPI_RegisterPacket() {
-	byte bitnum = bitset_getFirstFree(XBAPI_RegisteredPacketsBits);
-
-	if(bitnum == 0xFF) {
-		return 0xFF;
-	}
-
-	XBAPI_RegisteredPacketsBits |= 1 << bitnum;
-
-	return bitnum+1;
-}
-
-void XBAPI_NotifyReply(byte id) {
-	id --;
-	if(id >= MAX_XBEE_REPLIES) {
-		return;
-	}
-	
-	XBAPI_RepliesBits |= 1 << id;
-}
-
-inline XBAPI_ReplyStruct* XBAPI_WaitForReply(byte replyId) {
-	return XBAPI_WaitForReplyTmo(replyId, 0);
-}
-
-XBAPI_ReplyStruct* XBAPI_WaitForReplyTmo(byte replyId, unsigned int tmo) {
-	replyId --;
-
-	if(replyId >= MAX_XBEE_REPLIES) {
-		return NULL; // FIXME:  We should be checking for NULL on our pointers.
-	}
-	
-	timer1_setValue(0);
-
+// This function basically waits for a certain frame type to be received.
+int XBAPI_Wait(byte expectedFrameType) {
 	while(1) {
-		if(tmo && timer1_getValue() > tmo) {
-			break;
-		}
-
-		if(bitset_test(XBAPI_RepliesBits, replyId)) {
-			break;
+		if(lastFrameType == expectedFrameType) {
+			lastFrameType = 0;
+			return status;
 		}
 	}
 
-	if(timer1_getValue() >= tmo && tmo) {
-		return NULL;
-	}
-	
-	return &replies[replyId];
+	return -1;
 }
 
-void XBAPI_FreePacket(byte id) {
-	id --;
-	
-	// Possible values should be -1 through 7.
-	// valid values are 0 through 7.
-	// since -1 signed == 0xFF unsigned, we only need one compare.
-	if(id >= MAX_XBEE_REPLIES) {
-		return;
-	}
-	
-	XBAPI_RepliesBits &= ~(1 << id);
-	XBAPI_RegisteredPacketsBits &= ~(1 << id);
-	memset(&replies[id], 0, sizeof(XBAPI_ReplyStruct));
-}
-
-byte XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length) {
+void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, byte id) {
     //byte frame_length = sizeof(TxFrame); // I highly doubt that the frame will be over 256 bytes
     // long, so for now we'll just use a byte as it saves us space.
-
-	byte id = XBAPI_RegisterPacket();
-	if(id == 0xFF) {
-		return 0xFF;
-	}
 	
     apiFrame.tx.start_delimiter = 0x7e;
     apiFrame.tx.length[0] = 0; // Also we'll put this as a zero. (sizeof(TxFrame)-4) >> 8;
@@ -274,7 +221,6 @@ byte XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length)
     }
     
     return error;*/
-	return id;
 }
 
 uint32 swap_endian_32(uint32 n) {
@@ -300,7 +246,7 @@ uint32 swap_endian_32(uint32 n) {
 }*/
 
 byte calc_checksum;
-byte XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) {
+void XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) {
 
     /*int total_packet_length = 4 + length;
 
@@ -314,10 +260,9 @@ byte XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) 
     apiFrame.buffer[total_packet_length] = checksum(apiFrame.buffer+3, total_packet_length);
     */
 
-	byte id = XBAPI_RegisterPacket();
-	if(id == 0xFF) {
-		return 0xFF;
-	}
+	// We should only handle one at a time.
+	//byte id = XBAPI_RegisterPacket();
+	byte id = 0x1;
 
     byte atCmdLength = (data_valid) ? sizeof(ATCmdFrame) : sizeof(ATCmdFrame_NoData);
 
@@ -345,8 +290,6 @@ byte XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) 
     } else {
         return 0;
     }*/
-
-	return id;
 	
     // TODO:  Add checksum verification and a way to discard bytes that aren't in a frame.
 }
@@ -366,16 +309,16 @@ char XBAPI_ReadFrame(Frame* frame) {
 	return 0;
 }
 
-char XBAPI_HandleFrameIfValid(Frame* frame, byte expectedFrame, int length) {
+int XBAPI_HandleFrameIfValid(Frame* frame, int length) {
 	int frameLength = frame->rx.length[1] | (frame->rx.length[0] << 8);
 	if(frame->rx.start_delimiter == API_START_DELIM && frameLength + 4 <= length) {
-		return XBAPI_HandleFrame(frame, expectedFrame);
+		return XBAPI_HandleFrame(frame);
 	} else {
 		return -2;
 	}
 }
-// Returns -2 if a timeout occurs.
-char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
+// Returns the frame type of the handled frame.
+byte XBAPI_HandleFrame(Frame* frame) {
 	// Non-reentrant code, because *frame may be global.
 	// This is horribly, horribly messy, but that's what happens
 	// in MCUs that have 28KB of program space and 2KB of data space.
@@ -386,32 +329,17 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 
 		while(1) {
 			XBAPI_ReadFrame(frame);
-			if(frame->rx.frame_type == expectedFrame || !expectedFrame) {
-				break;
-			}
+
+			XBAPI_HandleFrame(frame);
 		}
 	}
 	
 	// TODO:  Add verification of frames
 
-	unsigned char frameId = frame->rx.frame_id;
-
-	XBAPI_ReplyStruct* reply;
-
-	byte frameIdBool = (frameId && frameId <= 8);
-	// We have to have an offset of one in our reply/reply ID, due
-	// to the fact that 0 is not a properly valid frame ID in the xbee.
-	
-	if(frameIdBool) {
-		XBAPI_NotifyReply(frameId);
-
-		frameId --;
-		reply = &replies[frameId];
-	}
-
 	switch(frame->rx.frame_type) { // It's all the same frame type so it doesn't really matter which struct in the union I choose to access it.
 		case API_RX_INDICATOR: {
 			Packet* packet = &frame->rx.packet;
+			
 			switch(packet->header.command) {
 				case RECEIVER_ACK: {
 					memset(dest_address.addr, 0, sizeof(XBeeAddress));
@@ -437,31 +365,24 @@ char XBAPI_HandleFrame(Frame* frame, byte expectedFrame) {
 				} break;
 			}
 
-			if(frameIdBool) {
-				reply->status = 0;
-				reply->frameType = API_RX_INDICATOR;
-			}
+			status = 0;
+			lastFrameType = API_RX_INDICATOR;
 		} break;
 
         case API_TRANSMIT_STATUS: {
             // TODO:  Add error handling code here.
-			if(frameIdBool) {
-				reply->status = frame->txStatus.delivery_status;
-				reply->frameType = frame->txStatus.frame_type;
-			}
+			status = frame->txStatus.delivery_status;
+			lastFrameType = frame->txStatus.frame_type;
         } break;
 
         case API_AT_CMD_RESPONSE: {
-			if(frameIdBool) {
-				reply->status = frame->atCmdResponse.cmd_status;
-				reply->frameType = frame->atCmdResponse.frame_type;
-			}
+			status = frame->atCmdResponse.cmd_status;
+			lastFrameType = frame->atCmdResponse.frame_type;
         } break;
 
         default:
-			if(frameIdBool) {
-				reply->status = NOT_HANDLED;
-			}
+			status = -1;
+			lastFrameType = frame->rx.frame_type;
             break;
     }
 

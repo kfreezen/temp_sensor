@@ -15,7 +15,7 @@ XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
 extern unsigned char xbee_reset_flag;
 extern unsigned char tmr1_err;
-void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int topResValue) {
+void SendReport(long* thermistorResistances, long thermRes25C, long thermBeta, long topResValue) {
     memset(&packet_buffer, 0, sizeof(Packet));
     
     packet_buffer.header.command = TEMP_REPORT;
@@ -25,7 +25,8 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
 	memcpy(&packet_buffer.header.sensorId, &eepromData.sensorId, sizeof(SensorId));
 	
 	packet_buffer.report.probeBeta = thermBeta;
-    packet_buffer.report.probeResistance[0] = thermistorResistance;
+
+	memcpy(packet_buffer.report.probeResistances, thermistorResistances, sizeof(long)*NUM_PROBES);
     packet_buffer.report.probeResistance25C = thermRes25C;
     packet_buffer.report.topResistorValue = topResValue;
 
@@ -34,17 +35,10 @@ void SendReport(int thermistorResistance, int thermRes25C, int thermBeta, int to
     packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
     packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
 
-    char id = SendPacket(&packet_buffer);
-	
-	XBAPI_ReplyStruct* reply;
-	do {
-		reply = XBAPI_WaitForReplyTmo(id, 256);
-	} while(!reply || (reply->frameType == API_TRANSMIT_STATUS && reply->status != TRANSMIT_SUCCESS));
-	XBAPI_FreePacket(id);
+    SendPacket(&packet_buffer, 0);
 }
 
 void SendReceiverBroadcastRequest() {
-restartSend:
 	memset(&packet_buffer, 0, sizeof(Packet));
     
     packet_buffer.header.command = REQUEST_RECEIVER;
@@ -58,54 +52,22 @@ restartSend:
 
 	packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
     packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
-    char id = SendPacket(&packet_buffer);
+    SendPacket(&packet_buffer, 1);
 
-	XBAPI_ReplyStruct* reply;
-	byte retries = 0;
-
-	while(1) {
-		reply = XBAPI_WaitForReply(id);
-		if(reply->frameType == API_RX_INDICATOR) {
-			break;
-		} else if(reply->frameType == API_TRANSMIT_STATUS) {
-			if(reply->status != TRANSMIT_SUCCESS) {
-				if(retries < 3) {
-					retries++;
-					goto restartSend;
-				}
-				
-				LED3_SIGNAL = 0;
-				while(1) {
-					LED1_SIGNAL = 1;
-					timer1_poll_delay(8192, DIVISION_1);
-					LED1_SIGNAL = 0;
-					timer1_poll_delay(8192, DIVISION_1);
-				}
-			}
-		}
-		// XBAPI_AckReply(id);
-		reply->frameType = 0;
-		reply->status = 0;
-	}
-
-	XBAPI_FreePacket(id);
+	XBAPI_Wait(API_RX_INDICATOR);
 }
 
 unsigned char frame_id_itr = 0;
 
 void __doTestSendPacket() {
-    SendPacket(&packet_buffer);
+    SendPacket(&packet_buffer, 0);
 }
 
-unsigned char SendPacket(Packet* packet) {
+void SendPacket(Packet* packet, byte id) {
     if(frame_id_itr == 0) {
         frame_id_itr++;
     }
 
-    char id = XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet)); // FIXME:  Some time I may want to know what the transmit status is.
-	if(id == 0xFF) {
-		return 0xFF;
-	}
-
-	return id;
+    XBAPI_Transmit(&dest_address, (byte*) packet, sizeof(Packet), id); // FIXME:  Some time I may want to know what the transmit status is.
+	
 }

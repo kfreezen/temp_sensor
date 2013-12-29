@@ -76,6 +76,10 @@ void ADC_EnableEx(byte pvrefSel) {
 
 	ADCON1bits.ADCS = FOSC_DIV_8;
 	ADCON1bits.ADNREF = 0;
+	if(pvrefSel == PIN_PVREF) {
+		ADCON1bits.ADPREF = PIN_PVREF;
+	}
+	
 	ADCON1bits.ADFM = 1;
 	ADCON0bits.ADRMD = 0;
 	ADCON0bits.ADON = 1;
@@ -83,18 +87,17 @@ void ADC_EnableEx(byte pvrefSel) {
 	//timer1_poll_delay(120, DIVISION_1);
 
 	if(pvrefSel == PIN_PVREF) {
-		ADCON1bits.ADPREF = PIN_PVREF;
 		// Use FVR to detect the voltage.
 		FVRCONbits.FVREN = 1;
 		FVRCONbits.ADFVR = 1; // 1.024V
 		while(!FVRCONbits.FVRRDY);
 
-		unsigned result = 0;
+		unsigned short long result = 0;
 
-		while(result > 2420 || result < 2800) {
+		while(result < 2420) {
 			result = ADC_Read(FVR_CHANNEL);
-			result = (16384 / result) * 1024;
-			result /= 4;
+			result = (262144 / result) * 1024;
+			result >>= 6; // /= 64;
 		}
 
 		FVRCONbits.FVREN = 0;
@@ -133,14 +136,17 @@ void ADC_DisablePin(byte select, byte port_pin) {
 	if(select == SEL_PORTB) {
 		TRISB &= ~(1 << port_pin);
 		ANSELB &= ~(1 << port_pin);
+	} else {
+		TRISA &= ~(1 << port_pin);
+		ANSELA &= ~(1 << port_pin);
 	}
 }
 
 uint16 ADC_ReadOne(byte channel) {
 	ADCON0bits.CHS = channel;
 	
-	// Wait (1/8000000)*50 seconds (6.25us) for the ADC to charge the holding capacitor.
-	timer0_poll_delay(50, DIVISION_1);
+	// Wait (1/(8000000/4))*16 seconds (6.4us) for the ADC to charge the holding capacitor.
+	timer0_poll_delay(16, DIVISION_1);
 
 	ADCON0bits.GO = 1;
 	while (ADCON0bits.GO) {
@@ -174,7 +180,13 @@ uint16 ADC_Read(byte channel) {
 	return (unsigned) (sum / (long) ADC_NUM_READS);
 }
 
+#define LOWER_BOUND_READ_VALID  20 // about 12mv
 // Probably doesn't belong in adc.c
 long GetProbeResistance(byte probe) {
-	return (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(PROBE_CHANNEL(probe)))-1000);
+	long n = ADC_Read(PROBE_CHANNEL(probe));
+	if(n < LOWER_BOUND_READ_VALID) {
+		return 0L;
+	} else {
+		return (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(PROBE_CHANNEL(probe)))-1000);
+	}
 }

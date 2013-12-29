@@ -7,7 +7,7 @@
 
 #pragma config WDTE = SWDTEN
 #pragma config FOSC = HS
-#pragma config PLLEN = 0
+#pragma config PLLEN = OFF
 #pragma config MCLRE = OFF
 #pragma config LVP = OFF
 
@@ -51,9 +51,6 @@ char error;
 unsigned batt_level;
 long probeResistance0;
 
-XBAPI_ReplyStruct* replyStruct;
-unsigned vdd;
-
 int main(int argc, char** argv) {
 	if(PCONbits.STKOVF || PCONbits.STKUNF) {
 		LED1_SIGNAL = 1;
@@ -75,6 +72,9 @@ int main(int argc, char** argv) {
 	PIE1 = 0;
 	PIE2 = 0;
 	INTCON = 0;
+
+	T1CON = 0;
+	T1GCON = 0;
 	
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
@@ -102,6 +102,7 @@ int main(int argc, char** argv) {
 	// Wait for the oscillator to stabilize.
 	while(!OSCSTATbits.OSTS) {}
 
+	unsigned vdd;
 	// Here we need to wait till VDD is within 3% of 3.3V
 	ADC_EnableEx(VDD_PVREF);
 	while(1) {
@@ -159,6 +160,8 @@ int main(int argc, char** argv) {
 	INTCONbits.IOCIE = 1;
 	
     XBee_Enable(9600);
+	XBAPI_Wait(API_MODEM_STATUS);
+	
     //LED1_SIGNAL = 1;
     //LED2_SIGNAL = 1;
 
@@ -169,10 +172,14 @@ int main(int argc, char** argv) {
 	 * corresponding info struct.
 	 */
 	
-    byte cmdId = XBAPI_Command(CMD_ATSM, 1L, TRUE);
-	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
+	//XBee_SwitchBaud(XBEE_BAUD);
+
+	LED3_SIGNAL = 1;
+
+    XBAPI_Command(CMD_ATSM, 1L, TRUE);
+	int status = XBAPI_Wait(API_AT_CMD_RESPONSE);
 	
-	if(replyStruct == NULL || replyStruct->status) {
+	if(status != 0) {
 		LED2_SIGNAL = 0;
 		LED1_SIGNAL = 1;
 		
@@ -185,12 +192,12 @@ int main(int argc, char** argv) {
 			LED3_SIGNAL = 0;
 			LED1_SIGNAL = 1;
         }
-    }
-	XBAPI_FreePacket(cmdId);
+	}
 
-    cmdId = XBAPI_Command(CMD_ATAC, 1L, FALSE);
-	replyStruct = XBAPI_WaitForReplyTmo(cmdId, 32768);
-    if(!replyStruct || replyStruct->status) {
+    XBAPI_Command(CMD_ATAC, 1L, FALSE);
+	status = XBAPI_Wait(API_AT_CMD_RESPONSE);
+	
+    if(status != 0) {
 		LED2_SIGNAL = 0;
         XBee_Disable();
         while(1){
@@ -200,7 +207,6 @@ int main(int argc, char** argv) {
 			timer1_poll_delay(16000, DIVISION_1);
         }
     }
-	XBAPI_FreePacket(cmdId);
 	
     // Initialize crc16 code.
     CRC16_Init();
@@ -229,7 +235,8 @@ int main(int argc, char** argv) {
 	LED3_SIGNAL = 0;
     LED2_SIGNAL = 0;
     LED1_SIGNAL = 0;
-    
+
+	int i;
     // Core logic
     while(1) {
         asm("clrwdt");
@@ -237,7 +244,9 @@ int main(int argc, char** argv) {
         LED1_SIGNAL = 1;
 		ADC_Enable();
 
-		ADC_EnablePin(PROBE_PORT(1), PROBE_PIN(1));
+		for(i=0; i < NUM_PROBES; i++) {
+			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
+		}
 		
 		// Give the external cap time to charge.
 		// The external cap is around 0.047uf, and according to my calculations
@@ -245,15 +254,21 @@ int main(int argc, char** argv) {
 		timer1_poll_delay(120, DIVISION_1);
 
 		// Gather data here so that the xbee isn't waiting on it.
-        // Temporary fix to determine if this is what's causing it to freeze.
-		probeResistance0 = GetProbeResistance(1);
+		long probeResistances[NUM_PROBES];
+		for(i = 0; i < NUM_PROBES; i++) {
+			probeResistances[i] = GetProbeResistance(i);
+			
+		}
+		
 
         XBee_Wake();
-        SendReport(probeResistance0, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
+        SendReport(probeResistances, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
         XBee_Sleep();
 
-		ADC_DisablePin(PROBE_PORT(1), PROBE_PIN(1));
-
+		for(i = 0; i < NUM_PROBES; i++) {
+			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
+		}
+		
 		ADC_Disable();
 		
         LED1_SIGNAL = 0;
