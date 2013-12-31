@@ -145,8 +145,8 @@ void ADC_DisablePin(byte select, byte port_pin) {
 uint16 ADC_ReadOne(byte channel) {
 	ADCON0bits.CHS = channel;
 	
-	// Wait (1/(8000000/4))*16 seconds (6.4us) for the ADC to charge the holding capacitor.
-	timer0_poll_delay(16, DIVISION_1);
+	// Wait (1/(8000000/4))*13 seconds (~6.4us) for the ADC to charge the holding capacitor.
+	timer0_poll_delay(13, DIVISION_1);
 
 	ADCON0bits.GO = 1;
 	while (ADCON0bits.GO) {
@@ -182,7 +182,10 @@ uint16 ADC_Read(byte channel) {
 
 #define LOWER_BOUND_READ_VALID  20 // about 12mv
 // Probably doesn't belong in adc.c
+
+byte probe__;
 long GetProbeResistance(byte probe) {
+	probe__ = probe;
 	long n = ADC_Read(PROBE_CHANNEL(probe));
 	if(n < LOWER_BOUND_READ_VALID) {
 		return 0L;

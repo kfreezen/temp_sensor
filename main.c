@@ -245,7 +245,7 @@ int main(int argc, char** argv) {
 		ADC_Enable();
 
 		for(i=0; i < NUM_PROBES; i++) {
-			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
+			//ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 		
 		// Give the external cap time to charge.
@@ -256,8 +256,9 @@ int main(int argc, char** argv) {
 		// Gather data here so that the xbee isn't waiting on it.
 		long probeResistances[NUM_PROBES];
 		for(i = 0; i < NUM_PROBES; i++) {
+			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 			probeResistances[i] = GetProbeResistance(i);
-			
+			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 		
 
@@ -266,7 +267,7 @@ int main(int argc, char** argv) {
         XBee_Sleep();
 
 		for(i = 0; i < NUM_PROBES; i++) {
-			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
+			
 		}
 		
 		ADC_Disable();
