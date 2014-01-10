@@ -15,7 +15,7 @@ XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
 extern unsigned char xbee_reset_flag;
 extern unsigned char tmr1_err;
-void SendReport(long* thermistorResistances, long thermRes25C, long thermBeta, long topResValue) {
+void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C, long thermBeta, long topResValue) {
     memset(&packet_buffer, 0, sizeof(Packet));
     
     packet_buffer.header.command = TEMP_REPORT;
@@ -29,7 +29,8 @@ void SendReport(long* thermistorResistances, long thermRes25C, long thermBeta, l
 	memcpy(packet_buffer.report.probeResistances, thermistorResistances, sizeof(long)*NUM_PROBES);
     packet_buffer.report.probeResistance25C = thermRes25C;
     packet_buffer.report.topResistorValue = topResValue;
-
+	packet_buffer.report.batteryLevel = battLevel;
+	
     CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
 
     packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();

@@ -79,6 +79,14 @@
 #define RESET_SIGNAL_IOCN IOCENbits.IOCEN3
 #define RESET_SIGNAL_IOCF IOCEFbits.IOCEF3
 
+// battery level defines.
+#define BATTLEVEL_PORTSEL SEL_PORTA
+#define BATTLEVEL_PIN 2
+#define BATTLEVEL_CHANNEL 2
+
+#define BATT_LOWER_KOHMS 590L
+#define BATT_UPPER_KOHMS 412L
+
 typedef struct {
 	short probeValueAdjust[3];
 	unsigned char reserved[10];

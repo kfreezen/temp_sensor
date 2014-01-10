@@ -74,7 +74,7 @@ struct ReportRev1 {
 	int32 probeResistances[3];
 	int32 probeResistance25C;
 	uint16 probeBeta;
-	uint16 reserved0;
+	uint16 batteryLevel;
 	uint32 topResistorValue;
 } PACKED_STRUCT;
 
@@ -116,7 +116,7 @@ typedef union {
     byte packet_data[48];
 } Packet;
 
-void SendReport(long* thermistorResistances, long thermRes25C, long thermBeta, long topResValue);
+void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C, long thermBeta, long topResValue);
 
 void SendReceiverBroadcastRequest();
 

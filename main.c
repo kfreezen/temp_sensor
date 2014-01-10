@@ -243,9 +243,9 @@ int main(int argc, char** argv) {
         
         LED1_SIGNAL = 1;
 		ADC_Enable();
-
-		for(i=0; i < NUM_PROBES; i++) {
-			//ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
+		
+		for(i=1; i < 2; i++) {
+			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 		
 		// Give the external cap time to charge.
@@ -254,17 +254,34 @@ int main(int argc, char** argv) {
 		timer1_poll_delay(120, DIVISION_1);
 
 		// Gather data here so that the xbee isn't waiting on it.
+
 		long probeResistances[NUM_PROBES];
-		for(i = 0; i < NUM_PROBES; i++) {
+		memset(probeResistances, 0, sizeof(long)*NUM_PROBES);
+		for(i = 1; i < 2; i++) {
 			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 			probeResistances[i] = GetProbeResistance(i);
 			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 		
+		// TODO:  Here, we read battery level.
+		ADC_EnableEx(PIN_PVREF);
+		ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
 
+		timer1_poll_delay(1590, DIVISION_1);
+
+		long battLevel = ADC_Read(BATTLEVEL_CHANNEL);
+
+		battLevel = (battLevel * 3300L / 4096L) << 8;
+		battLevel /= (BATT_LOWER_KOHMS<<8) / (BATT_LOWER_KOHMS + BATT_UPPER_KOHMS);
+
+		ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
+		
         XBee_Wake();
-        SendReport(probeResistances, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
-        XBee_Sleep();
+        SendReport(probeResistances, battLevel, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
+		// Let's just delay 207 ms for this.
+		//timer1_poll_delay(6782, DIVISION_1);
+		
+		XBee_Sleep();
 
 		for(i = 0; i < NUM_PROBES; i++) {
 			
