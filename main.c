@@ -12,8 +12,8 @@
 #pragma config LVP = OFF
 
 #pragma config PWRTE = ON // Power-on reset timer.
-#pragma config BOREN = ON
-#pragma config BORV = HI
+#pragma config BOREN = OFF
+//#pragma config BORV = HI
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,6 +31,8 @@
 #include "test.h"
 #include "interrupts.h"
 #include "asm.h"
+
+//#define TEST_NO_XBEE
 
 EEPROM_Structure eepromData;
 
@@ -69,6 +71,7 @@ int main(int argc, char** argv) {
 		asm("reset");
 	}*/
 
+	// Initialize
 	PIE1 = 0;
 	PIE2 = 0;
 	INTCON = 0;
@@ -93,6 +96,13 @@ int main(int argc, char** argv) {
 	PORTA = 0;
 	PORTB = 0;
 	PORTC = 0;
+
+	LATA = 0;
+	LATB = 0;
+	LATC = 0;
+
+	// Set up low power sleep mode.
+	VREGCONbits.VREGPM = 1;
 	
 	//if(REVID == 0) {
 	//	LED1_SIGNAL = 1;
@@ -132,7 +142,7 @@ int main(int argc, char** argv) {
 		}
 	}
 	ADC_Disable();
-
+	
 	timer1_poll_delay(1, DIVISION_8);
 	pulseLed(80);
 
@@ -158,10 +168,16 @@ int main(int argc, char** argv) {
 	// Enable interrupt on change for the reset button.
 	RESET_SIGNAL_IOCN = 1;
 	INTCONbits.IOCIE = 1;
+
+	LED2_SIGNAL = 0;
 	
+	
+	
+#ifndef TEST_NO_XBEE
     XBee_Enable(9600);
 	XBAPI_Wait(API_MODEM_STATUS);
-	
+#endif
+
     //LED1_SIGNAL = 1;
     //LED2_SIGNAL = 1;
 
@@ -175,7 +191,7 @@ int main(int argc, char** argv) {
 	//XBee_SwitchBaud(XBEE_BAUD);
 
 	LED3_SIGNAL = 1;
-
+#ifndef TEST_NO_XBEE
     XBAPI_Command(CMD_ATSM, 1L, TRUE);
 	int status = XBAPI_Wait(API_AT_CMD_RESPONSE);
 	
@@ -194,6 +210,9 @@ int main(int argc, char** argv) {
         }
 	}
 
+	XBAPI_Command(CMD_ATPD, 0L, TRUE);
+	status = XBAPI_Wait(API_AT_CMD_RESPONSE);
+	
     XBAPI_Command(CMD_ATAC, 1L, FALSE);
 	status = XBAPI_Wait(API_AT_CMD_RESPONSE);
 	
@@ -207,6 +226,7 @@ int main(int argc, char** argv) {
 			timer1_poll_delay(16000, DIVISION_1);
         }
     }
+#endif
 	
     // Initialize crc16 code.
     CRC16_Init();
@@ -216,28 +236,35 @@ int main(int argc, char** argv) {
 	LED2_SIGNAL = 0;
 	
 	if(TEST_SIGNAL) {
+#ifndef TEST_NO_XBEE
 		XBee_Sleep();
-		
+#endif
+
 		testMain();
 
 		// Do clean-up and shut off stuff here.
+#ifndef TEST_NO_XBEE
 		XBee_Sleep();
 		XBee_Disable();
+#endif
 		while(1) {
-			sleep(1);
+			sleep(2);
 		}
 	}
 
+#ifndef TEST_NO_XBEE
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
     //XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
-
+#endif
+	
 	LED3_SIGNAL = 0;
     LED2_SIGNAL = 0;
     LED1_SIGNAL = 0;
 
-	int i;
+	int battlevel_itr = 0, i=0;
     // Core logic
+
     while(1) {
         asm("clrwdt");
         
@@ -251,46 +278,73 @@ int main(int argc, char** argv) {
 		// Give the external cap time to charge.
 		// The external cap is around 0.047uf, and according to my calculations
 		// should be sufficiently charged in whatever 120 ticks is, I guess?
-		timer1_poll_delay(120, DIVISION_1);
+		unsigned short tmr1_start = TMR1;
+		
+		//XBAPI_Command(CMD_ATSM, 1L, TRUE);
+		//XBAPI_Wait(API_AT_CMD_RESPONSE);
+
+		timer1_poll_delay(120-(TMR1 - tmr1_start), DIVISION_1);
 
 		// Gather data here so that the xbee isn't waiting on it.
 
 		long probeResistances[NUM_PROBES];
 		memset(probeResistances, 0, sizeof(long)*NUM_PROBES);
 		for(i = 1; i < 2; i++) {
-			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 			probeResistances[i] = GetProbeResistance(i);
-			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 		
 		// TODO:  Here, we read battery level.
-		ADC_EnableEx(PIN_PVREF);
-		ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
-
-		timer1_poll_delay(1590, DIVISION_1);
-
-		long battLevel = ADC_Read(BATTLEVEL_CHANNEL);
-
-		battLevel = (battLevel * 3300L / 4096L) << 8;
-		battLevel /= (BATT_LOWER_KOHMS<<8) / (BATT_LOWER_KOHMS + BATT_UPPER_KOHMS);
-
-		ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
 		
+
+		battlevel_itr ++;
+		long battLevel = 0;
+		
+		if(battlevel_itr >= 1440) {
+			ADC_EnableEx(PIN_PVREF);
+			ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
+
+			timer1_poll_delay(1590, DIVISION_1);
+
+			battLevel = ADC_Read(BATTLEVEL_CHANNEL);
+
+			battLevel = (battLevel * 3300L / 4096L) << 8;
+			battLevel /= (BATT_LOWER_KOHMS<<8) / (BATT_LOWER_KOHMS + BATT_UPPER_KOHMS);
+
+			ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
+
+			battlevel_itr = 0;
+		}
+
+#ifndef TEST_NO_XBEE
         XBee_Wake();
         SendReport(probeResistances, battLevel, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
 		// Let's just delay 207 ms for this.
 		//timer1_poll_delay(6782, DIVISION_1);
 		
 		XBee_Sleep();
+		long sleeptmo = 1000000;
+		while(XBEE_ON_nSLEEP && sleeptmo --) {
 
-		for(i = 0; i < NUM_PROBES; i++) {
-			
+		}
+
+		// If it timed out, reset sleep mode.
+		if(sleeptmo < 1) {
+			XBAPI_Command(CMD_ATSM, 1L, TRUE);
+			XBAPI_Wait(API_AT_CMD_RESPONSE);
+		}
+#endif
+		
+		for(i = 1; i < 2; i++) {
+			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 		
 		ADC_Disable();
 		
         LED1_SIGNAL = 0;
-        
-        sleep(59);
+
+		// Fill out the last cycle.
+		asm("sleep");
+
+        sleep(58);
     }
 }

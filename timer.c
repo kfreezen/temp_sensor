@@ -77,6 +77,14 @@ void timer1_sleep(unsigned short periods) {
 	T1CONbits.nT1SYNC = 1;
 	//T1GCONbits.TMR1GE = 1;
 	
+	int div_periods = periods >> 3;
+	periods -= div_periods << 3;
+	T1CONbits.T1CKPS = DIVISION_8;
+	while(div_periods--) {
+		asm("sleep");
+	}
+
+	T1CONbits.T1CKPS = DIVISION_1;
 	while(periods --) {
 		asm("sleep");
 	}

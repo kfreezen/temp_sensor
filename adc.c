@@ -71,7 +71,8 @@ void ADC_EnableEx(byte pvrefSel) {
 
 		// OK, what we want to do here is poll the VREF+ pin until the value reaches
 		// roughly 2.425 (2.5-(3% * 2.5))
-		//ADC_EnablePin(SEL_PORTA, PVREF_PIN);
+		// We enable this pin...
+		ADC_EnablePin(SEL_PORTA, PVREF_PIN);
 	}
 
 	ADCON1bits.ADCS = FOSC_DIV_8;
@@ -117,6 +118,7 @@ void ADC_Enable() {
 void ADC_Disable() {
 	ANALOG_POWER_TOGGLE = 0;
 	ADCON0bits.ADON = 0;
+	ADC_DisablePin(SEL_PORTA, PVREF_PIN);
 }
 
 void ADC_EnablePin(byte select, byte port_pin) {
