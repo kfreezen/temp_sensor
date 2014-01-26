@@ -39,6 +39,29 @@ void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C,
     SendPacket(&packet_buffer, 0);
 }
 
+unsigned char SendRangeTest() {
+	memset(&packet_buffer, 0, sizeof(Packet));
+    
+    packet_buffer.header.command = RANGE_TEST;
+    packet_buffer.header.flags = 0;
+    packet_buffer.header.revision = PROGRAM_REVISION;
+
+	// add an if here, when we get around to it.
+	memcpy(&packet_buffer.header.sensorId, &eepromData.sensorId, sizeof(SensorId));
+	
+    CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
+
+	packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
+    packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
+    SendPacket(&packet_buffer, 1);
+
+	if(XBAPI_WaitTmo(API_RX_INDICATOR, 32768) == -1) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
 void SendReceiverBroadcastRequest() {
 	memset(&packet_buffer, 0, sizeof(Packet));
     

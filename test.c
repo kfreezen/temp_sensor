@@ -68,12 +68,14 @@ void tasking_scheduler() {
 	}
 }*/
 
+unsigned char timer1_flag;
 void interrupt isr() {
 	extern unsigned char UART_Buffer[];
 	extern unsigned char UART_BufferItr;
 
 	if (PIR1bits.TMR1IF) {
 		PIR1bits.TMR1IF = 0;
+		timer1_flag = 1;
 	} else if (PIR1bits.RCIF) {
 		UART_HandleInterrupt();
 		PIR1bits.RCIF = 0;
@@ -112,14 +114,80 @@ void interrupt isr() {
 	
 }
 
+unsigned char mainTaskDone = 0;
 void* MainTask(void* param) {
 	if(param == 0) {
 		XBee_Wake();
 		UART_Init(9600);
 		SendReceiverBroadcastRequest();
+
+		/*DAC_Enable();
+
+		// Enable CCP1 in PWM mode.
+		TRISBbits.TRISB0 = 1; // Enable output driver.
+		APFCONbits.CCP1SEL = 1; // Set to RB0
+		CCP1CONbits.CCP1M = 0xC; // Set to PWM mode.
+
+		PIE1bits.TMR2IE = 0;
+
+		CCP1CONbits.DC1B = 3; // 511 & 3 = 3
+		CCPR1L = 127;
+		PIR1bits.TMR2IF = 0;
+		T2CONbits.T2CKPS = 0; // Timer 2 prescaler 1:1.
+		T2CONbits.TMR2ON = 1;
+
+		TRISBbits.TRISB0 = 1; // Put it to input.*/
+
+		LED1_SIGNAL = 0;
+		LED2_SIGNAL = 0;
+		LED3_SIGNAL = 0;
+		
+		mainTaskDone = 1;
 		return (void*) 1;
 	} else {
 		return (void*) 2;
+	}
+}
+
+extern unsigned long userData;
+void* RangeTestTask(void* param) {
+	if(mainTaskDone == 0) {
+		return (void*) 0;
+	}
+
+	// Do range test.
+	if(SendRangeTest() == 1) {
+		XBAPI_Command(CMD_ATDB, 0, FALSE);
+		XBAPI_Wait(API_AT_CMD_RESPONSE);
+		unsigned toWrite = userData;
+		// 0 to -255dBm
+		// 0 to -40 is very good signal.
+		// -41 to -60 is good signal
+		// -61 to -70 is ok signal.
+		// -71 to -80 is bad signal.
+		// -81 to -90 is very bad
+		// -91 to -101 is super uber bad.
+		// -40 is the upper bound for 3.3V (DAC_Write(255))
+		// -101 should be 0V
+		if(toWrite < 40) {
+			toWrite = 0;
+		} else {
+			toWrite -= 40;
+		}
+		toWrite = 255 * toWrite;
+		toWrite /= 61;
+		// Now we have properly scaled value.
+		// invert it.
+		toWrite = ~toWrite;
+		
+		toWrite >>= 5;
+		LED1_SIGNAL = toWrite & 1;
+		LED2_SIGNAL = (toWrite & 2) >> 1;
+		LED3_SIGNAL = (toWrite & 4) >> 2;
+	} else {
+		LED1_SIGNAL = 0;
+		LED2_SIGNAL = 0;
+		LED3_SIGNAL = 0;
 	}
 }
 
@@ -206,7 +274,8 @@ int testMain() {
 	// Enable interrupt on change, falling edge, on TEST_SIGNAL_IOCN
 	TEST_SIGNAL_IOCN = 1;
 	
-	tasking_initTask(GatherCalibrationDataTask, 0);
+	//tasking_initTask(GatherCalibrationDataTask, 0);
+	tasking_initTask(RangeTestTask, 0);
 	tasking_initTask(MainTask, 0);
 
 	// And start it.

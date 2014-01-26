@@ -46,28 +46,17 @@ void timer1_poll_delay(unsigned short ticks, byte division) {
 	byte savedDivision = T1CONbits.T1CKPS;
 	T1CONbits.T1CKPS = division;
 
-	TMR1 = 0;
+	unsigned short expected = TMR1 + ticks;
+	if(expected < TMR1) {
+		// We want to wait until TMR1 is less than expected.
+		while(TMR1 > expected) {
+		}
+	}
 
-    unsigned char tmr1_turned_on = 0;
+	// Now wait till TMR1 is greater than expected.
+	while(TMR1 < expected) {
 
-    while(tmr1_turned_on < TIMER1_INIT_TRIES) {
-        // For some reason TMR1ON is 0.
-
-        /*if(T1CONbits.TMR1ON == 0) {
-            // I shouldn't have to have this "if" here.
-            Timer1_Init(TMR1_PINOSC, division);
-            //TMR1 = 0;
-            tmr1_turned_on ++;
-        }*/
-
-        if(TMR1 >= ticks) {
-            break;
-        }
-    }
-
-    if(tmr1_turned_on >= TIMER1_INIT_TRIES) {
-        tmr1_err = 1;
-    }
+	}
 
 	T1CONbits.T1CKPS = savedDivision;
 }

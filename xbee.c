@@ -98,7 +98,8 @@ void XBee_Reset() {
 }
 
 inline void XBee_Sleep() {
-    XBEE_SLEEP_RQ = 1;
+	timer1_poll_delay(163, DIVISION_1);
+	XBEE_SLEEP_RQ = 1;
 }
 
 void XBee_Wake() {
@@ -179,10 +180,21 @@ unsigned char doChecksumVerify(unsigned char* address, int length, unsigned char
 
 byte lastFrameType = 0;
 int status = 0;
+uint32 userData = 0;
 
 // This function basically waits for a certain frame type to be received.
-int XBAPI_Wait(byte expectedFrameType) {
+extern unsigned char timer1_flag;
+int XBAPI_WaitTmo(byte expectedFrameType, unsigned tmo) {
+	unsigned expected = TMR1 + tmo;
+	if(expected < tmo) { // Overflowed.
+		timer1_flag = 0;
+	}
+
 	while(1) {
+		if(TMR1 > expected && timer1_flag == 1 && tmo) {
+			break; // Timed out.
+		}
+		
 		if(lastFrameType == expectedFrameType) {
 			lastFrameType = 0;
 			return status;
@@ -190,6 +202,10 @@ int XBAPI_Wait(byte expectedFrameType) {
 	}
 
 	return -1;
+}
+
+int XBAPI_Wait(byte expectedFrame) {
+	return XBAPI_WaitTmo(expectedFrame, 0);
 }
 
 void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, byte id) {
@@ -203,7 +219,7 @@ void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length,
     apiFrame.tx.frame_type = API_TRANSMIT_FRAME;
     memcpy(&apiFrame.tx.destination_address, address, sizeof(XBeeAddress));
     apiFrame.tx.reserved = 0xFEFF;
-    apiFrame.tx.transmit_options = 0;
+    apiFrame.tx.transmit_options = DEFAULT_TO;
     apiFrame.tx.broadcast_radius = 0;
     memcpy(&apiFrame.tx.packet, data, ((unsigned)length>sizeof(Packet)) ? sizeof(Packet) : length);
     apiFrame.tx.checksum = checksum(apiFrame.buffer+3, sizeof(TxFrame)-4);
@@ -322,7 +338,7 @@ byte XBAPI_HandleFrame(Frame* frame) {
 	// Non-reentrant code, because *frame may be global.
 	// This is horribly, horribly messy, but that's what happens
 	// in MCUs that have 28KB of program space and 2KB of data space.
-	DisableInterrupts();
+	//DisableInterrupts();
 
 	if(frame == NULL) {
 		frame = &apiFrame;
@@ -378,6 +394,18 @@ byte XBAPI_HandleFrame(Frame* frame) {
         case API_AT_CMD_RESPONSE: {
 			status = frame->atCmdResponse.cmd_status;
 			lastFrameType = frame->atCmdResponse.frame_type;
+
+			int length = (frame->atCmdResponse.length[0] << 8) | frame->atCmdResponse.length[1];
+			
+			unsigned char dataSize = length - (sizeof(ATCmdResponse) - 8);
+			switch(dataSize) {
+				case 1:
+					userData = frame->atCmdResponse.data[0];
+					break;
+				case 2:
+					userData = (frame->atCmdResponse.data[0] << 8) | frame->atCmdResponse.length[1];
+					break;
+			}
         } break;
 
         default:
@@ -386,6 +414,6 @@ byte XBAPI_HandleFrame(Frame* frame) {
             break;
     }
 
-	EnableInterrupts();
+	//EnableInterrupts();
     return 0;
 }

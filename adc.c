@@ -195,3 +195,20 @@ long GetProbeResistance(byte probe) {
 		return (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(PROBE_CHANNEL(probe)))-1000);
 	}
 }
+
+void DAC_Enable() {
+	DAC1CON0bits.DAC1EN = 1;
+	TRISBbits.TRISB7 = 0;
+	DAC1CON0bits.DAC1OE1 = 0;
+	DAC1CON0bits.DAC1OE2 = 1;
+	DAC1CON0bits.DAC1PSS = 0;
+	DAC1CON0bits.DAC1NSS = 0;
+}
+
+void DAC_Write(unsigned char w) {
+	DAC1CON1bits.DAC1R = w;
+}
+
+void DAC_Disable() {
+	DAC1CON0bits.DAC1EN = 0;
+}

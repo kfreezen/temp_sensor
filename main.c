@@ -8,7 +8,7 @@
 #pragma config WDTE = SWDTEN
 #pragma config FOSC = HS
 #pragma config PLLEN = OFF
-#pragma config MCLRE = OFF
+//#pragma config MCLRE = OFF
 #pragma config LVP = OFF
 
 #pragma config PWRTE = ON // Power-on reset timer.

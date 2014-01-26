@@ -61,6 +61,7 @@ void XBee_Recv(char* buf, int max_len, const char end_char);
 #define API_RX_INDICATOR 0x90
 
 // AT commands
+#define CMD_ATDB 0x4244
 #define CMD_ATBD 0x4442
 #define CMD_ATSM 0x4D53
 #define CMD_ATAC 0x4341
@@ -71,6 +72,8 @@ void XBee_Recv(char* buf, int max_len, const char end_char);
 #define ERROR 1
 #define INVALID_COMMAND 2
 #define INVALID_PARAM 3
+
+#define DEFAULT_TO 0x40 // Set to point-multipoint.
 
 void XBAPI_Command(unsigned short command, unsigned long data, byte data_valid);
 void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, byte id);
@@ -199,6 +202,7 @@ void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src);
 byte XBAPI_HandleFrame(Frame* frame);
 int XBAPI_HandleFrameIfValid(Frame* frame, int length);
 
+int XBAPI_WaitTmo(byte expectedFrame, unsigned ticks);
 int XBAPI_Wait(byte expectedFrame);
 
 char XBAPI_ReadFrame(Frame* frame);

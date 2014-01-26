@@ -22,6 +22,9 @@ void ADC_Enable(void);
 void ADC_DisablePin(byte select, byte port_pin);
 void ADC_Disable(void);
 
+void DAC_Enable(void);
+void DAC_Write(unsigned char w);
+
 uint16 ADC_ReadOne(byte channel);
 uint16 ADC_Read(byte channel);
 

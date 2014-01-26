@@ -15,6 +15,8 @@
 #define RECEIVER_ACK 0x04
 #define REQUEST_RECEIVER 0x04
 
+#define RANGE_TEST 0xFF
+
 #include "globaldef.h"
 
 typedef union SensorId {
@@ -121,6 +123,8 @@ void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C,
 void SendReceiverBroadcastRequest();
 
 void SendPacket(Packet* packet, byte id);
+
+unsigned char SendRangeTest();
 
 #endif	/* PACKETS_H */
 
