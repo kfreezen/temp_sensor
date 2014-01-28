@@ -98,6 +98,7 @@ void XBee_Reset() {
 }
 
 inline void XBee_Sleep() {
+	// Wait about 5ms. for things to settle.
 	timer1_poll_delay(163, DIVISION_1);
 	XBEE_SLEEP_RQ = 1;
 }
