@@ -294,25 +294,25 @@ int main(int argc, char** argv) {
 		}
 		
 		// TODO:  Here, we read battery level.
-		
 
 		battlevel_itr ++;
 		long battLevel = 0;
 		
 		if(battlevel_itr >= 1440) {
-			ADC_EnableEx(PIN_PVREF);
-			ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
+			unsigned vdd = DetectVdd();
 
 			timer1_poll_delay(1590, DIVISION_1);
 
 			battLevel = ADC_Read(BATTLEVEL_CHANNEL);
 
-			battLevel = (battLevel * 3300L / 4096L) << 8;
+			battLevel = (battLevel * (long) vdd / 4096L) << 8;
 			battLevel /= (BATT_LOWER_KOHMS<<8) / (BATT_LOWER_KOHMS + BATT_UPPER_KOHMS);
 
 			ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
 
 			battlevel_itr = 0;
+
+			FVRCONbits.FVREN = 0;
 		}
 
 #ifndef TEST_NO_XBEE

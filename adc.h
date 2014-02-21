@@ -38,6 +38,7 @@ long GetProbeResistance(byte probe);
 
 unsigned DetectVdd();
 
+#define FVR_PVREF 3
 #define PIN_PVREF 1
 #define VDD_PVREF 0
 
