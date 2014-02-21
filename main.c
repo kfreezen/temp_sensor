@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
     LED2_SIGNAL = 0;
     LED1_SIGNAL = 0;
 
-	int battlevel_itr = 0, i=0;
+	int battlevel_itr = 1440, i=0;
     // Core logic
 
     while(1) {
