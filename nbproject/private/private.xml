@@ -1,3 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/uart.c</file>
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/main.c</file>
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/xbee.h</file>
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/timer.c</file>
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/uart.h</file>
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/packets.h</file>
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/timer.h</file>
+        <file>file:/C:/Users/Kent/Documents/GitHub/temp_sensor/adc.c</file>
+    </open-files>
 </project-private>

@@ -36,6 +36,8 @@ extern "C" {
 #define SLEEP_500KHZ 4
 #define SLEEP_250KHZ 5
 
+#define WDT_SECONDS_8 13
+	
 #include "globaldef.h"
 
 void Timer1_Init();

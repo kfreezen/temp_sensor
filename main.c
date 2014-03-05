@@ -266,6 +266,10 @@ int main(int argc, char** argv) {
     // Core logic
 
     while(1) {
+		// Enable Watchdog timer.
+		SWDTEN = 1;
+		WDTCONbits.WDTPS = WDT_SECONDS_8;
+
         asm("clrwdt");
         
         LED1_SIGNAL = 1;
@@ -292,20 +296,18 @@ int main(int argc, char** argv) {
 		for(i = 1; i < 2; i++) {
 			probeResistances[i] = GetProbeResistance(i);
 		}
-		
-		// TODO:  Here, we read battery level.
 
 		battlevel_itr ++;
 		long battLevel = 0;
 		
 		if(battlevel_itr >= 1440) {
-			unsigned vdd = DetectVdd();
+			unsigned long vdd = DetectVdd();
 
 			timer1_poll_delay(1590, DIVISION_1);
 
 			battLevel = ADC_Read(BATTLEVEL_CHANNEL);
 
-			battLevel = (battLevel * (long) vdd / 4096L) << 8;
+			battLevel = (battLevel * vdd / 4096L) << 8;
 			battLevel /= (BATT_LOWER_KOHMS<<8) / (BATT_LOWER_KOHMS + BATT_UPPER_KOHMS);
 
 			ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
@@ -342,6 +344,8 @@ int main(int argc, char** argv) {
 		
         LED1_SIGNAL = 0;
 
+		asm("clrwdt");
+		SWDTEN = 0;
 		// Fill out the last cycle.
 		asm("sleep");
 
