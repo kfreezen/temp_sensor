@@ -53,6 +53,8 @@ char error;
 unsigned batt_level;
 long probeResistance0;
 
+extern unsigned char failedReceiverBroadcast;
+
 int main(int argc, char** argv) {
 	if(PCONbits.STKOVF || PCONbits.STKUNF) {
 		LED1_SIGNAL = 1;
@@ -255,6 +257,17 @@ int main(int argc, char** argv) {
 #ifndef TEST_NO_XBEE
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
+	if(failedReceiverBroadcast) {
+		while(failedReceiverBroadcast) {
+			XBee_Sleep();
+			sleep(300);
+			XBee_Wake();
+
+			failedReceiverBroadcast = 0;
+			
+			SendReceiverBroadcastRequest();
+		}
+	}
     //XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
 #endif
 	

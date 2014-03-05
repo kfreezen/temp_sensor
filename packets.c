@@ -62,6 +62,11 @@ unsigned char SendRangeTest() {
 	}
 }
 
+// TODO:  Implement receiver xbee id save.
+// If we try ten times to get the reciever xbee.
+
+unsigned char failedReceiverBroadcast = 0;
+
 void SendReceiverBroadcastRequest() {
 	memset(&packet_buffer, 0, sizeof(Packet));
     
@@ -78,7 +83,36 @@ void SendReceiverBroadcastRequest() {
     packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
     SendPacket(&packet_buffer, 1);
 
-	XBAPI_Wait(API_RX_INDICATOR);
+	while(1) {
+		unsigned char receiverContactTries = 10;
+		while(receiverContactTries--) {
+			int transmitStatus = XBAPI_Wait(API_TRANSMIT_STATUS);
+			// Now we make sure that it has been transmitted.
+			if(transmitStatus == TRANSMIT_SUCCESS) {
+				break;
+			} else {
+				XBee_Sleep();
+				sleep(10);
+				XBee_Wake();
+			}
+		}
+
+		if(receiverContactTries) {
+			failedReceiverBroadcast = 0;
+			XBAPI_Wait(API_RX_INDICATOR);
+		} else {
+			if(failedReceiverBroadcast) {
+				// We already did this, so we should just return, and go into a
+				// lowpower mode.
+				return;
+			}
+			// Set the broadcast destination, which is 0x000000000000FFFF
+			memset(&eepromData.sensorId, 0, sizeof(SensorId));
+			eepromData.sensorId.id[7] = eepromData.sensorId.id[6] = 0xFF;
+			failedReceiverBroadcast = 1;
+			// We should now go back and try the transmitting again.
+		}
+	}
 }
 
 unsigned char frame_id_itr = 0;
