@@ -36,7 +36,10 @@ extern "C" {
 #define SLEEP_500KHZ 4
 #define SLEEP_250KHZ 5
 
+#define WDT_SECONDS_4 12
 #define WDT_SECONDS_8 13
+#define WDT_SECONDS_16 14
+#define WDT_SECONDS_32 15
 	
 #include "globaldef.h"
 

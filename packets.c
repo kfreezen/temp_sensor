@@ -87,6 +87,8 @@ void SendReceiverBroadcastRequest() {
 		unsigned char receiverContactTries = 10;
 		while(receiverContactTries--) {
 			int transmitStatus = XBAPI_Wait(API_TRANSMIT_STATUS);
+			asm("clrwdt");
+			
 			// Now we make sure that it has been transmitted.
 			if(transmitStatus == TRANSMIT_SUCCESS) {
 				break;
@@ -100,6 +102,7 @@ void SendReceiverBroadcastRequest() {
 		if(receiverContactTries) {
 			failedReceiverBroadcast = 0;
 			XBAPI_Wait(API_RX_INDICATOR);
+			break;
 		} else {
 			if(failedReceiverBroadcast) {
 				// We already did this, so we should just return, and go into a

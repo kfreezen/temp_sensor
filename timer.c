@@ -62,6 +62,12 @@ void timer1_poll_delay(unsigned short ticks, byte division) {
 }
 
 void timer1_sleep(unsigned short periods) {
+	// The most we will ever sleep is 16 seconds at a time so give ourselves plenty of margin
+	// for error, but not enough that we're going to be stuck somewhere forever.
+	// Save our timeout as well.
+	unsigned char last_wdtps = WDTCONbits.WDTPS;
+	WDTCONbits.WDTPS = WDT_SECONDS_32;
+	
 	PIE1bits.TMR1IE = 1;
 	T1CONbits.nT1SYNC = 1;
 	//T1GCONbits.TMR1GE = 1;
@@ -71,14 +77,21 @@ void timer1_sleep(unsigned short periods) {
 	T1CONbits.T1CKPS = DIVISION_8;
 	while(div_periods--) {
 		asm("sleep");
+		asm("clrwdt");
 	}
 
 	T1CONbits.T1CKPS = DIVISION_1;
+
+	WDTCONbits.WDTPS = WDT_SECONDS_4;
 	while(periods --) {
 		asm("sleep");
+		asm("clrwdt");
 	}
 
 	while(!OSCSTATbits.OSTS) {}
+	WDTCONbits.WDTPS = last_wdtps;
+
+	asm("clrwdt");
 }
 
 void sleep(unsigned short seconds) {

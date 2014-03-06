@@ -58,8 +58,8 @@ unsigned DetectVdd() {
 
 	result = ADC_Read(FVR_CHANNEL);
 	//result = ADC_Read(FVR_CHANNEL);
-	result = (131072 / result) * 1024;
-	result >>= 5;
+	result = (262144 / result) * 1024;
+	result >>= 6;
 
 	FVRCONbits.FVREN = 0;
 	return result;

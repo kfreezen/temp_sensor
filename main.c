@@ -5,7 +5,7 @@
  * Created on May 7, 2013, 4:46 PM
  */
 
-#pragma config WDTE = SWDTEN
+//#pragma config WDTE = SWDTEN
 #pragma config FOSC = HS
 #pragma config PLLEN = OFF
 //#pragma config MCLRE = OFF
@@ -56,6 +56,8 @@ long probeResistance0;
 extern unsigned char failedReceiverBroadcast;
 
 int main(int argc, char** argv) {
+	WDTCONbits.WDTPS = WDT_SECONDS_32;
+	
 	if(PCONbits.STKOVF || PCONbits.STKUNF) {
 		LED1_SIGNAL = 1;
 		LED2_SIGNAL = 0;
@@ -258,14 +260,17 @@ int main(int argc, char** argv) {
     // Send receiver address broadcast request
     SendReceiverBroadcastRequest();
 	if(failedReceiverBroadcast) {
+		LED3_SIGNAL = 0;
 		while(failedReceiverBroadcast) {
 			XBee_Sleep();
 			sleep(300);
 			XBee_Wake();
 
 			failedReceiverBroadcast = 0;
-			
+
+			LED3_SIGNAL = 1;
 			SendReceiverBroadcastRequest();
+			LED3_SIGNAL = 0;
 		}
 	}
     //XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
@@ -277,10 +282,9 @@ int main(int argc, char** argv) {
 
 	int battlevel_itr = 1440, i=0;
     // Core logic
-
+	long reportsSent = 0;
+	
     while(1) {
-		// Enable Watchdog timer.
-		SWDTEN = 1;
 		WDTCONbits.WDTPS = WDT_SECONDS_8;
 
         asm("clrwdt");
@@ -316,8 +320,13 @@ int main(int argc, char** argv) {
 		if(battlevel_itr >= 1440) {
 			unsigned long vdd = DetectVdd();
 
+			ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
+			
 			timer1_poll_delay(1590, DIVISION_1);
-
+			if(reportsSent == 0) {
+				timer1_poll_delay(1590, DIVISION_1);
+			}
+			
 			battLevel = ADC_Read(BATTLEVEL_CHANNEL);
 
 			battLevel = (battLevel * vdd / 4096L) << 8;
@@ -335,6 +344,7 @@ int main(int argc, char** argv) {
         SendReport(probeResistances, battLevel, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
 		// Let's just delay 207 ms for this.
 		//timer1_poll_delay(6782, DIVISION_1);
+		reportsSent++;
 		
 		XBee_Sleep();
 		long sleeptmo = 1000000;
@@ -343,9 +353,10 @@ int main(int argc, char** argv) {
 		}
 
 		// If it timed out, reset sleep mode.
-		if(sleeptmo < 1) {
+		if(sleeptmo < 1 && XBEE_ON_nSLEEP) {
 			XBAPI_Command(CMD_ATSM, 1L, TRUE);
 			XBAPI_Wait(API_AT_CMD_RESPONSE);
+			XBee_Sleep();
 		}
 #endif
 		
