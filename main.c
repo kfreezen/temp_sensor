@@ -35,6 +35,7 @@
 //#define TEST_NO_XBEE
 
 EEPROM_Structure eepromData;
+CrashReport crashReport;
 
 unsigned char xbee_reset_flag = 0;
 
@@ -334,6 +335,24 @@ int main(int argc, char** argv) {
 
 			ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
 
+			if(battLevel <= BATTERY_LEVEL_LOWPOINT) {
+				// Ok, we've reached our battery level lowpoint.
+				if(!(crashReport.wrong_flags & BATTERY_LEVEL)) {
+					// Battery level has not been activated yet.
+					crashReport.wrong_flags |= BATTERY_LEVEL;
+					crashReport.firstBatteryLevelCycle = reportsSent;
+					crashReport.lastBatteryLevelCycle = reportsSent;
+				}
+
+				crashReport.lastBatteryLevel = (word) battLevel;
+				// Now we need to write the crash report to EEPROM.
+				EEPROM_Write(128, &crashReport, sizeof(CrashReport));
+			} else {
+				// We are above the lowpoint,
+				// TODO:  Finish, disable crashreport yadda yadda yadd.
+
+			}
+
 			battlevel_itr = 0;
 
 			FVRCONbits.FVREN = 0;
@@ -369,7 +388,6 @@ int main(int argc, char** argv) {
         LED1_SIGNAL = 0;
 
 		asm("clrwdt");
-		SWDTEN = 0;
 		// Fill out the last cycle.
 		asm("sleep");
 

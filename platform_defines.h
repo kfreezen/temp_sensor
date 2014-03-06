@@ -87,6 +87,8 @@
 #define BATT_LOWER_KOHMS 590L
 #define BATT_UPPER_KOHMS 412L
 
+#define BATTERY_LEVEL_LOWPOINT 4400
+
 typedef struct {
 	short probeValueAdjust[3];
 	unsigned char reserved[10];
@@ -95,6 +97,16 @@ typedef struct {
 typedef struct {
     word interval;
 } IntervalData;
+
+typedef struct {
+	unsigned char wrong_flags;
+	word lastBatteryLevel;
+	long firstBatteryLevelCycle;
+	long lastBatteryLevelCycle;
+} CrashReport;
+
+#define BATTERY_LEVEL (1 << 0)
+
 /////////////////////////////////////////
 // KEEP ALL EEPROM MANAGEMENT DEFINES //
 // HERE                              //
