@@ -66,6 +66,8 @@ unsigned DetectVdd() {
 }
 
 void ADC_EnableEx(byte pvrefSel) {
+	asm("clrwdt");
+
 	if(pvrefSel == PIN_PVREF) {
 		ANALOG_POWER_TOGGLE = 1;
 
@@ -87,6 +89,8 @@ void ADC_EnableEx(byte pvrefSel) {
 
 	//timer1_poll_delay(120, DIVISION_1);
 
+	asm("clrwdt");
+	
 	if(pvrefSel == PIN_PVREF) {
 		// Use FVR to detect the voltage.
 		FVRCONbits.FVREN = 1;
@@ -95,6 +99,7 @@ void ADC_EnableEx(byte pvrefSel) {
 
 		unsigned short long result = 0;
 
+		asm("clrwdt");
 		while(result < 2420) {
 			result = ADC_Read(FVR_CHANNEL);
 			result = (262144 / result) * 1024;

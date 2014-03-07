@@ -67,6 +67,8 @@ unsigned char SendRangeTest() {
 
 unsigned char failedReceiverBroadcast = 0;
 
+extern unsigned char lastWDTPlace;
+
 void SendReceiverBroadcastRequest() {
 	memset(&packet_buffer, 0, sizeof(Packet));
     

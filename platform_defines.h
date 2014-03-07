@@ -100,12 +100,14 @@ typedef struct {
 
 typedef struct {
 	unsigned char wrong_flags;
+	unsigned char reset_status;
 	word lastBatteryLevel;
 	long firstBatteryLevelCycle;
 	long lastBatteryLevelCycle;
 } CrashReport;
 
 #define BATTERY_LEVEL (1 << 0)
+#define RESET_STATUS_VALID (1 << 1)
 
 /////////////////////////////////////////
 // KEEP ALL EEPROM MANAGEMENT DEFINES //

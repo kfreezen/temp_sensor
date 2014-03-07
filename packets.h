@@ -87,7 +87,8 @@ typedef struct ReportRev1 Report;
 } PACKED_STRUCT;*/
 
 struct RequestReceiverRev1 {
-	byte reserved[32];
+	byte wdt_place;
+	byte reserved[31];
 } PACKED_STRUCT;
 
 typedef struct RequestReceiverRev1 RequestReceiver;

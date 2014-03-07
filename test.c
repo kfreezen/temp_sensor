@@ -49,6 +49,7 @@ void tasking_scheduler() {
 		byte taskMask = 1<<curTask;
 		
 		if(taskBits & taskMask) {
+			asm("clrwdt");
 			savedParams[curTask] = tasks[curTask](savedParams[curTask]);
 		}
 
@@ -93,12 +94,6 @@ void interrupt isr() {
 			// save stuff and reset.
 			EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 			TEST_SIGNAL_IOCF = 0;
-			RESET_SIGNAL_IOCF = 0;
-			asm("reset");
-		}
-
-		if(RESET_SIGNAL == 0) {
-			// We'll just assume that we aren't in TEST mode.
 			RESET_SIGNAL_IOCF = 0;
 			asm("reset");
 		}

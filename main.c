@@ -56,7 +56,34 @@ long probeResistance0;
 
 extern unsigned char failedReceiverBroadcast;
 
+#define __WDT_START 0
+#define __STATE_SET_FINISHED 1
+#define __MCU_INIT_FINISHED 2
+#define __XBEE_INIT_FINISHED 3
+#define __INIT_FINISHED 4
+#define __MAINLOOP_START 5
+#define __ADC_PINS_ENABLED 6
+#define __RESISTANCES_FETCHED 7
+#define __BATTERIES_READ 8
+#define __SEND_REPORT_START 9
+#define __SEND_REPORT_END 10
+#define __XBEE_ASLEEP 11
+#define __ADC_DISABLED 12
+#define __LAST_SLEEP_CYCLE 13
+#define __SLEEP_START 14
+
+unsigned char lastWDTPlace;
+unsigned char WDTPlace;
+
 int main(int argc, char** argv) {
+	// Now we may be starting from a WDT reset, so grab our WDTPlace and put it into lastWDTPlace
+	lastWDTPlace = WDTPlace;
+	// Now reset the WDTPlace.
+	WDTPlace = __WDT_START;
+	
+	crashReport.reset_status = PCON;
+	crashReport.wrong_flags |= RESET_STATUS_VALID;
+	
 	WDTCONbits.WDTPS = WDT_SECONDS_32;
 	
 	if(PCONbits.STKOVF || PCONbits.STKUNF) {
@@ -117,6 +144,10 @@ int main(int argc, char** argv) {
 	// Wait for the oscillator to stabilize.
 	while(!OSCSTATbits.OSTS) {}
 
+	WDTPlace = __STATE_SET_FINISHED;
+	
+	asm("clrwdt");
+	
 	unsigned vdd;
 	// Here we need to wait till VDD is within 3% of 3.3V
 	ADC_EnableEx(VDD_PVREF);
@@ -151,6 +182,8 @@ int main(int argc, char** argv) {
 	timer1_poll_delay(1, DIVISION_8);
 	pulseLed(80);
 
+	asm("clrwdt");
+	
     //sleep(1);
     LED2_SIGNAL = 1;
     
@@ -163,20 +196,15 @@ int main(int argc, char** argv) {
 		EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 	}
 
-    asm("clrwdt");
-
 	EnableInterrupts();
 
 	INTCONbits.PEIE = 1;
 	PIE1bits.RCIE = 1;
 
-	// Enable interrupt on change for the reset button.
-	RESET_SIGNAL_IOCN = 1;
-	INTCONbits.IOCIE = 1;
-
 	LED2_SIGNAL = 0;
 	
-	
+	asm("clrwdt");
+	WDTPlace = __MCU_INIT_FINISHED;
 	
 #ifndef TEST_NO_XBEE
     XBee_Enable(9600);
@@ -215,9 +243,11 @@ int main(int argc, char** argv) {
         }
 	}
 
+	asm("clrwdt");
 	XBAPI_Command(CMD_ATPD, 0L, TRUE);
 	status = XBAPI_Wait(API_AT_CMD_RESPONSE);
-	
+
+	asm("clrwdt");
     XBAPI_Command(CMD_ATAC, 1L, FALSE);
 	status = XBAPI_Wait(API_AT_CMD_RESPONSE);
 	
@@ -232,6 +262,8 @@ int main(int argc, char** argv) {
         }
     }
 #endif
+
+	asm("clrwdt");
 	
     // Initialize crc16 code.
     CRC16_Init();
@@ -259,7 +291,12 @@ int main(int argc, char** argv) {
 
 #ifndef TEST_NO_XBEE
     // Send receiver address broadcast request
+
+	WDTPlace = __XBEE_INIT_FINISHED;
+	
+	asm("clrwdt");
     SendReceiverBroadcastRequest();
+	
 	if(failedReceiverBroadcast) {
 		LED3_SIGNAL = 0;
 		while(failedReceiverBroadcast) {
@@ -269,6 +306,8 @@ int main(int argc, char** argv) {
 
 			failedReceiverBroadcast = 0;
 
+			asm("clrwdt");
+			
 			LED3_SIGNAL = 1;
 			SendReceiverBroadcastRequest();
 			LED3_SIGNAL = 0;
@@ -286,16 +325,21 @@ int main(int argc, char** argv) {
 	long reportsSent = 0;
 	
     while(1) {
+		WDTPlace = __MAINLOOP_START;
+		
 		WDTCONbits.WDTPS = WDT_SECONDS_8;
 
         asm("clrwdt");
         
         LED1_SIGNAL = 1;
 		ADC_Enable();
-		
+
+		// __forloop-0
 		for(i=1; i < 2; i++) {
 			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
+
+		WDTPlace = __ADC_PINS_ENABLED;
 		
 		// Give the external cap time to charge.
 		// The external cap is around 0.047uf, and according to my calculations
@@ -311,9 +355,13 @@ int main(int argc, char** argv) {
 
 		long probeResistances[NUM_PROBES];
 		memset(probeResistances, 0, sizeof(long)*NUM_PROBES);
+
+		// __forloop-1
 		for(i = 1; i < 2; i++) {
 			probeResistances[i] = GetProbeResistance(i);
 		}
+
+		WDTPlace = __RESISTANCES_FETCHED;
 
 		battlevel_itr ++;
 		long battLevel = 0;
@@ -356,8 +404,13 @@ int main(int argc, char** argv) {
 			battlevel_itr = 0;
 
 			FVRCONbits.FVREN = 0;
+			WDTPlace = __BATTERIES_READ;
 		}
 
+		asm("clrwdt");
+
+		WDTPlace = __SEND_REPORT_START;
+		
 #ifndef TEST_NO_XBEE
         XBee_Wake();
         SendReport(probeResistances, battLevel, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
@@ -366,9 +419,15 @@ int main(int argc, char** argv) {
 		reportsSent++;
 		
 		XBee_Sleep();
-		long sleeptmo = 1000000;
-		while(XBEE_ON_nSLEEP && sleeptmo --) {
+		asm("clrwdt");
 
+		WDTPlace = __SEND_REPORT_END;
+		
+		long sleeptmo = 1000000;
+
+		// __whileloop-0
+		while(XBEE_ON_nSLEEP && sleeptmo --) {
+			// This right here is a possible area for resets
 		}
 
 		// If it timed out, reset sleep mode.
@@ -378,19 +437,25 @@ int main(int argc, char** argv) {
 			XBee_Sleep();
 		}
 #endif
+
+		WDTPlace = __XBEE_ASLEEP;
 		
 		for(i = 1; i < 2; i++) {
 			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 		
 		ADC_Disable();
+
+		WDTPlace = __ADC_DISABLED;
 		
         LED1_SIGNAL = 0;
 
 		asm("clrwdt");
 		// Fill out the last cycle.
+		WDTPlace = __LAST_SLEEP_CYCLE;
 		asm("sleep");
 
+		WDTPlace = __SLEEP_START;
         sleep(58);
     }
 }

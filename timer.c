@@ -68,6 +68,8 @@ void timer1_sleep(unsigned short periods) {
 	unsigned char last_wdtps = WDTCONbits.WDTPS;
 	WDTCONbits.WDTPS = WDT_SECONDS_32;
 	
+	asm("clrwdt");
+
 	PIE1bits.TMR1IE = 1;
 	T1CONbits.nT1SYNC = 1;
 	//T1GCONbits.TMR1GE = 1;
