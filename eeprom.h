@@ -20,6 +20,7 @@ typedef struct EEPROM_Structure {
 	CalibrationData calibration;
 	IntervalData interval;
 	SensorId sensorId;
+	XBeeAddress receiverAddress;
 } EEPROM_Structure;
 
 #define EEPROM_DATA_MAGIC 0x1234

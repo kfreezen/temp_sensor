@@ -361,6 +361,7 @@ byte XBAPI_HandleFrame(Frame* frame) {
 				case RECEIVER_ACK: {
 					memset(dest_address.addr, 0, sizeof(XBeeAddress));
 					memcpy(dest_address.addr+1, &(frame->rx.source_address), sizeof(XBeeAddress_7Bytes));
+					memcpy(&eepromData.receiverAddress, &dest_address, sizeof(XBeeAddress));
 
 					byte i;
 					for(i=0; i<sizeof(SensorId); i++) {
@@ -372,9 +373,10 @@ byte XBAPI_HandleFrame(Frame* frame) {
 					// This means that sensorId is invalid, so we have to load the proper one, and save it to EEPROM.
 					if(i >= 8) {
 						memcpy(&eepromData.sensorId, &packet->header.sensorId, sizeof(SensorId));
-						EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 					}
-					    
+
+					// Write everything to eeprom.
+					EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 
 						// These nodes will only need to ever reply to one address,
 						// allowing us to just use dest_address for this purpose.
@@ -417,4 +419,9 @@ byte XBAPI_HandleFrame(Frame* frame) {
 
 	//EnableInterrupts();
     return 0;
+}
+
+void SetXBeeBroadcastAddress(XBeeAddress* addr) {
+	memset(addr, 0x00, sizeof(XBeeAddress)-2);
+	memset(&addr->addr[6], 0xFF, 2);
 }

@@ -70,52 +70,48 @@ unsigned char failedReceiverBroadcast = 0;
 extern unsigned char lastWDTPlace;
 
 void SendReceiverBroadcastRequest() {
-	memset(&packet_buffer, 0, sizeof(Packet));
-    
-    packet_buffer.header.command = REQUEST_RECEIVER;
-    packet_buffer.header.flags = 0;
-    packet_buffer.header.revision = PROGRAM_REVISION;
-
-	// add an if here, when we get around to it.
-	memcpy(&packet_buffer.header.sensorId, &eepromData.sensorId, sizeof(SensorId));
-	
-    CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
-
-	packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
-    packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
-    SendPacket(&packet_buffer, 1);
-
-	while(1) {
-		unsigned char receiverContactTries = 10;
+	unsigned char retries = 2;
+	while(retries--) {
+		unsigned char receiverContactTries = 3;
 		while(receiverContactTries--) {
+			memset(&packet_buffer, 0, sizeof(Packet));
+
+			packet_buffer.header.command = REQUEST_RECEIVER;
+			packet_buffer.header.flags = 0;
+			packet_buffer.header.revision = PROGRAM_REVISION;
+
+			// add an if here, when we get around to it.
+			memcpy(&packet_buffer.header.sensorId, &eepromData.sensorId, sizeof(SensorId));
+
+			CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
+
+			packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
+			packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
+			SendPacket(&packet_buffer, 1);
+
 			int transmitStatus = XBAPI_Wait(API_TRANSMIT_STATUS);
 			asm("clrwdt");
-			
+
 			// Now we make sure that it has been transmitted.
 			if(transmitStatus == TRANSMIT_SUCCESS) {
 				break;
+			} else if(transmitStatus == MAC_ACK_FAIL) {
+				// Bad MAC address, reset it to broadcast.
+				SetXBeeBroadcastAddress(&dest_address);
 			} else {
 				XBee_Sleep();
-				sleep(10);
+				sleep(1);
 				XBee_Wake();
 			}
 		}
 
-		if(receiverContactTries) {
-			failedReceiverBroadcast = 0;
+		if(!receiverContactTries) {
+			// It failed, we now need to reset the destination address.
+			SetXBeeBroadcastAddress(&dest_address);
+		} else {
+			// It succeeded, so break from the loop.
 			XBAPI_Wait(API_RX_INDICATOR);
 			break;
-		} else {
-			if(failedReceiverBroadcast) {
-				// We already did this, so we should just return, and go into a
-				// lowpower mode.
-				return;
-			}
-			// Set the broadcast destination, which is 0x000000000000FFFF
-			memset(&eepromData.sensorId, 0, sizeof(SensorId));
-			eepromData.sensorId.id[7] = eepromData.sensorId.id[6] = 0xFF;
-			failedReceiverBroadcast = 1;
-			// We should now go back and try the transmitting again.
 		}
 	}
 }

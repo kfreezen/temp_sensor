@@ -208,5 +208,7 @@ int XBAPI_Wait(byte expectedFrame);
 char XBAPI_ReadFrame(Frame* frame);
 
 void XBee_SwitchBaud(long baud);
+
+void SetXBeeBroadcastAddress(XBeeAddress* addr);
 #endif	/* XBEE_H */
 

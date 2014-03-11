@@ -75,6 +75,8 @@ extern unsigned char failedReceiverBroadcast;
 unsigned char lastWDTPlace;
 unsigned char WDTPlace;
 
+extern XBeeAddress dest_address;
+
 int main(int argc, char** argv) {
 	// Now we may be starting from a WDT reset, so grab our WDTPlace and put it into lastWDTPlace
 	lastWDTPlace = WDTPlace;
@@ -193,8 +195,14 @@ int main(int argc, char** argv) {
 		memset(&eepromData.calibration, 0, sizeof(CalibrationData));
 		eepromData.interval.interval = DEFAULT_INTERVAL;
 		memset(&eepromData.sensorId, 0xFF, sizeof(SensorId));
+
+		memset(&eepromData.receiverAddress, 0x00, sizeof(XBeeAddress)-2);
+		memset(&eepromData.receiverAddress.addr[6], 0xFF, 2);
+		
 		EEPROM_Write(0, (byte*)&eepromData, sizeof(EEPROM_Structure));
 	}
+
+	memcpy(&dest_address, &eepromData.receiverAddress, sizeof(XBeeAddress));
 
 	EnableInterrupts();
 
@@ -299,18 +307,18 @@ int main(int argc, char** argv) {
 	
 	if(failedReceiverBroadcast) {
 		LED3_SIGNAL = 0;
-		while(failedReceiverBroadcast) {
-			XBee_Sleep();
+		if(failedReceiverBroadcast) {
+			XBee_Disable();
 			sleep(300);
-			XBee_Wake();
 
-			failedReceiverBroadcast = 0;
-
-			asm("clrwdt");
+			// Reset it now, in case something got missed in
+			// our initialization.  Should not be used as
+			// a crutch for something else that's wrong, but
+			// I'm using it to make the sensor a little bit more
+			// robust.
 			
-			LED3_SIGNAL = 1;
-			SendReceiverBroadcastRequest();
-			LED3_SIGNAL = 0;
+			WDTPlace = __WDT_START;
+			asm("reset");
 		}
 	}
     //XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
