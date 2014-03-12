@@ -2,7 +2,7 @@
 #include <pic16f1788.h>
 #include "platform_defines.h"
 
-void Timer1_Init() {
+void Timer1_Init(char dowait) {
 	byte tmr1cs, t1ckps;
 	t1ckps = DIVISION_1;
 	tmr1cs = TMR1_PINOSC;
@@ -16,10 +16,12 @@ void Timer1_Init() {
 		T1CONbits.T1OSCEN = 1;
 	}
 
-	TMR1 = 0xFC00;
-	PIR1bits.TMR1IF = 0;
-	// wait for TMR1 to stabilize.
-	while(!PIR1bits.TMR1IF) {}
+	if(dowait) {
+		TMR1 = 0xFC00;
+		PIR1bits.TMR1IF = 0;
+		// wait for TMR1 to stabilize.
+		while(!PIR1bits.TMR1IF) {}
+	}
 }
 
 #define TIMER1_INIT_TRIES 3
@@ -62,6 +64,8 @@ void timer1_poll_delay(unsigned short ticks, byte division) {
 }
 
 void timer1_sleep(unsigned short periods) {
+	Timer1_Init(0);
+
 	// The most we will ever sleep is 16 seconds at a time so give ourselves plenty of margin
 	// for error, but not enough that we're going to be stuck somewhere forever.
 	// Save our timeout as well.

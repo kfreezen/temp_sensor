@@ -43,7 +43,7 @@ extern "C" {
 	
 #include "globaldef.h"
 
-void Timer1_Init();
+void Timer1_Init(char dowait);
 
 #include <pic16f1788.h>
 
