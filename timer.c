@@ -21,8 +21,7 @@ void Timer1_Init(byte t1ckps, byte tmr1cs) {
     if(tmr1cs == TMR1_PINOSC) {
 		T1CONbits.T1OSCEN = 1;
 	}
-
-	
+		
 }
 
 #define TIMER1_INIT_TRIES 3
@@ -87,6 +86,8 @@ void timer1_poll_delay(unsigned short ticks, byte division) {
 }
 
 void timer1_sleep(unsigned short periods) {
+	Timer1_Init(0);
+
 	// The most we will ever sleep is 16 seconds at a time so give ourselves plenty of margin
 	// for error, but not enough that we're going to be stuck somewhere forever.
 	// Save our timeout as well.
