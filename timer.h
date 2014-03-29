@@ -43,7 +43,8 @@ extern "C" {
 	
 #include "globaldef.h"
 
-void Timer1_Init();
+void Timer1_Start();
+void Timer1_Init(byte t1ckps, byte tmr1cs);
 
 #include <pic16f1788.h>
 
@@ -64,6 +65,14 @@ inline void timer1_setValue(unsigned int val);
 
 void wdt_sleep(int setting);
 
+typedef struct {
+	unsigned short tmr1_match;
+	byte overflow;
+	byte status;
+} TmoObj;
+
+TmoObj timer1_timeoutObject(unsigned short ticks);
+char timer1_isTimedOut(TmoObj* obj);
 #ifdef	__cplusplus
 }
 #endif

@@ -70,6 +70,7 @@ void tasking_scheduler() {
 }*/
 
 unsigned char timer1_flag;
+unsigned char timer1_overflow = 0;
 void interrupt isr() {
 	extern unsigned char UART_Buffer[];
 	extern unsigned char UART_BufferItr;
@@ -77,6 +78,11 @@ void interrupt isr() {
 	if (PIR1bits.TMR1IF) {
 		PIR1bits.TMR1IF = 0;
 		timer1_flag = 1;
+		timer1_overflow++;
+
+		// clrwdt in the isr requires everything to time out.
+		asm("clrwdt");
+		
 	} else if (PIR1bits.RCIF) {
 		UART_HandleInterrupt();
 		PIR1bits.RCIF = 0;

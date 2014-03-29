@@ -116,6 +116,32 @@ void SendReceiverBroadcastRequest() {
 	}
 }
 
+void SendErrorReport(unsigned short error, unsigned long data) {
+	unsigned char do_disable = 0;
+	if(XBEE_ON_nSLEEP == 0) {
+		XBee_Wake();
+		do_disable = 1;
+	}
+
+
+	memset(&packet_buffer, 0, sizeof(packet_buffer));
+	
+	packet_buffer.header.command = ERROR_REPORT;
+	packet_buffer.header.flags = 0;
+	packet_buffer.header.revision = PROGRAM_REVISION;
+
+	packet_buffer.errReport.data = data;
+	packet_buffer.errReport.error = error;
+
+	GenerateCRC(&packet_buffer);
+
+	SendPacket(&packet_buffer, 0);
+
+	if(do_disable) {
+		XBee_Sleep();
+	}
+}
+
 unsigned char frame_id_itr = 0;
 
 void __doTestSendPacket() {

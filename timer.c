@@ -2,10 +2,16 @@
 #include <pic16f1788.h>
 #include "platform_defines.h"
 
-void Timer1_Init() {
-	byte tmr1cs, t1ckps;
-	t1ckps = DIVISION_1;
-	tmr1cs = TMR1_PINOSC;
+void Timer1_Start() {
+	Timer1_Init(DIVISION_1, TMR1_PINOSC);
+	
+	TMR1 = 0xFC00;
+	PIR1bits.TMR1IF = 0;
+	// wait for TMR1 to stabilize.
+	while(!PIR1bits.TMR1IF) {}
+}
+
+void Timer1_Init(byte t1ckps, byte tmr1cs) {
 	
     T1CONbits.TMR1CS = tmr1cs;
     T1CONbits.TMR1ON = 1;
@@ -16,10 +22,7 @@ void Timer1_Init() {
 		T1CONbits.T1OSCEN = 1;
 	}
 
-	TMR1 = 0xFC00;
-	PIR1bits.TMR1IF = 0;
-	// wait for TMR1 to stabilize.
-	while(!PIR1bits.TMR1IF) {}
+	
 }
 
 #define TIMER1_INIT_TRIES 3
@@ -38,6 +41,28 @@ void timer0_poll_delay(byte ticks, byte division) {
 	TMR0 = 255 - ticks;
 	while(!INTCONbits.TMR0IF) {}
 	
+}
+
+extern unsigned char timer1_overflow;
+TmoObj timer1_timeoutObject(unsigned short ticks) {
+	TmoObj obj;
+	obj.tmr1_match = TMR1 + ticks;
+	obj.overflow = timer1_overflow;
+	if(obj.tmr1_match < TMR1) {
+		obj.overflow++;
+	}
+
+	return obj;
+}
+
+char timer1_isTimedOut(TmoObj* obj) {
+	if(obj->overflow >= timer1_overflow && obj->tmr1_match >= TMR1) {
+		obj->status = 1;
+		return 1;
+	} else {
+		obj->status = 0;
+		return 0;
+	}
 }
 
 void timer1_poll_delay(unsigned short ticks, byte division) {

@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
 	//if(REVID == 0) {
 	//	LED1_SIGNAL = 1;
 	//}
-	Timer1_Init();
+	Timer1_Start();
 	
 	// Wait for the oscillator to stabilize.
 	while(!OSCSTATbits.OSTS) {}
@@ -342,7 +342,6 @@ int main(int argc, char** argv) {
         LED1_SIGNAL = 1;
 		ADC_Enable();
 
-		// __forloop-0
 		for(i=1; i < 2; i++) {
 			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
@@ -369,6 +368,8 @@ int main(int argc, char** argv) {
 			probeResistances[i] = GetProbeResistance(i);
 		}
 
+		// check-bott
+		
 		WDTPlace = __RESISTANCES_FETCHED;
 
 		battlevel_itr ++;

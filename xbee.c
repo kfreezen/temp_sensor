@@ -57,8 +57,13 @@ void XBee_SwitchBaud(long baud) {
 	}
 }
 
-void XBee_Enable(int baud) {
+unsigned char xbee_enabled = 0;
 
+void XBee_Enable(int baud) {
+	if(xbee_enabled) {
+		return;
+	}
+	
 	UART_Init(baud);
     last_xbee_baud = baud;
 	
@@ -88,6 +93,7 @@ void XBee_Enable(int baud) {
 	}
     
     sleep(1);
+	xbee_enabled = 1;
 }
 
 void XBee_Reset() {
@@ -126,6 +132,7 @@ void XBee_Wake() {
 inline void XBee_Disable() {
     XBEE_nRESET_LATCH = 0;
 	XBEE_nRESET_TRIS = OUTPUT;
+	xbee_enabled = 0;
 }
 
 void XBee_Send(const char* msg, int len, const char end_char) {

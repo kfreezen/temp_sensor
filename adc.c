@@ -2,6 +2,7 @@
 #include "timer.h"
 #include "globaldef.h"
 #include "platform_defines.h"
+#include "xbee.h"
 
 #define PREF_VDD 0
 #define PREF_VREFPIN 1
@@ -14,6 +15,7 @@
 
 #define FVR_VALUE_AT_MAX_ANALOG_VOLTAGE 1497
 
+extern unsigned char xbee_enabled;
 
 const byte PROBE_PORTS[3] = {
 	SEL_PORTA, SEL_PORTA, SEL_PORTA
@@ -99,11 +101,21 @@ void ADC_EnableEx(byte pvrefSel) {
 
 		unsigned short long result = 0;
 
+		// The most this should take is 50 microseconds.
+		// Let's time out after five milliseconds.
+		TmoObj tmoObj = timer1_timeoutObject(164);
+		
 		asm("clrwdt");
-		while(result < 2420) {
+		while(result < 2420 && !timer1_isTimedOut(&tmoObj)) {
 			result = ADC_Read(FVR_CHANNEL);
 			result = (262144 / result) * 1024;
 			result >>= 6; // /= 64;
+		}
+
+		if(tmoObj.status == 1) {
+			unsigned char do_disable = 0;
+			
+			SendErrorReport(ADC_PVREF_TOO_LOW, result);
 		}
 
 		FVRCONbits.FVREN = 0;
@@ -155,10 +167,17 @@ uint16 ADC_ReadOne(byte channel) {
 	// Wait (1/(8000000/4))*13 seconds (~6.4us) for the ADC to charge the holding capacitor.
 	timer0_poll_delay(13, DIVISION_1);
 
+	//
+	TmoObj conversionTmo = timer1_timeoutObject(164);
+
 	ADCON0bits.GO = 1;
-	while (ADCON0bits.GO) {
+	while (ADCON0bits.GO && timer1_isTimedOut(&conversionTmo)) {
 	}
 
+	if(conversionTmo.status == 1) {
+		// Timed out.
+		SendErrorReport(ADC_CONVERSION_TIMEOUT, 0L);
+	}
 	unsigned short result = ADRES;
 	PIR1bits.ADIF = 0; // Clearing ADC Interrupt flag for completeness.
 

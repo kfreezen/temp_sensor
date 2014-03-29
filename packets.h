@@ -10,7 +10,7 @@
 
 #define TEMP_REPORT 0x00
 #define REPORT 0x00
-#define CALIBRATE 0x01
+#define ERROR_REPORT 0x01
 
 #define RECEIVER_ACK 0x04
 #define REQUEST_RECEIVER 0x04
@@ -126,6 +126,12 @@ void SendReceiverBroadcastRequest();
 void SendPacket(Packet* packet, byte id);
 
 unsigned char SendRangeTest();
+
+#define ERR_SUCCESS 0x0000
+#define ADC_PVREF_TOO_LOW 0x0001
+#define ADC_CONVERSION_TIMEOUT 0x0002
+
+void SendErrorReport(unsigned short error, unsigned long data);
 
 #endif	/* PACKETS_H */
 
