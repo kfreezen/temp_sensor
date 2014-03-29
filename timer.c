@@ -2,6 +2,7 @@
 #include <pic16f1788.h>
 #include "platform_defines.h"
 
+<<<<<<< HEAD
 void Timer1_Start() {
 	Timer1_Init(DIVISION_1, TMR1_PINOSC);
 	
