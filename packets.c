@@ -69,6 +69,12 @@ unsigned char failedReceiverBroadcast = 0;
 
 extern unsigned char lastWDTPlace;
 
+void GenerateCRC(Packet* p) {
+	CRC16_Generate((byte*) p, sizeof(Packet));
+	p->header.crc.crc16_bytes[1] = CRC16_GetHigh();
+	p->header.crc.crc16_bytes[0] = CRC16_GetLow();
+}
+
 void SendReceiverBroadcastRequest() {
 	unsigned char retries = 2;
 	while(retries--) {

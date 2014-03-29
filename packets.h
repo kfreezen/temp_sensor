@@ -103,13 +103,19 @@ struct ReceiverAckRev1 {
 
 typedef struct ReceiverAckRev1 ReceiverAck;
 
+typedef struct ErrorReport {
+	unsigned short error;
+	unsigned long data;
+} ErrorReport;
+
 // This union allows me to select between using a byte buffer and a myriad of structures for my packets
 typedef union {
 
      struct {
-        PacketHeader header; // 8B
+        PacketHeader header; // 16B
 
         union {
+			ErrorReport errReport;
 			Report report;
 			RequestReceiver requestReceiver;
 			ReceiverAck receiverAck;
