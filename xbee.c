@@ -43,7 +43,7 @@ void XBee_StartReset() {
 	XBEE_nRESET_LATCH = 0;
 }
 
-void XBee_SwitchBaud(long baud) {
+/*void XBee_SwitchBaud(long baud) {
 	XBAPI_Command(CMD_ATBD, baud, TRUE);
 	
 	// There's no guarantee we'll receive something here, so
@@ -55,7 +55,7 @@ void XBee_SwitchBaud(long baud) {
 	if(status != 0) {
 		UART_Init(DEFAULT_XBEE_BAUD);
 	}
-}
+}*/
 
 unsigned char xbee_enabled = 0;
 
@@ -91,8 +91,18 @@ void XBee_Enable(int baud) {
 			XBee_StopReset();
 		}*/
 	}
-    
-    sleep(1);
+
+	int err = XBAPI_WaitTmo(API_MODEM_STATUS, 32768); // timeout in 1 second.
+	if(err == -1) {
+		// Something went wrong, what shall we do?
+		// TODO:  Decide.
+
+		// For now we're just going to sleep for 30 seconds and then issue a reset command.
+		XBee_Disable();
+		sleep(30);
+		asm("reset");
+	}
+
 	xbee_enabled = 1;
 }
 
@@ -114,7 +124,7 @@ void XBee_Wake() {
     // wait for nCTS to go low.
     long i = 0;
     while(XBEE_nCTS && i++ < XTAL_FREQUENCY) {
-    } // FIXME: This is causing a freeze glitch
+    }
 
     // This and that "&& i++ < XTAL_FREQUENCY" should fix the problem of freezing.
     if(i >= XTAL_FREQUENCY-1 && XBEE_nCTS) {
@@ -122,8 +132,6 @@ void XBee_Wake() {
         // The documentation I found said that the minimum reset pulse needed to be 50ns.
         timer1_poll_delay(40, DIVISION_8);
         XBee_Enable(DEFAULT_XBEE_BAUD);
-		long tmp = last_xbee_baud;
-		XBee_SwitchBaud(tmp);
 		
         xbee_reset_flag = 1;
     }
@@ -194,7 +202,7 @@ uint32 userData = 0;
 extern unsigned char timer1_flag;
 int XBAPI_WaitTmo(byte expectedFrameType, unsigned tmo) {
 	unsigned expected = TMR1 + tmo;
-	if(expected < tmo) { // Overflowed.
+	if(expected < tmo) { // TMR1 must overflow before we call timeout.
 		timer1_flag = 0;
 	}
 
@@ -212,9 +220,9 @@ int XBAPI_WaitTmo(byte expectedFrameType, unsigned tmo) {
 	return -1;
 }
 
-int XBAPI_Wait(byte expectedFrame) {
+/*int XBAPI_Wait(byte expectedFrame) {
 	return XBAPI_WaitTmo(expectedFrame, 0);
-}
+}*/
 
 void XBAPI_Transmit(XBeeAddress* address, const unsigned char* data, int length, byte id) {
     //byte frame_length = sizeof(TxFrame); // I highly doubt that the frame will be over 256 bytes

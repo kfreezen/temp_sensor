@@ -95,8 +95,18 @@ void SendReceiverBroadcastRequest() {
 			packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
 			SendPacket(&packet_buffer, 1);
 
-			int transmitStatus = XBAPI_Wait(API_TRANSMIT_STATUS);
-			asm("clrwdt");
+			int transmitStatus = XBAPI_WaitTmo(API_TRANSMIT_STATUS, 32768);
+			if(transmitStatus == -1) {
+				// Should have gotten the transmit status by now.  The xbee may not be
+				// up, but let's send an error report.
+
+				// First reset the xbee.
+				XBee_Disable();
+				sleep(2);
+				XBee_Enable(XBEE_BAUD);
+
+				SendErrorReport(REQUEST_RECEIVER_TIMEOUT, 0L);
+			}
 
 			// Now we make sure that it has been transmitted.
 			if(transmitStatus == TRANSMIT_SUCCESS) {
@@ -106,7 +116,7 @@ void SendReceiverBroadcastRequest() {
 				SetXBeeBroadcastAddress(&dest_address);
 			} else {
 				XBee_Sleep();
-				sleep(1);
+				sleep(2);
 				XBee_Wake();
 			}
 		}
@@ -116,7 +126,11 @@ void SendReceiverBroadcastRequest() {
 			SetXBeeBroadcastAddress(&dest_address);
 		} else {
 			// It succeeded, so break from the loop.
-			XBAPI_Wait(API_RX_INDICATOR);
+			int status = XBAPI_WaitTmo(API_RX_INDICATOR, 32768);
+			if(status == -1) {
+				// Something went wrong, what shall we do?  DECIDE_FIX
+			}
+
 			break;
 		}
 	}

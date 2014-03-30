@@ -54,7 +54,13 @@ unsigned DetectVdd() {
 	// Use FVR to detect the voltage.
 	FVRCONbits.FVREN = 1;
 	FVRCONbits.ADFVR = 1; // 1.024V
-	while(!FVRCONbits.FVRRDY);
+
+	TmoObj obj = timer1_timeoutObject(164);
+	while(!FVRCONbits.FVRRDY && !timer1_isTimedOut(&obj));
+
+	if(obj.status == 1) {
+		SendErrorReport(FVRRDY_TIMEOUT, 0L);
+	}
 
 	unsigned short long result = 0;
 
@@ -171,7 +177,7 @@ uint16 ADC_ReadOne(byte channel) {
 	TmoObj conversionTmo = timer1_timeoutObject(164);
 
 	ADCON0bits.GO = 1;
-	while (ADCON0bits.GO && timer1_isTimedOut(&conversionTmo)) {
+	while (ADCON0bits.GO && !timer1_isTimedOut(&conversionTmo)) {
 	}
 
 	if(conversionTmo.status == 1) {
@@ -187,7 +193,13 @@ uint16 ADC_ReadOne(byte channel) {
 }
 
 uint16 ADC_Read(byte channel) {
-	while (!OSCSTATbits.OSTS) {
+	TmoObj oscstatTmo = timer1_timeoutObject(2048);
+	while (!OSCSTATbits.OSTS && !timer1_isTimedOut(&oscstatTmo)) {
+	}
+
+	if(!OSCSTATbits.OSTS && oscstatTmo.status) {
+		// We need to figure out how to handle this.
+		// DECIDE_FIX
 	}
 
 	ADC_ReadOne(channel); // discard this in case it's necessary.

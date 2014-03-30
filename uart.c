@@ -51,9 +51,7 @@ void UART_TransmitMsg(volatile const byte* _msg, int len, const char end_char) {
 byte UART_Receive() {
 	while(!OSCSTATbits.OSTS) {}
 
-	asm("clrwdt");
 	while(!PIR1bits.RCIF) {}
-	asm("clrwdt");
 
 	return RC1REG;
 }
@@ -96,10 +94,10 @@ void UART_ClearBuffer() {
 int UART_ReceiveMsg(char* msg, int len, char end_char) {
     int i;
 
-    // Ensure that the sensor doesn't freeze for some stupid non-reply
     for(i=0; i<len; i++) {
         char c;
         c = UART_Receive();
+		
 		msg[i] = c;
         
         if(msg[i] == end_char && end_char) {

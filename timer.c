@@ -2,7 +2,6 @@
 #include <pic16f1788.h>
 #include "platform_defines.h"
 
-<<<<<<< HEAD
 void Timer1_Start() {
 	Timer1_Init(DIVISION_1, TMR1_PINOSC);
 	
@@ -56,13 +55,26 @@ TmoObj timer1_timeoutObject(unsigned short ticks) {
 }
 
 char timer1_isTimedOut(TmoObj* obj) {
-	if(obj->overflow >= timer1_overflow && obj->tmr1_match >= TMR1) {
+	if(obj->overflow == 1 && obj->tmr1_match <= TMR1) {
+		// We must've looped around, set overflow to 0.
+		obj->overflow = 0;
+	}
+
+	if(obj->overflow == 0 && obj->tmr1_match >= TMR1) {
 		obj->status = 1;
 		return 1;
 	} else {
 		obj->status = 0;
 		return 0;
 	}
+
+	/*if(obj->overflow >= timer1_overflow && obj->tmr1_match >= TMR1) {
+		obj->status = 1;
+		return 1;
+	} else {
+		obj->status = 0;
+		return 0;
+	}*/
 }
 
 void timer1_poll_delay(unsigned short ticks, byte division) {
@@ -87,7 +99,7 @@ void timer1_poll_delay(unsigned short ticks, byte division) {
 }
 
 void timer1_sleep(unsigned short periods) {
-	Timer1_Init(0);
+	Timer1_Init(DIVISION_1, TMR1_PINOSC);
 
 	// The most we will ever sleep is 16 seconds at a time so give ourselves plenty of margin
 	// for error, but not enough that we're going to be stuck somewhere forever.

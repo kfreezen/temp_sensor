@@ -1,5 +1,6 @@
 #include "eeprom.h"
 #include "globaldef.h"
+#include "timer.h"
 
 #include <pic16f1788.h>
 
@@ -27,7 +28,7 @@ void EEPROM_Write(byte address, byte* data, int length) {
         EECON1bits.WR = 1;
 
         // Now wait for completion of the write
-        while(!PIR2bits.EEIF) {}
+        while(!PIR2bits.EEIF) {} // DECIDE_FIX
         PIR2bits.EEIF = 0;
         EECON1bits.WREN = 0;
     }

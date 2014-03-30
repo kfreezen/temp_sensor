@@ -77,6 +77,10 @@ unsigned char WDTPlace;
 
 extern XBeeAddress dest_address;
 
+extern uint32 userData;
+
+void GenericErrorReset();
+
 int main(int argc, char** argv) {
 	// Now we may be starting from a WDT reset, so grab our WDTPlace and put it into lastWDTPlace
 	lastWDTPlace = WDTPlace;
@@ -216,7 +220,6 @@ int main(int argc, char** argv) {
 	
 #ifndef TEST_NO_XBEE
     XBee_Enable(9600);
-	XBAPI_Wait(API_MODEM_STATUS);
 #endif
 
     //LED1_SIGNAL = 1;
@@ -233,42 +236,45 @@ int main(int argc, char** argv) {
 
 	LED3_SIGNAL = 1;
 #ifndef TEST_NO_XBEE
-    XBAPI_Command(CMD_ATSM, 1L, TRUE);
-	int status = XBAPI_Wait(API_AT_CMD_RESPONSE);
-	
-	if(status != 0) {
-		LED2_SIGNAL = 0;
-		LED1_SIGNAL = 1;
-		
-        //XBee_Disable();
-        while(1){
-			timer1_poll_delay(16384, DIVISION_1);
-			LED1_SIGNAL = 0;
-			LED3_SIGNAL = 1;
-			timer1_poll_delay(16384, DIVISION_1);
-			LED3_SIGNAL = 0;
-			LED1_SIGNAL = 1;
-        }
+
+	XBAPI_Command(CMD_ATSM, 0L, FALSE);
+	int readStatus = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+	if(readStatus == 0 && userData == 0) {
+
+		XBAPI_Command(CMD_ATSM, 1L, TRUE);
+		int status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+
+		if(status != 0) {
+			GenericErrorReset();
+		}
+
+		asm("clrwdt");
+		XBAPI_Command(CMD_ATPD, 0L, TRUE);
+		status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+		if(status != 0) {
+			GenericErrorReset();
+		}
+
+		asm("clrwdt");
+		XBAPI_Command(CMD_ATAC, 1L, FALSE);
+		status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+
+		if(status != 0) {
+			GenericErrorReset();
+		}
+
+		asm("clrwdt");
+		XBAPI_Command(CMD_ATWR, 0L, FALSE);
+		status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+
+		if(status != 0) {
+			GenericErrorReset();
+		}
+
+	} else {
+		GenericErrorReset();
 	}
 
-	asm("clrwdt");
-	XBAPI_Command(CMD_ATPD, 0L, TRUE);
-	status = XBAPI_Wait(API_AT_CMD_RESPONSE);
-
-	asm("clrwdt");
-    XBAPI_Command(CMD_ATAC, 1L, FALSE);
-	status = XBAPI_Wait(API_AT_CMD_RESPONSE);
-	
-    if(status != 0) {
-		LED2_SIGNAL = 0;
-        XBee_Disable();
-        while(1){
-			LED1_SIGNAL = 1;
-			timer1_poll_delay(16000, DIVISION_1);
-			LED1_SIGNAL = 0;
-			timer1_poll_delay(16000, DIVISION_1);
-        }
-    }
 #endif
 
 	asm("clrwdt");
@@ -367,8 +373,6 @@ int main(int argc, char** argv) {
 		for(i = 1; i < 2; i++) {
 			probeResistances[i] = GetProbeResistance(i);
 		}
-
-		// check-bott
 		
 		WDTPlace = __RESISTANCES_FETCHED;
 
@@ -377,7 +381,7 @@ int main(int argc, char** argv) {
 		
 		if(battlevel_itr >= 1440) {
 			unsigned long vdd = DetectVdd();
-
+			
 			ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
 			
 			timer1_poll_delay(1590, DIVISION_1);
@@ -404,6 +408,7 @@ int main(int argc, char** argv) {
 				crashReport.lastBatteryLevel = (word) battLevel;
 				// Now we need to write the crash report to EEPROM.
 				EEPROM_Write(128, &crashReport, sizeof(CrashReport));
+				// check-bott
 			} else {
 				// We are above the lowpoint,
 				// TODO:  Finish, disable crashreport yadda yadda yadd.
@@ -442,7 +447,8 @@ int main(int argc, char** argv) {
 		// If it timed out, reset sleep mode.
 		if(sleeptmo < 1 && XBEE_ON_nSLEEP) {
 			XBAPI_Command(CMD_ATSM, 1L, TRUE);
-			XBAPI_Wait(API_AT_CMD_RESPONSE);
+			XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+			
 			XBee_Sleep();
 		}
 #endif
@@ -467,4 +473,10 @@ int main(int argc, char** argv) {
 		WDTPlace = __SLEEP_START;
         sleep(58);
     }
+}
+
+void GenericErrorReset() {
+	XBee_Disable();
+	sleep(10);
+	asm("reset");
 }

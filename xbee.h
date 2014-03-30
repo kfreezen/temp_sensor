@@ -67,6 +67,8 @@ void XBee_Recv(char* buf, int max_len, const char end_char);
 #define CMD_ATAC 0x4341
 #define CMD_ATVR 0x5256
 #define CMD_ATPD 0x4450
+#define CMD_ATWR 0x5257
+
 // Command response codes
 #define OK 0
 #define ERROR 1
@@ -203,11 +205,9 @@ byte XBAPI_HandleFrame(Frame* frame);
 int XBAPI_HandleFrameIfValid(Frame* frame, int length);
 
 int XBAPI_WaitTmo(byte expectedFrame, unsigned ticks);
-int XBAPI_Wait(byte expectedFrame);
+//int XBAPI_Wait(byte expectedFrame);
 
 char XBAPI_ReadFrame(Frame* frame);
-
-void XBee_SwitchBaud(long baud);
 
 void SetXBeeBroadcastAddress(XBeeAddress* addr);
 #endif	/* XBEE_H */

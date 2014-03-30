@@ -136,6 +136,8 @@ unsigned char SendRangeTest();
 #define ERR_SUCCESS 0x0000
 #define ADC_PVREF_TOO_LOW 0x0001
 #define ADC_CONVERSION_TIMEOUT 0x0002
+#define FVRRDY_TIMEOUT 0x0003
+#define REQUEST_RECEIVER_TIMEOUT 0x0004
 
 void SendErrorReport(unsigned short error, unsigned long data);
 

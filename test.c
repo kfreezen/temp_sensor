@@ -159,7 +159,7 @@ void* RangeTestTask(void* param) {
 	// Do range test.
 	if(SendRangeTest() == 1) {
 		XBAPI_Command(CMD_ATDB, 0, FALSE);
-		XBAPI_Wait(API_AT_CMD_RESPONSE);
+		XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
 		unsigned toWrite = userData;
 		// 0 to -255dBm
 		// 0 to -40 is very good signal.
