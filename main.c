@@ -82,6 +82,7 @@ extern uint32 userData;
 void GenericErrorReset();
 
 int main(int argc, char** argv) {
+
 	// Now we may be starting from a WDT reset, so grab our WDTPlace and put it into lastWDTPlace
 	lastWDTPlace = WDTPlace;
 	// Now reset the WDTPlace.
@@ -153,7 +154,7 @@ int main(int argc, char** argv) {
 	WDTPlace = __STATE_SET_FINISHED;
 	
 	asm("clrwdt");
-	
+
 	unsigned vdd;
 	// Here we need to wait till VDD is within 3% of 3.3V
 	ADC_EnableEx(VDD_PVREF);
@@ -271,7 +272,7 @@ int main(int argc, char** argv) {
 			GenericErrorReset();
 		}
 
-	} else {
+	} else if(readStatus != 0) {
 		GenericErrorReset();
 	}
 
@@ -407,7 +408,7 @@ int main(int argc, char** argv) {
 
 				crashReport.lastBatteryLevel = (word) battLevel;
 				// Now we need to write the crash report to EEPROM.
-				EEPROM_Write(128, &crashReport, sizeof(CrashReport));
+				EEPROM_Write(128, (byte*) &crashReport, sizeof(CrashReport));
 				// check-bott
 			} else {
 				// We are above the lowpoint,

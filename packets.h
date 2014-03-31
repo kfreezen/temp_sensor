@@ -11,6 +11,7 @@
 #define TEMP_REPORT 0x00
 #define REPORT 0x00
 #define ERROR_REPORT 0x01
+#define DIAG_REPORT 0x02
 
 #define RECEIVER_ACK 0x04
 #define REQUEST_RECEIVER 0x04
@@ -124,7 +125,7 @@ typedef struct DiagReport {
 	unsigned char STATUS;
 	unsigned char reserved;
 	unsigned char reservedForExtendedDiagReport;
-};
+} DiagReport;
 // This union allows me to select between using a byte buffer and a myriad of structures for my packets
 typedef union {
 
@@ -136,6 +137,8 @@ typedef union {
 			Report report;
 			RequestReceiver requestReceiver;
 			ReceiverAck receiverAck;
+
+			DiagReport diagReport;
         };
     };
 

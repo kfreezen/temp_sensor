@@ -7,6 +7,7 @@
 #include "eeprom.h"
 
 #include <pic16f1788.h>
+#include <stddef.h>
 
 #define MAX_TASKS 4
 

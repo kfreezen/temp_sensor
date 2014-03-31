@@ -46,7 +46,7 @@ extern unsigned char timer1_overflow;
 TmoObj timer1_timeoutObject(unsigned short ticks) {
 	TmoObj obj;
 	obj.tmr1_match = TMR1 + ticks;
-	obj.overflow = timer1_overflow;
+	obj.overflow = 0;
 	if(obj.tmr1_match < TMR1) {
 		obj.overflow++;
 	}
@@ -55,12 +55,12 @@ TmoObj timer1_timeoutObject(unsigned short ticks) {
 }
 
 char timer1_isTimedOut(TmoObj* obj) {
-	if(obj->overflow == 1 && obj->tmr1_match <= TMR1) {
+	if(obj->overflow == 1 && TMR1 <= obj->tmr1_match) {
 		// We must've looped around, set overflow to 0.
 		obj->overflow = 0;
 	}
 
-	if(obj->overflow == 0 && obj->tmr1_match >= TMR1) {
+	if(obj->overflow == 0 && TMR1 >= obj->tmr1_match) {
 		obj->status = 1;
 		return 1;
 	} else {

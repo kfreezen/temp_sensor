@@ -55,11 +55,13 @@ unsigned DetectVdd() {
 	FVRCONbits.FVREN = 1;
 	FVRCONbits.ADFVR = 1; // 1.024V
 
-	TmoObj obj = timer1_timeoutObject(164);
+	TmoObj obj = timer1_timeoutObject(1000);
+	unsigned short tmr1_start = TMR1;
+
 	while(!FVRCONbits.FVRRDY && !timer1_isTimedOut(&obj));
 
-	if(obj.status == 1) {
-		SendErrorReport(FVRRDY_TIMEOUT, 0L);
+	if(obj.status == 1 || TMR1 - tmr1_start >= 164) {
+		SendErrorReport(FVRRDY_TIMEOUT, TMR1 - tmr1_start);
 	}
 
 	unsigned short long result = 0;
@@ -103,13 +105,20 @@ void ADC_EnableEx(byte pvrefSel) {
 		// Use FVR to detect the voltage.
 		FVRCONbits.FVREN = 1;
 		FVRCONbits.ADFVR = 1; // 1.024V
-		while(!FVRCONbits.FVRRDY);
+		
+		TmoObj tmoObj = timer1_timeoutObject(164);
+		
+		while(!FVRCONbits.FVRRDY && !timer1_isTimedOut(&tmoObj));
+
+		if(tmoObj.status == 1) {
+			SendErrorReport(FVRRDY_TIMEOUT, 0);
+		}
 
 		unsigned short long result = 0;
 
 		// The most this should take is 50 microseconds.
 		// Let's time out after five milliseconds.
-		TmoObj tmoObj = timer1_timeoutObject(164);
+		tmoObj = timer1_timeoutObject(164);
 		
 		asm("clrwdt");
 		while(result < 2420 && !timer1_isTimedOut(&tmoObj)) {
@@ -182,8 +191,14 @@ uint16 ADC_ReadOne(byte channel) {
 
 	if(conversionTmo.status == 1) {
 		// Timed out.
-		SendErrorReport(ADC_CONVERSION_TIMEOUT, 0L);
+		long data = ADCON0 | (ADCON1 << 8);
+		/*unsigned char* datap = (unsigned char*) &data;
+		datap[0] = ADCON0;
+		datap[1] = ADCON1;*/
+
+		SendErrorReport(ADC_CONVERSION_TIMEOUT, data);
 	}
+	
 	unsigned short result = ADRES;
 	PIR1bits.ADIF = 0; // Clearing ADC Interrupt flag for completeness.
 

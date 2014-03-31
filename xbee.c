@@ -87,7 +87,7 @@ void XBee_Enable(int baud) {
 		}*/
 	}
 
-	int err = XBAPI_WaitTmo(API_MODEM_STATUS, 32768); // timeout in 1 second.
+	/*int err = XBAPI_WaitTmo(API_MODEM_STATUS, 32768); // timeout in 1 second.
 	if(err == -1) {
 		// Something went wrong, what shall we do?
 		// TODO:  Decide.
@@ -96,9 +96,11 @@ void XBee_Enable(int baud) {
 		XBee_Disable();
 		sleep(30);
 		asm("reset");
-	}
+	}*/
 
 	xbee_enabled = 1;
+
+	sleep(2);
 }
 
 void XBee_Reset() {

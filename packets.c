@@ -136,6 +136,72 @@ void SendReceiverBroadcastRequest() {
 	}
 }
 
+/*
+typedef struct DiagReport {
+	unsigned char PORTA, PORTB, PORTC, PORTD, PORTE;
+	unsigned char TRISA, TRISB, TRISC, TRISD, TRISE;
+	unsigned char ANSELA, ANSELB, ANSELC, ANSELD, ANSELE;
+	unsigned char APFCON1;
+	unsigned char BAUD1CON;
+	unsigned char SP1BRGL, SP1BRGH;
+	unsigned char RC1STA, TX1STA;
+	unsigned char TMR1L, TMR1H;
+	unsigned char T1CON, T1GCON;
+	unsigned char OPTION_REG;
+	unsigned char INTCON;
+	unsigned char PIE1, PIR1;
+	unsigned char STATUS;
+	unsigned char reserved;
+	unsigned char reservedForExtendedDiagReport;
+} DiagReport;
+*/
+
+void SendDiagReport() {
+	memset(&packet_buffer, 0, sizeof(packet_buffer));
+
+	packet_buffer.header.command = DIAG_REPORT;
+	packet_buffer.header.flags = 0;
+	packet_buffer.header.revision = PROGRAM_REVISION;
+
+	packet_buffer.diagReport.PORTA = PORTA; 
+	packet_buffer.diagReport.PORTB = PORTB; 
+	packet_buffer.diagReport.PORTC = PORTC; 
+	packet_buffer.diagReport.PORTE = PORTE;
+
+	packet_buffer.diagReport.TRISA = TRISA; 
+	packet_buffer.diagReport.TRISB = TRISB; 
+	packet_buffer.diagReport.TRISC = TRISC; 
+	packet_buffer.diagReport.TRISE = TRISE;
+
+	packet_buffer.diagReport.ANSELA = ANSELA; 
+	packet_buffer.diagReport.ANSELB = ANSELB; 
+	packet_buffer.diagReport.ANSELC = ANSELC; 
+
+	packet_buffer.diagReport.APFCON1 = APFCON1;
+	packet_buffer.diagReport.BAUD1CON = BAUD1CON;
+	packet_buffer.diagReport.SP1BRGL = SP1BRGL;
+	packet_buffer.diagReport.SP1BRGH = SP1BRGH;
+
+	packet_buffer.diagReport.RC1STA = RC1STA;
+	packet_buffer.diagReport.TX1STA = TX1STA;
+
+	packet_buffer.diagReport.TMR1L = TMR1L;
+	packet_buffer.diagReport.TMR1H = TMR1H;
+
+	packet_buffer.diagReport.T1CON = T1CON;
+	packet_buffer.diagReport.T1GCON = T1GCON;
+	packet_buffer.diagReport.OPTION_REG = OPTION_REG;
+	packet_buffer.diagReport.INTCON = INTCON;
+	packet_buffer.diagReport.PIE1 = PIE1;
+	packet_buffer.diagReport.PIR1 = PIR1;
+	packet_buffer.diagReport.STATUS = STATUS;
+	packet_buffer.diagReport.reserved = 0;
+	packet_buffer.diagReport.reservedForExtendedDiagReport = 0;
+	GenerateCRC(&packet_buffer);
+
+	SendPacket(&packet_buffer, 0);
+}
+
 void SendErrorReport(unsigned short error, unsigned long data) {
 	unsigned char do_disable = 0;
 	if(XBEE_ON_nSLEEP == 0) {
@@ -157,6 +223,8 @@ void SendErrorReport(unsigned short error, unsigned long data) {
 
 	SendPacket(&packet_buffer, 0);
 
+	SendDiagReport();
+	
 	if(do_disable) {
 		XBee_Sleep();
 	}
