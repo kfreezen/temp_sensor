@@ -20,15 +20,10 @@ extern EEPROM_Structure eepromData;
 
 extern unsigned char xbee_reset_flag;
 
-long last_xbee_baud;
+unsigned short long last_xbee_baud;
 // It may be necessary to delay.
 
-XBeeAddress* debug_dest;
-XBeeAddress_7Bytes* debug_src;
-
 void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src) {
-    debug_dest = dest;
-    debug_src = src;
     memset(dest->addr, 0, sizeof(XBeeAddress));
     memcpy(dest->addr+1, src, sizeof(XBeeAddress_7Bytes));
 }
