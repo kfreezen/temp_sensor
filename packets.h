@@ -108,6 +108,23 @@ typedef struct ErrorReport {
 	unsigned long data;
 } ErrorReport;
 
+typedef struct DiagReport {
+	unsigned char PORTA, PORTB, PORTC, PORTD, PORTE;
+	unsigned char TRISA, TRISB, TRISC, TRISD, TRISE;
+	unsigned char ANSELA, ANSELB, ANSELC, ANSELD, ANSELE;
+	unsigned char APFCON1;
+	unsigned char BAUD1CON;
+	unsigned char SP1BRGL, SP1BRGH;
+	unsigned char RC1STA, TX1STA;
+	unsigned char TMR1L, TMR1H;
+	unsigned char T1CON, T1GCON;
+	unsigned char OPTION_REG;
+	unsigned char INTCON;
+	unsigned char PIE1, PIR1;
+	unsigned char STATUS;
+	unsigned char reserved;
+	unsigned char reservedForExtendedDiagReport;
+};
 // This union allows me to select between using a byte buffer and a myriad of structures for my packets
 typedef union {
 
