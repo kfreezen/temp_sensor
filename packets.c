@@ -17,6 +17,8 @@ void SendBareErrorReport(unsigned short error, unsigned long data);
 
 extern unsigned char xbee_reset_flag;
 extern unsigned char tmr1_err;
+
+unsigned macAckFails = 0, networkAckFails = 0, routeNotFoundFails = 0;
 void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C, long thermBeta, long topResValue) {
     memset(&packet_buffer, 0, sizeof(Packet));
     
@@ -32,6 +34,9 @@ void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C,
     packet_buffer.report.probeResistance25C = thermRes25C;
     packet_buffer.report.topResistorValue = topResValue;
 	packet_buffer.report.batteryLevel = battLevel;
+	packet_buffer.report.macAckFails = macAckFails;
+	packet_buffer.report.networkAckFails = networkAckFails;
+	packet_buffer.report.routeNotFoundFails = routeNotFoundFails;
 	
     CRC16_Generate((byte*)&packet_buffer, sizeof(Packet));
 
@@ -46,7 +51,27 @@ void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C,
 		LED1_SIGNAL = 0;
 	} else {
 		switch(status) {
-			
+			default: // We'll assume the best in everyone!
+				// TODO:  In the future we'll want to re-establish the connection
+				// if necessary.
+			case TRANSMIT_SUCCESS:
+				macAckFails = 0;
+				networkAckFails = 0;
+				routeNotFoundFails = 0;
+				break;
+
+			case MAC_ACK_FAIL:
+				macAckFails ++;
+				break;
+
+			case NETWORK_ACK_FAIL:
+				networkAckFails ++;
+				break;
+
+			case ROUTE_NOT_FOUND:
+				routeNotFoundFails ++;
+				break;
+
 		}
 	}
 }

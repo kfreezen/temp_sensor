@@ -79,6 +79,9 @@ struct ReportRev1 {
 	uint16 probeBeta;
 	uint16 batteryLevel;
 	uint32 topResistorValue;
+	uint16 macAckFails;
+	uint16 networkAckFails;
+	uint16 routeNotFoundFails;
 } PACKED_STRUCT;
 
 typedef struct ReportRev1 Report;
