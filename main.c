@@ -49,10 +49,10 @@ extern XBeeAddress dest_address;
 
 extern void __doTestSendPacket();
 
-char error;
+char error = 0;
 
-unsigned batt_level;
-long probeResistance0;
+unsigned batt_level = 0;
+long probeResistance0 = 0L;
 
 extern unsigned char failedReceiverBroadcast;
 
@@ -74,6 +74,11 @@ extern unsigned char failedReceiverBroadcast;
 
 unsigned char lastWDTPlace;
 unsigned char WDTPlace;
+
+// External globals for main to clear.
+extern Packet packet_buffer;
+extern Frame apiFrame;
+// end external globals for main to clear.
 
 extern XBeeAddress dest_address;
 
@@ -147,6 +152,12 @@ int main(int argc, char** argv) {
 	//	LED1_SIGNAL = 1;
 	//}
 	Timer1_Start();
+
+	// Initialize globals.
+	memset(&eepromData, 0, sizeof(eepromData));
+	memset(&crashReport, 0, sizeof(crashReport));
+	memset(&packet_buffer, 0, sizeof(packet_buffer));
+	memset(&apiFrame, 0, sizeof(apiFrame));
 	
 	// Wait for the oscillator to stabilize.
 	while(!OSCSTATbits.OSTS) {}
@@ -155,7 +166,7 @@ int main(int argc, char** argv) {
 	
 	asm("clrwdt");
 
-	unsigned vdd;
+	unsigned vdd = 0;
 	// Here we need to wait till VDD is within 3% of 3.3V
 	ADC_EnableEx(VDD_PVREF);
 	while(1) {

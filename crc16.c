@@ -24,7 +24,7 @@ unsigned short CRC16_LookupLow[16] = {
 /*
  * CRC16 "Register". This is implemented as two 8bit values
  */
-unsigned char CRC16_High, CRC16_Low;
+unsigned char CRC16_High = 0xFF, CRC16_Low = 0xFF;
 
 /*
  * Before each message CRC is generated, the CRC register must be 
@@ -44,7 +44,7 @@ void CRC16_Init( void )
  */
 void CRC16_Update4Bits( unsigned char val )
 {
-	unsigned char	t;
+	unsigned char	t = 0;
 
 	// Step one, extract the Most significant 4 bits of the CRC register
 	t = CRC16_High >> 4;

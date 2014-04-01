@@ -20,7 +20,7 @@ extern EEPROM_Structure eepromData;
 
 extern unsigned char xbee_reset_flag;
 
-unsigned short long last_xbee_baud;
+unsigned short long last_xbee_baud = 0;
 // It may be necessary to delay.
 
 void XBeeAddress_From7ByteAddress(XBeeAddress* dest, XBeeAddress_7Bytes* src) {
@@ -165,9 +165,8 @@ Frame apiFrame;
     return 0xFF - checksum;
 }*/
 
-unsigned char checksum(void* addr, int length) {
-    unsigned char* address = (unsigned char*) addr;
-    
+unsigned char checksum(unsigned char* address, int length) {
+
     // Calculate checksum
     unsigned char checksum = 0;
     int i;
@@ -274,7 +273,7 @@ uint32 swap_endian_32(uint32 n) {
     return r;
 }*/
 
-byte calc_checksum;
+byte calc_checksum = 0;
 void XBAPI_Command(unsigned short command, unsigned long data, byte data_valid) {
 
     /*int total_packet_length = 4 + length;

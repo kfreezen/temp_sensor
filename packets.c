@@ -13,6 +13,8 @@ extern EEPROM_Structure eepromData;
 Packet packet_buffer;
 XBeeAddress dest_address = {{0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF}};
 
+void SendBareErrorReport(unsigned short error, unsigned long data);
+
 extern unsigned char xbee_reset_flag;
 extern unsigned char tmr1_err;
 void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C, long thermBeta, long topResValue) {
@@ -36,7 +38,17 @@ void SendReport(long* thermistorResistances, uint16 battLevel, long thermRes25C,
     packet_buffer.header.crc.crc16_bytes[1] = CRC16_GetHigh();
     packet_buffer.header.crc.crc16_bytes[0] = CRC16_GetLow();
 
-    SendPacket(&packet_buffer, 0);
+    SendPacket(&packet_buffer, 1);
+
+	int status = XBAPI_WaitTmo(API_TRANSMIT_STATUS, 16384);
+	if(status == -1) {
+		// Shut off LED1 and wait another half-second.
+		LED1_SIGNAL = 0;
+	} else {
+		switch(status) {
+			
+		}
+	}
 }
 
 unsigned char SendRangeTest() {
@@ -202,16 +214,9 @@ void SendDiagReport() {
 	SendPacket(&packet_buffer, 0);
 }
 
-void SendErrorReport(unsigned short error, unsigned long data) {
-	unsigned char do_disable = 0;
-	if(XBEE_ON_nSLEEP == 0) {
-		XBee_Wake();
-		do_disable = 1;
-	}
-
-
+void SendBareErrorReport(unsigned short error, unsigned long data) {
 	memset(&packet_buffer, 0, sizeof(packet_buffer));
-	
+
 	packet_buffer.header.command = ERROR_REPORT;
 	packet_buffer.header.flags = 0;
 	packet_buffer.header.revision = PROGRAM_REVISION;
@@ -222,7 +227,16 @@ void SendErrorReport(unsigned short error, unsigned long data) {
 	GenerateCRC(&packet_buffer);
 
 	SendPacket(&packet_buffer, 0);
+}
 
+void SendErrorReport(unsigned short error, unsigned long data) {
+	unsigned char do_disable = 0;
+	if(XBEE_ON_nSLEEP == 0) {
+		XBee_Wake();
+		do_disable = 1;
+	}
+
+	SendBareErrorReport(error, data);
 	SendDiagReport();
 	
 	if(do_disable) {

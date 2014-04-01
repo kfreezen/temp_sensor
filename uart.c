@@ -13,7 +13,7 @@ void UART_Init(long baud) {
 	BAUDCONbits.BRG16 = 1;
 	TX1STAbits.BRGH = 1;
 	
-    int spbrg;
+    int spbrg = 0;
 	//spbrg = ((XTAL_FREQUENCY/baud)>>6) - 1; // >>6 == /64
 	spbrg = ((XTAL_FREQUENCY/baud)>>2) - 1;
 

@@ -220,14 +220,17 @@ uint16 ADC_Read(byte channel) {
 	ADC_ReadOne(channel); // discard this in case it's necessary.
 
 	unsigned res[ADC_NUM_READS];
+	
 	byte i;
 	for (i = 0; i < ADC_NUM_READS; i++) {
 		res[i] = ADC_ReadOne(channel);
 	}
 
 	long sum = 0;
-	for (i = 0; i < ADC_NUM_READS; i++) {
-		sum += res[i];
+	byte j; // We use a seperate variable from 'i' here to prevent junk even though the odds
+	// of this happening are probably 1 to graham's number^graham's number (very small)
+	for (j = 0; j < i; j++) {
+		sum += res[j];
 	}
 
 	return (unsigned) (sum / (long) ADC_NUM_READS);
