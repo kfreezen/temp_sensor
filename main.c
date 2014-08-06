@@ -360,7 +360,7 @@ int main(int argc, char** argv) {
         LED1_SIGNAL = 1;
 		ADC_Enable();
 
-		for(i=1; i < 2; i++) {
+		for(i=0; i < NUM_PROBES; i++) {
 			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
 		}
 
@@ -382,7 +382,7 @@ int main(int argc, char** argv) {
 		memset(probeResistances, 0, sizeof(long)*NUM_PROBES);
 
 		// __forloop-1
-		for(i = 1; i < 2; i++) {
+		for(i = 0; i < NUM_PROBES; i++) {
 			probeResistances[i] = GetProbeResistance(i);
 		}
 		

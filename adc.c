@@ -240,9 +240,12 @@ uint16 ADC_Read(byte channel) {
 // Probably doesn't belong in adc.c
 
 byte probe__;
+long n__;
 long GetProbeResistance(byte probe) {
 	probe__ = probe;
 	long n = ADC_Read(PROBE_CHANNEL(probe));
+	n__ = n;
+
 	if(n < LOWER_BOUND_READ_VALID) {
 		return 0L;
 	} else {
