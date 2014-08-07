@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pic16f1788.h>
+#include <pic16f1789.h>
 
 #include "timer.h"
 #include "xbee.h"
@@ -126,6 +126,7 @@ int main(int argc, char** argv) {
 	TRISA = TRISA_MASK;
 	TRISB = TRISB_MASK;
 	TRISC = TRISC_MASK;
+	TRISD = TRISD_MASK;
 
 	// These are 0 because the ADC_Enable will enable as necessary.
 	ANSELA = 0;
@@ -253,20 +254,20 @@ int main(int argc, char** argv) {
 	int readStatus = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
 	if(readStatus == 0 && userData == 0) {
 
-		XBAPI_Command(CMD_ATSM, 1L, TRUE);
-		int status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
-
-		if(status != 0) {
-			GenericErrorReset();
-		}
-
 		asm("clrwdt");
 		XBAPI_Command(CMD_ATPD, 0L, TRUE);
-		status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+		int status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
 		if(status != 0) {
 			GenericErrorReset();
 		}
 
+		XBAPI_Command(CMD_ATSM, 1L, TRUE);
+		status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+
+		if(status != 0) {
+			GenericErrorReset();
+		}
+		
 		asm("clrwdt");
 		XBAPI_Command(CMD_ATAC, 1L, FALSE);
 		status = XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);

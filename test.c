@@ -6,7 +6,7 @@
 #include "adc.h"
 #include "eeprom.h"
 
-#include <pic16f1788.h>
+#include <pic16f1789.h>
 #include <stddef.h>
 
 #define MAX_TASKS 4
@@ -207,9 +207,9 @@ void* GatherCalibrationDataTask(void* param) {
 
 	ADC_Enable();
 
-	ADC_EnablePin(SEL_PORTB, POT1_PIN);
-	ADC_EnablePin(SEL_PORTB, POT2_PIN);
-	ADC_EnablePin(SEL_PORTB, POT3_PIN);
+	ADC_EnablePin(POT1_PORT, POT1_PIN);
+	ADC_EnablePin(POT2_PORT, POT2_PIN);
+	ADC_EnablePin(POT3_PORT, POT3_PIN);
 
 	byte i;
 	for(i=0; i<3; i++) {
@@ -242,9 +242,9 @@ void* GatherCalibrationDataTask(void* param) {
 	eepromData.calibration.probeValueAdjust[1] = (eepromData.calibration.probeValueAdjust[1] >> 6) - 32;
 	eepromData.calibration.probeValueAdjust[2] = (eepromData.calibration.probeValueAdjust[2] >> 6) - 32;
 	
-	ADC_DisablePin(SEL_PORTB, POT3_PIN);
-	ADC_DisablePin(SEL_PORTB, POT2_PIN);
-	ADC_DisablePin(SEL_PORTB, POT1_PIN);
+	ADC_DisablePin(POT3_PORT, POT3_PIN);
+	ADC_DisablePin(POT2_PORT, POT2_PIN);
+	ADC_DisablePin(POT1_PORT, POT1_PIN);
 
 	for(i=0; i<3; i++) {
 		ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));

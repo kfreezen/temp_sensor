@@ -1,5 +1,5 @@
 #include "timer.h"
-#include <pic16f1788.h>
+#include <pic16f1789.h>
 #include "platform_defines.h"
 
 void Timer1_Start() {

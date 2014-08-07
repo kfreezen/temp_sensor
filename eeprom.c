@@ -2,7 +2,7 @@
 #include "globaldef.h"
 #include "timer.h"
 
-#include <pic16f1788.h>
+#include <pic16f1789.h>
 
 void EEPROM_Read(byte address, byte* data, int length) {
     unsigned char i;

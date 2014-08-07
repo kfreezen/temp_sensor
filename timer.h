@@ -46,7 +46,7 @@ extern "C" {
 void Timer1_Start();
 void Timer1_Init(byte t1ckps, byte tmr1cs);
 
-#include <pic16f1788.h>
+#include <pic16f1789.h>
 
 void Timer1_Disable();
 

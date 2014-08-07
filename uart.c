@@ -2,7 +2,7 @@
 #include "timer.h"
 #include "platform_defines.h"
 
-#include <pic16f1788.h>
+#include <pic16f1789.h>
 #include <string.h>
 
 void UART_Init(long baud) {
