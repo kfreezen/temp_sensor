@@ -15,7 +15,7 @@
 #define INPUT 1
 #define OUTPUT 0
 
-#define TRISD_MASK 0xC0
+#define TRISD_MASK 0x80
 
 #define TRISC_MASK 0xB0
 #define TRISB_MASK 0x00
@@ -38,13 +38,13 @@
 
 #define NUM_PROBES 3
 
-#define TOP_RESISTOR_VALUE 31600
+#define BOTTOM_RESISTOR_VALUE 31600
 
 #define DEFAULT_INTERVAL 60
 
-#define LED1_SIGNAL LATBbits.LATB0
-#define LED2_SIGNAL LATBbits.LATB6
-#define LED3_SIGNAL LATBbits.LATB7
+#define LED1_SIGNAL LATDbits.LATD0
+#define LED2_SIGNAL LATDbits.LATD1
+#define LED3_SIGNAL LATDbits.LATD2
 
 #define POT1_PIN 5
 #define POT1_PORT SEL_PORTA

@@ -342,148 +342,147 @@ int main(int argc, char** argv) {
 	}
     //XBAPI_HandleFrame(NULL, API_RX_INDICATOR);
 #endif
-	
-	LED3_SIGNAL = 0;
+
+    LED3_SIGNAL = 0;
     LED2_SIGNAL = 0;
     LED1_SIGNAL = 0;
 
-	int battlevel_itr = 1440, i=0;
+    int battlevel_itr = 1440, i=0;
     // Core logic
-	long reportsSent = 0;
+    long reportsSent = 0;
 	
     while(1) {
-		WDTPlace = __MAINLOOP_START;
-		
-		WDTCONbits.WDTPS = WDT_SECONDS_8;
+        WDTPlace = __MAINLOOP_START;
+
+        WDTCONbits.WDTPS = WDT_SECONDS_8;
 
         asm("clrwdt");
-        
+
         LED1_SIGNAL = 1;
-		ADC_Enable();
+        ADC_Enable();
 
-		for(i=0; i < NUM_PROBES; i++) {
-			ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
-		}
+        for(i = 0; i < NUM_PROBES; i++) {
+            //ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
+        }
 
-		WDTPlace = __ADC_PINS_ENABLED;
-		
-		// Give the external cap time to charge.
-		// The external cap is around 0.047uf, and according to my calculations
-		// should be sufficiently charged in whatever 120 ticks is, I guess?
-		unsigned short tmr1_start = TMR1;
-		
-		//XBAPI_Command(CMD_ATSM, 1L, TRUE);
-		//XBAPI_Wait(API_AT_CMD_RESPONSE);
+        WDTPlace = __ADC_PINS_ENABLED;
 
-		timer1_poll_delay(120-(TMR1 - tmr1_start), DIVISION_1);
+        // Gather data here so that the xbee isn't waiting on it.
 
-		// Gather data here so that the xbee isn't waiting on it.
+        long probeResistances[NUM_PROBES];
+        memset(probeResistances, 0, sizeof(long)*NUM_PROBES);
 
-		long probeResistances[NUM_PROBES];
-		memset(probeResistances, 0, sizeof(long)*NUM_PROBES);
+        // __forloop-1
+        for(i = 0; i < NUM_PROBES; i++) {
+            ADC_EnablePin(PROBE_PORT(i), PROBE_PIN(i));
+            // Give the external cap time to charge.
+            // The external cap is around 0.047uf, and according to my calculations
+            // should be sufficiently charged in whatever 120 ticks is, I guess?  (approx 3.66ms)
+            timer1_poll_delay(120, DIVISION_1);
+            probeResistances[i] = GetProbeResistance(i);
+            ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
+        }
 
-		// __forloop-1
-		for(i = 0; i < NUM_PROBES; i++) {
-			probeResistances[i] = GetProbeResistance(i);
-		}
-		
-		WDTPlace = __RESISTANCES_FETCHED;
+        WDTPlace = __RESISTANCES_FETCHED;
 
-		battlevel_itr ++;
-		long battLevel = 0;
-		
-		if(battlevel_itr >= 1440) {
-			unsigned long vdd = DetectVdd();
-			
-			ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
-			
-			timer1_poll_delay(1590, DIVISION_1);
-			if(reportsSent == 0) {
-				timer1_poll_delay(1590, DIVISION_1);
-			}
-			
-			battLevel = ADC_Read(BATTLEVEL_CHANNEL);
+        battlevel_itr ++;
+        long battLevel = 0;
 
-			battLevel = (battLevel * vdd / 4096L) << 8;
-			battLevel /= (BATT_LOWER_KOHMS<<8) / (BATT_LOWER_KOHMS + BATT_UPPER_KOHMS);
+        if(battlevel_itr >= 1440) {
+            unsigned long vdd = DetectVdd();
+            ADC_Disable();
+            ADC_EnableEx(VDD_PVREF);
+            
+            ADC_EnablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
 
-			ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
+            timer1_poll_delay(7000, DIVISION_1);
+            if(reportsSent == 0) {
+                timer1_poll_delay(7000, DIVISION_1);
+            }
 
-			if(battLevel <= BATTERY_LEVEL_LOWPOINT) {
-				// Ok, we've reached our battery level lowpoint.
-				if(!(crashReport.wrong_flags & BATTERY_LEVEL)) {
-					// Battery level has not been activated yet.
-					crashReport.wrong_flags |= BATTERY_LEVEL;
-					crashReport.firstBatteryLevelCycle = reportsSent;
-					crashReport.lastBatteryLevelCycle = reportsSent;
-				}
+            battLevel = ADC_Read(BATTLEVEL_CHANNEL);
 
-				crashReport.lastBatteryLevel = (word) battLevel;
-				// Now we need to write the crash report to EEPROM.
-				EEPROM_Write(128, (byte*) &crashReport, sizeof(CrashReport));
-				// check-bott
-			} else {
-				// We are above the lowpoint,
-				// TODO:  Finish, disable crashreport yadda yadda yadd.
+            battLevel = (battLevel * vdd / 4096L) << 8;
+            battLevel /= (BATT_LOWER_KOHMS<<8) / (BATT_LOWER_KOHMS + BATT_UPPER_KOHMS);
 
-			}
+            ADC_DisablePin(BATTLEVEL_PORTSEL, BATTLEVEL_PIN);
 
-			battlevel_itr = 0;
+            if(battLevel <= BATTERY_LEVEL_LOWPOINT) {
+                // Ok, we've reached our battery level lowpoint.
+                if(!(crashReport.wrong_flags & BATTERY_LEVEL)) {
+                    // Battery level has not been activated yet.
+                    crashReport.wrong_flags |= BATTERY_LEVEL;
+                    crashReport.firstBatteryLevelCycle = reportsSent;
+                    crashReport.lastBatteryLevelCycle = reportsSent;
+                }
 
-			FVRCONbits.FVREN = 0;
-			WDTPlace = __BATTERIES_READ;
-		}
+                crashReport.lastBatteryLevel = (word) battLevel;
+                // Now we need to write the crash report to EEPROM.
+                EEPROM_Write(128, (byte*) &crashReport, sizeof(CrashReport));
+                // check-bott
+            } else {
+                // We are above the lowpoint,
+                // TODO:  Finish, disable crashreport yadda yadda yadd.
 
-		asm("clrwdt");
+            }
 
-		WDTPlace = __SEND_REPORT_START;
+            battlevel_itr = 0;
+
+            FVRCONbits.FVREN = 0;
+            WDTPlace = __BATTERIES_READ;
+        }
+
+
+        ADC_Disable();
+
+        WDTPlace = __ADC_DISABLED;
+
+        asm("clrwdt");
+
+        WDTPlace = __SEND_REPORT_START;
 		
 #ifndef TEST_NO_XBEE
         XBee_Wake();
-        SendReport(probeResistances, battLevel, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, TOP_RESISTOR_VALUE);
-		// Let's just delay 207 ms for this.
-		//timer1_poll_delay(6782, DIVISION_1);
-		reportsSent++;
-		
-		XBee_Sleep();
-		asm("clrwdt");
+        SendReport(probeResistances, battLevel, THERMISTOR_RESISTANCE_25C, THERMISTOR_BETA, BOTTOM_RESISTOR_VALUE);
+        // Let's just delay 207 ms for this.
+        //timer1_poll_delay(6782, DIVISION_1);
+        reportsSent++;
 
-		WDTPlace = __SEND_REPORT_END;
-		
-		long sleeptmo = 1000000;
+        XBee_Sleep();
+        asm("clrwdt");
 
-		// __whileloop-0
-		while(XBEE_ON_nSLEEP && sleeptmo --) {
-			// This right here is a possible area for resets
-		}
+        WDTPlace = __SEND_REPORT_END;
 
-		// If it timed out, reset sleep mode.
-		if(sleeptmo < 1 && XBEE_ON_nSLEEP) {
-			XBAPI_Command(CMD_ATSM, 1L, TRUE);
-			XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
-			
-			XBee_Sleep();
-		}
+        long sleeptmo = 1000000;
+
+        // __whileloop-0
+        while(XBEE_ON_nSLEEP && sleeptmo --) {
+                // This right here is a possible area for resets
+        }
+
+        // If it timed out, reset sleep mode.
+        if(sleeptmo < 1 && XBEE_ON_nSLEEP) {
+                XBAPI_Command(CMD_ATSM, 1L, TRUE);
+                XBAPI_WaitTmo(API_AT_CMD_RESPONSE, 32768);
+
+                XBee_Sleep();
+        }
 #endif
 
-		WDTPlace = __XBEE_ASLEEP;
-		
-		for(i = 1; i < 2; i++) {
-			ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
-		}
-		
-		ADC_Disable();
+        WDTPlace = __XBEE_ASLEEP;
 
-		WDTPlace = __ADC_DISABLED;
+        for(i = 0; i < NUM_PROBES; i++) {
+                //ADC_DisablePin(PROBE_PORT(i), PROBE_PIN(i));
+        }
 		
         LED1_SIGNAL = 0;
 
-		asm("clrwdt");
-		// Fill out the last cycle.
-		WDTPlace = __LAST_SLEEP_CYCLE;
-		asm("sleep");
+        asm("clrwdt");
+        // Fill out the last cycle.
+        WDTPlace = __LAST_SLEEP_CYCLE;
+        asm("sleep");
 
-		WDTPlace = __SLEEP_START;
+        WDTPlace = __SLEEP_START;
         sleep(58);
     }
 }

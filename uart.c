@@ -52,8 +52,13 @@ byte UART_Receive() {
 	while(!OSCSTATbits.OSTS) {}
 
 	while(!PIR1bits.RCIF) {}
+        /*if(RC1REG == 0x7D) {
+            return UART_Receive() ^ 0x20;
+        } else {
+            return RC1REG;
+        }*/
 
-	return RC1REG;
+        return RC1REG;
 }
 
 #define UART_BUFFER_LEN 128

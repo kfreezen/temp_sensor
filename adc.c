@@ -22,11 +22,11 @@ const byte PROBE_PORTS[3] = {
 };
 
 const byte PROBE_PINS[3] = {
-	0, 1, 5
+	2, 1, 0
 };
 
 const byte PROBE_CHANNELS[3] = {
-	0, 1, 4
+	2, 1, 0
 };
 
 const byte POT_CHANNELS[3] = {
@@ -73,6 +73,28 @@ unsigned DetectVdd() {
 
 	FVRCONbits.FVREN = 0;
 	return result;
+}
+
+short ADC_GetRefVoltage() {
+    unsigned short long result;
+
+    // Use FVR to detect the voltage.
+    FVRCONbits.FVREN = 1;
+    FVRCONbits.ADFVR = 1; // 1.024V
+
+    TmoObj tmoObj = timer1_timeoutObject(164);
+
+    while(!FVRCONbits.FVRRDY && !timer1_isTimedOut(&tmoObj));
+
+    if(tmoObj.status == 1) {
+            SendErrorReport(FVRRDY_TIMEOUT, 0);
+    }
+    
+    result = ADC_Read(FVR_CHANNEL);
+    result = (262144 / result) * 1024;
+    result >>= 6; // /= 64;
+
+    return (short) result;
 }
 
 void ADC_EnableEx(byte pvrefSel) {
@@ -249,7 +271,9 @@ long GetProbeResistance(byte probe) {
 	if(n < LOWER_BOUND_READ_VALID) {
 		return 0L;
 	} else {
-		return (TOP_RESISTOR_VALUE * 1000L) / ((4096000L/ADC_Read(PROBE_CHANNEL(probe)))-1000);
+            float result = (float)BOTTOM_RESISTOR_VALUE * ((4096.0f / (float)n) - 1.0f);
+            return (long)result;
+            //return (BOTTOM_RESISTOR_VALUE * ADC_GetRefVoltage()) / ((4096000L/n)-1000) - BOTTOM_RESISTOR_VALUE;
 	}
 }
 

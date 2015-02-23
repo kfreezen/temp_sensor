@@ -144,7 +144,7 @@ void sleep(unsigned short seconds) {
         WDTCONbits.SWDTEN = 0;
     }*/
 
-	timer1_sleep(seconds >> 1);
+    timer1_sleep(seconds >> 1);
 }
 
 void Timer1_Disable()  {
